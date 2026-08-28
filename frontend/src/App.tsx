@@ -1,53 +1,104 @@
-import { useQuery } from "@tanstack/react-query"
+import {
+  BrowserRouter,
+  Link,
+  Navigate,
+  Route,
+  Routes,
+} from "react-router-dom";
 
-
-interface HealthResponse {
-  status: string
-  sistema: string
-}
-
-
-async function getHealth(): Promise<HealthResponse> {
-  const response = await fetch(
-    `${import.meta.env.VITE_API_URL}/health/`
-  )
-
-  if (!response.ok) {
-    throw new Error("No se pudo conectar con el backend")
-  }
-
-  return response.json()
-}
+import NuevoRepartoPage from "./pages/NuevoRepartoPage";
+import HistorialRepartosPage from "./pages/HistorialRepartosPage";
+import EditarRepartoPage from "./pages/EditarRepartoPage";
+import ReporteRecargasPage from "./pages/ReporteRecargasPage";
 
 
 function App() {
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["health"],
-    queryFn: getHealth,
-  })
-
-  if (isLoading) {
-    return <p>Cargando...</p>
-  }
-
-  if (isError) {
-    return <p>Error conectando con Django</p>
-  }
-
   return (
-    <main className="min-h-screen bg-gray-100 p-10">
-      <div className="mx-auto max-w-xl rounded-xl bg-white p-8 shadow">
-        <h1 className="text-3xl font-bold">
-          Talca Logística
-        </h1>
+    <BrowserRouter>
 
-        <p className="mt-4">
-          Backend: {data?.status}
-        </p>
+      <div className="app">
+
+        <header className="barra-superior">
+
+          <div className="marca">
+            Logística Talca
+          </div>
+
+
+          <nav className="navegacion">
+
+            <Link to="/repartos/nuevo">
+              Nuevo reparto
+            </Link>
+
+            <Link to="/repartos">
+              Historial
+            </Link>
+
+            <Link to="/repartos/recargas">
+              Reporte recargas
+            </Link>
+
+          </nav>
+
+        </header>
+
+
+        <main>
+
+          <Routes>
+
+            <Route
+              path="/"
+              element={
+                <Navigate
+                  to="/repartos/nuevo"
+                  replace
+                />
+              }
+            />
+
+
+            <Route
+              path="/repartos/nuevo"
+              element={
+                <NuevoRepartoPage />
+              }
+            />
+
+
+            <Route
+              path="/repartos"
+              element={
+                <HistorialRepartosPage />
+              }
+            />
+
+
+            <Route
+              path="/repartos/:id/editar"
+              element={
+                <EditarRepartoPage />
+              }
+            />
+
+
+            <Route
+              path="/repartos/recargas"
+              element={
+                <ReporteRecargasPage />
+              }
+            />
+
+          </Routes>
+
+        </main>
+
       </div>
-    </main>
-  )
+
+    </BrowserRouter>
+  );
 }
 
 
-export default App
+export default App;

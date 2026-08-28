@@ -258,4 +258,84 @@ def crear_reparto(
         ]
     )
 
+
+@transaction.atomic
+def actualizar_reparto(
+    *,
+    reparto,
+    fecha,
+    bultos,
+    chofer,
+    ayudantes=None,
+    vehiculo=None,
+    asignacion=None,
+    puntos_venta="",
+    observaciones="",
+):
+    """
+    Actualiza un reparto existente.
+
+    Vuelve a:
+    - validar el personal;
+    - calcular las recargas;
+    - actualizar los datos del reparto;
+    - reconstruir chofer y ayudantes.
+    """
+
+    ayudantes = list(ayudantes or [])
+
+    validar_personal_reparto(
+        chofer=chofer,
+        ayudantes=ayudantes,
+    )
+
+    calculo = calcular_recargas(
+        bultos=bultos,
+        cantidad_ayudantes=len(ayudantes),
+        hay_chofer=True,
+    )
+
+    reparto.fecha = fecha
+    reparto.vehiculo = vehiculo
+    reparto.asignacion = asignacion
+    reparto.bultos = int(bultos)
+    reparto.puntos_venta = str(
+        puntos_venta or ""
+    ).strip()
+
+    reparto.recargas = calculo["recargas"]
+
+    reparto.observaciones = str(
+        observaciones or ""
+    ).strip()
+
+    reparto.save()
+
+    # Borramos la composición anterior del reparto.
+    reparto.personal.all().delete()
+
+    # Chofer
+    RepartoPersonal.objects.create(
+        reparto=reparto,
+        empleado=chofer,
+        rol=RepartoPersonal.Rol.CHOFER,
+        orden=0,
+    )
+
+    # Ayudantes
+    RepartoPersonal.objects.bulk_create(
+        [
+            RepartoPersonal(
+                reparto=reparto,
+                empleado=ayudante,
+                rol=RepartoPersonal.Rol.AYUDANTE,
+                orden=indice,
+            )
+            for indice, ayudante in enumerate(
+                ayudantes,
+                start=1,
+            )
+        ]
+    )
+
     return reparto

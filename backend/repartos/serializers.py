@@ -2,7 +2,10 @@ from rest_framework import serializers
 
 from maestros.models import Empleado, Vehiculo, Asignacion
 from .models import Reparto, RepartoPersonal
-from .services import crear_reparto
+from .services import (
+    crear_reparto,
+    actualizar_reparto,
+)
 
 
 class RepartoPersonalSerializer(serializers.ModelSerializer):
@@ -265,4 +268,57 @@ class RepartoCreateSerializer(serializers.Serializer):
                 ""
             ),
             creado_por=creado_por,
+        )
+
+    def update(self, instance, validated_data):
+        vehiculo = None
+        asignacion = None
+
+        vehiculo_id = validated_data.get(
+            "vehiculo_id"
+        )
+
+        asignacion_id = validated_data.get(
+            "asignacion_id"
+        )
+
+        if vehiculo_id is not None:
+            vehiculo = Vehiculo.objects.get(
+                id=vehiculo_id
+            )
+
+        if asignacion_id is not None:
+            asignacion = Asignacion.objects.get(
+                id=asignacion_id
+            )
+
+        chofer = Empleado.objects.get(
+            id=validated_data["chofer_id"]
+        )
+
+        ayudantes = list(
+            Empleado.objects.filter(
+                id__in=validated_data.get(
+                    "ayudantes_ids",
+                    []
+                )
+            )
+        )
+
+        return actualizar_reparto(
+            reparto=instance,
+            fecha=validated_data["fecha"],
+            bultos=validated_data["bultos"],
+            chofer=chofer,
+            ayudantes=ayudantes,
+            vehiculo=vehiculo,
+            asignacion=asignacion,
+            puntos_venta=validated_data.get(
+                "puntos_venta",
+                ""
+            ),
+            observaciones=validated_data.get(
+                "observaciones",
+                ""
+            ),
         )
