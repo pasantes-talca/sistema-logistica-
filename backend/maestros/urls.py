@@ -5,6 +5,7 @@ from .views import (
     AyudantesAPIView,
     VehiculosAPIView,
     AsignacionesAPIView,
+    MotivosRechazoAPIView,
 )
 
 
@@ -31,5 +32,11 @@ urlpatterns = [
         "asignaciones/",
         AsignacionesAPIView.as_view(),
         name="maestros-asignaciones",
+    ),
+
+    path(
+        "motivos-rechazo/",
+        MotivosRechazoAPIView.as_view(),
+        name="maestros-motivos-rechazo",
     ),
 ]

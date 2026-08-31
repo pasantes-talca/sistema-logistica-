@@ -514,3 +514,38 @@ textarea {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* =========================================
+   ESTADÍSTICAS RECHAZOS
+========================================= */
+
+.grafico-rechazos {
+  width: 100%;
+  min-height: 350px;
+
+  margin-top: 20px;
+  margin-bottom: 35px;
+
+  padding: 20px;
+
+  background: #f9fafb;
+
+  border-radius: 12px;
+
+  border: 1px solid #e5e7eb;
+}
+
+
+.titulo-seccion-estadisticas {
+  margin-top: 40px;
+  margin-bottom: 18px;
+}
+
+
+@media (max-width: 768px) {
+
+  .grafico-rechazos {
+    padding: 10px;
+  }
+}

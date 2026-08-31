@@ -4,6 +4,7 @@ from .models import (
     Empleado,
     Vehiculo,
     Asignacion,
+    MotivoRechazo,
 )
 
 
@@ -55,3 +56,17 @@ class AsignacionSerializer(serializers.ModelSerializer):
             "chofer_predeterminado_id",
             "chofer_predeterminado_nombre",
         ]
+
+class MotivoRechazoSerializer(
+    serializers.ModelSerializer
+):
+
+    class Meta:
+        model = MotivoRechazo
+
+        fields = [
+            "id",
+            "nombre",
+            "activo",
+        ]
+

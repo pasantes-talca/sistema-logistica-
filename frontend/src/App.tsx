@@ -11,8 +11,14 @@ import HistorialRepartosPage from "./pages/HistorialRepartosPage";
 import EditarRepartoPage from "./pages/EditarRepartoPage";
 import ReporteRecargasPage from "./pages/ReporteRecargasPage";
 
+import NuevoRechazoPage from "./pages/NuevoRechazoPage";
+import HistorialRechazosPage from "./pages/HistorialRechazosPage";
+import EditarRechazoPage from "./pages/EditarRechazoPage";
+import EstadisticasRechazosPage from "./pages/EstadisticasRechazosPage";
+
 
 function App() {
+
   return (
     <BrowserRouter>
 
@@ -32,11 +38,23 @@ function App() {
             </Link>
 
             <Link to="/repartos">
-              Historial
+              Historial repartos
             </Link>
 
             <Link to="/repartos/recargas">
               Reporte recargas
+            </Link>
+
+            <Link to="/rechazos/nuevo">
+              Nuevo rechazo
+            </Link>
+
+            <Link to="/rechazos">
+              Historial rechazos
+            </Link>
+
+            <Link to="/rechazos/estadisticas">
+              Estadísticas rechazos
             </Link>
 
           </nav>
@@ -87,6 +105,38 @@ function App() {
               path="/repartos/recargas"
               element={
                 <ReporteRecargasPage />
+              }
+            />
+
+
+            <Route
+              path="/rechazos/nuevo"
+              element={
+                <NuevoRechazoPage />
+              }
+            />
+
+
+            <Route
+              path="/rechazos"
+              element={
+                <HistorialRechazosPage />
+              }
+            />
+
+
+            <Route
+              path="/rechazos/:id/editar"
+              element={
+                <EditarRechazoPage />
+              }
+            />
+
+
+            <Route
+              path="/rechazos/estadisticas"
+              element={
+                <EstadisticasRechazosPage />
               }
             />
 

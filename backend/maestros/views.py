@@ -7,12 +7,14 @@ from .models import (
     Empleado,
     Vehiculo,
     Asignacion,
+    MotivoRechazo,
 )
 
 from .serializers import (
     EmpleadoSerializer,
     VehiculoSerializer,
     AsignacionSerializer,
+    MotivoRechazoSerializer,
 )
 
 
@@ -102,3 +104,28 @@ class AsignacionesAPIView(APIView):
         )
 
         return Response(serializer.data)
+
+class MotivosRechazoAPIView(APIView):
+
+    def get(self, request):
+
+        motivos = (
+            MotivoRechazo.objects
+            .filter(
+                activo=True
+            )
+            .order_by(
+                "nombre"
+            )
+        )
+
+        serializer = (
+            MotivoRechazoSerializer(
+                motivos,
+                many=True,
+            )
+        )
+
+        return Response(
+            serializer.data
+        )

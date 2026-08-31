@@ -83,3 +83,75 @@ export interface ReporteRecargas {
   empleados: ReporteRecargasEmpleado[];
   total_general: number;
 }
+
+
+export interface MotivoRechazo {
+  id: number;
+  nombre: string;
+  activo: boolean;
+}
+
+
+export interface Rechazo {
+  id: number;
+
+  fecha: string;
+
+  asignacion_id: number | null;
+  asignacion_codigo: string | null;
+
+  punto_venta: string;
+  bultos: string;
+
+  motivo_id: number;
+  motivo_nombre: string;
+
+  observacion: string;
+
+  registrado_en: string | null;
+  creado_en: string;
+  actualizado_en: string;
+}
+
+
+export interface CrearRechazoPayload {
+  fecha: string;
+
+  asignacion_id: number | null;
+
+  punto_venta: string;
+  bultos: string;
+
+  motivo_id: number;
+
+  observacion: string;
+}
+
+
+export interface EstadisticaMotivoRechazo {
+  motivo_id: number;
+  motivo: string;
+  cantidad: number;
+  porcentaje: number;
+}
+
+
+export interface EstadisticaAsignacionRechazo {
+  asignacion_id: number | null;
+  asignacion: string;
+  cantidad: number;
+}
+
+
+export interface EstadisticasRechazos {
+  desde: string;
+  hasta: string;
+
+  asignacion_id: number | null;
+
+  total_rechazos: number;
+
+  por_motivo: EstadisticaMotivoRechazo[];
+
+  por_asignacion: EstadisticaAsignacionRechazo[];
+}
