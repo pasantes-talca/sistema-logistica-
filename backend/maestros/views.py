@@ -8,6 +8,10 @@ from .models import (
     Vehiculo,
     Asignacion,
     MotivoRechazo,
+    Concesionario,
+    Producto,
+    MotivoCambio,
+    MotivoCambioFamilia,
 )
 
 from .serializers import (
@@ -15,6 +19,9 @@ from .serializers import (
     VehiculoSerializer,
     AsignacionSerializer,
     MotivoRechazoSerializer,
+    ConcesionarioSerializer,
+    ProductoSerializer,
+    MotivoCambioSerializer,
 )
 
 
@@ -121,6 +128,102 @@ class MotivosRechazoAPIView(APIView):
 
         serializer = (
             MotivoRechazoSerializer(
+                motivos,
+                many=True,
+            )
+        )
+
+        return Response(
+            serializer.data
+        )
+
+
+class ConcesionariosAPIView(APIView):
+
+    def get(self, request):
+
+        concesionarios = (
+            Concesionario.objects
+            .filter(
+                activo=True
+            )
+            .order_by(
+                "nombre"
+            )
+        )
+
+        serializer = (
+            ConcesionarioSerializer(
+                concesionarios,
+                many=True,
+            )
+        )
+
+        return Response(
+            serializer.data
+        )
+
+
+class ProductosAPIView(APIView):
+
+    def get(self, request):
+
+        productos = (
+            Producto.objects
+            .filter(
+                activo=True
+            )
+            .order_by(
+                "codigo"
+            )
+        )
+
+        serializer = (
+            ProductoSerializer(
+                productos,
+                many=True,
+            )
+        )
+
+        return Response(
+            serializer.data
+        )
+
+
+class MotivosCambioAPIView(APIView):
+
+    def get(self, request):
+
+        familia = request.query_params.get(
+            "familia"
+        )
+
+        motivos = (
+            MotivoCambio.objects
+            .filter(
+                activo=True
+            )
+        )
+
+
+        if familia:
+
+            motivos = motivos.filter(
+                familias_permitidas__familia=familia
+            )
+
+
+        motivos = (
+            motivos
+            .distinct()
+            .order_by(
+                "nombre"
+            )
+        )
+
+
+        serializer = (
+            MotivoCambioSerializer(
                 motivos,
                 many=True,
             )

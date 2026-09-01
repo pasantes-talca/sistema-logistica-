@@ -6,6 +6,9 @@ from .views import (
     VehiculosAPIView,
     AsignacionesAPIView,
     MotivosRechazoAPIView,
+    ConcesionariosAPIView,
+    ProductosAPIView,
+    MotivosCambioAPIView,
 )
 
 
@@ -38,5 +41,23 @@ urlpatterns = [
         "motivos-rechazo/",
         MotivosRechazoAPIView.as_view(),
         name="maestros-motivos-rechazo",
+    ),
+
+    path(
+    "concesionarios/",
+    ConcesionariosAPIView.as_view(),
+    name="maestros-concesionarios",
+    ),
+
+    path(
+        "productos/",
+        ProductosAPIView.as_view(),
+        name="maestros-productos",
+    ),
+
+    path(
+        "motivos-cambio/",
+        MotivosCambioAPIView.as_view(),
+        name="maestros-motivos-cambio",
     ),
 ]

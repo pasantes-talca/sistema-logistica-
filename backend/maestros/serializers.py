@@ -5,6 +5,9 @@ from .models import (
     Vehiculo,
     Asignacion,
     MotivoRechazo,
+    Concesionario,
+    Producto,
+    MotivoCambio,
 )
 
 
@@ -70,3 +73,47 @@ class MotivoRechazoSerializer(
             "activo",
         ]
 
+class ConcesionarioSerializer(
+    serializers.ModelSerializer
+):
+
+    class Meta:
+        model = Concesionario
+
+        fields = [
+            "id",
+            "nombre",
+            "activo",
+        ]
+
+
+class ProductoSerializer(
+    serializers.ModelSerializer
+):
+
+    class Meta:
+        model = Producto
+
+        fields = [
+            "id",
+            "codigo",
+            "nombre",
+            "presentacion",
+            "sabor",
+            "familia",
+            "activo",
+        ]
+
+
+class MotivoCambioSerializer(
+    serializers.ModelSerializer
+):
+
+    class Meta:
+        model = MotivoCambio
+
+        fields = [
+            "id",
+            "nombre",
+            "activo",
+        ]

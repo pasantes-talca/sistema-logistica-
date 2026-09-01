@@ -25,4 +25,9 @@ urlpatterns = [
         include("rechazos.urls"),
     ),
 
+    path(
+        "api/cambios/",
+        include("cambios.urls"),
+    ),
+
 ]
