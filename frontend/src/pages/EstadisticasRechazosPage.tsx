@@ -457,6 +457,8 @@ export default function EstadisticasRechazosPage() {
 
                           <CartesianGrid
                             strokeDasharray="3 3"
+                            stroke="#e4eaf2"
+                            vertical={false}
                           />
 
                           <XAxis
@@ -465,19 +467,27 @@ export default function EstadisticasRechazosPage() {
                             textAnchor="end"
                             interval={0}
                             height={100}
+                            tick={{ fill: "#657289", fontSize: 11 }}
+                            axisLine={{ stroke: "#d9e1eb" }}
+                            tickLine={false}
                           />
 
                           <YAxis
                             allowDecimals={
                               false
                             }
+                            tick={{ fill: "#657289", fontSize: 11 }}
+                            axisLine={false}
+                            tickLine={false}
                           />
 
-                          <Tooltip />
+                          <Tooltip cursor={{ fill: "#f2f7fd" }} contentStyle={{ border: "1px solid #dfe6ef", borderRadius: 10, boxShadow: "0 8px 24px rgba(18,38,63,.08)", fontSize: 12 }} />
 
                           <Bar
                             dataKey="cantidad"
                             name="Cantidad"
+                            fill="#2780f3"
+                            radius={[5, 5, 0, 0]}
                           />
 
                         </BarChart>

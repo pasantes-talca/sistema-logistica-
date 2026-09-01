@@ -1,9 +1,4 @@
-import {
-  BrowserRouter,
-  Link,
-  Route,
-  Routes,
-} from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import RutaProtegida from "./components/RutaProtegida";
 
@@ -29,6 +24,7 @@ import EstadisticasCambiosPage from "./pages/EstadisticasCambiosPage";
 import InicioRepartosPage from "./pages/InicioRepartosPage";
 import InicioRechazosPage from "./pages/InicioRechazosPage";
 import InicioCambiosPage from "./pages/InicioCambiosPage";
+import AppLayout from "./components/layout/AppLayout";
 
 
 function App() {
@@ -59,30 +55,7 @@ function App() {
           element={
             <RutaProtegida>
 
-              <div className="app">
-
-                <header className="barra-superior">
-
-                  <Link
-                    to="/"
-                    className="marca"
-                  >
-                    Logística Talca
-                  </Link>
-
-
-                  <nav className="navegacion">
-
-                    <Link to="/">
-                      Inicio
-                    </Link>
-
-                  </nav>
-
-                </header>
-
-
-                <main>
+              <AppLayout>
 
                   <Routes>
 
@@ -220,9 +193,7 @@ function App() {
 
                   </Routes>
 
-                </main>
-
-              </div>
+              </AppLayout>
 
             </RutaProtegida>
           }
