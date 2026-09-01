@@ -30,4 +30,9 @@ urlpatterns = [
         include("cambios.urls"),
     ),
 
+    path(
+        "api/auth/",
+        include("core.urls"),
+    ),
+
 ]

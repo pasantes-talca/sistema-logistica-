@@ -17,6 +17,8 @@ import type {
   RespuestaGuardarReciboCambio,
   ReciboCambio,
   EstadisticasCambios,
+  LoginPayload,
+  UsuarioActual,
 } from "../types/logistica";
 
 
@@ -386,4 +388,72 @@ export function obtenerEstadisticasCambios(
   return getJson<EstadisticasCambios>(
     `${API_URL}/cambios/estadisticas/?${parametros.toString()}`
   );
+}
+
+export async function iniciarSesion(
+  datos: LoginPayload
+): Promise<UsuarioActual> {
+
+  const response = await fetch(
+    `${API_URL}/auth/login/`,
+    {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(datos),
+    }
+  );
+
+  if (!response.ok) {
+
+    const error = await response.json();
+
+    throw new Error(
+      error.error ??
+      "No se pudo iniciar sesión."
+    );
+  }
+
+  return response.json();
+}
+
+
+export async function obtenerUsuarioActual():
+Promise<UsuarioActual> {
+
+  const response = await fetch(
+    `${API_URL}/auth/usuario/`,
+    {
+      credentials: "include",
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      "No hay una sesión activa."
+    );
+  }
+
+  return response.json();
+}
+
+
+export async function cerrarSesion():
+Promise<void> {
+
+  const response = await fetch(
+    `${API_URL}/auth/logout/`,
+    {
+      method: "POST",
+      credentials: "include",
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      "No se pudo cerrar la sesión."
+    );
+  }
 }

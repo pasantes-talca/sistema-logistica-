@@ -279,3 +279,17 @@ export interface EstadisticasCambios {
   por_producto_concesionario:
     EstadisticaCambioProductoConcesionario[];
 }
+
+export interface UsuarioActual {
+  autenticado?: boolean;
+  id: number;
+  username: string;
+  first_name: string;
+  last_name: string;
+  nombre_completo: string;
+}
+
+export interface LoginPayload {
+  username: string;
+  password: string;
+}

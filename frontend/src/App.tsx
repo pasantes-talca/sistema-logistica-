@@ -1,10 +1,14 @@
 import {
   BrowserRouter,
   Link,
-  Navigate,
   Route,
   Routes,
 } from "react-router-dom";
+
+import RutaProtegida from "./components/RutaProtegida";
+
+import LoginPage from "./pages/LoginPage";
+import PanelPrincipalPage from "./pages/PanelPrincipalPage";
 
 import NuevoRepartoPage from "./pages/NuevoRepartoPage";
 import HistorialRepartosPage from "./pages/HistorialRepartosPage";
@@ -16,195 +20,215 @@ import HistorialRechazosPage from "./pages/HistorialRechazosPage";
 import EditarRechazoPage from "./pages/EditarRechazoPage";
 import EstadisticasRechazosPage from "./pages/EstadisticasRechazosPage";
 
-
 import NuevoReciboCambioPage from "./pages/NuevoReciboCambioPage";
 import HistorialRecibosCambioPage from "./pages/HistorialRecibosCambioPage";
 import DetalleReciboCambioPage from "./pages/DetalleReciboCambioPage";
 import EditarReciboCambioPage from "./pages/EditarReciboCambioPage";
 import EstadisticasCambiosPage from "./pages/EstadisticasCambiosPage";
 
+import InicioRepartosPage from "./pages/InicioRepartosPage";
+import InicioRechazosPage from "./pages/InicioRechazosPage";
+import InicioCambiosPage from "./pages/InicioCambiosPage";
+
+
 function App() {
 
   return (
     <BrowserRouter>
 
-      <div className="app">
+      <Routes>
 
-        <header className="barra-superior">
+        {/* ========================================= */}
+        {/* LOGIN */}
+        {/* ========================================= */}
 
-          <div className="marca">
-            Logística Talca
-          </div>
-
-
-          <nav className="navegacion">
-
-            <Link to="/repartos/nuevo">
-              Nuevo reparto
-            </Link>
-
-            <Link to="/repartos">
-              Historial repartos
-            </Link>
-
-            <Link to="/repartos/recargas">
-              Reporte recargas
-            </Link>
-
-            <Link to="/rechazos/nuevo">
-              Nuevo rechazo
-            </Link>
-
-            <Link to="/rechazos">
-              Historial rechazos
-            </Link>
-
-            <Link to="/rechazos/estadisticas">
-              Estadísticas rechazos
-            </Link>
-
-            <Link to="/cambios/nuevo">
-              Nuevo recibo
-            </Link>
-
-            <Link to="/cambios">
-              Historial cambios
-            </Link>
-
-            <Link to="/cambios/estadisticas">
-              Estadísticas cambios
-            </Link>
-
-          </nav>
-
-        </header>
+        <Route
+          path="/login"
+          element={
+            <LoginPage />
+          }
+        />
 
 
-        <main>
+        {/* ========================================= */}
+        {/* SISTEMA PROTEGIDO */}
+        {/* ========================================= */}
 
-          <Routes>
+        <Route
+          path="/*"
+          element={
+            <RutaProtegida>
 
-            <Route
-              path="/"
-              element={
-                <Navigate
-                  to="/repartos/nuevo"
-                  replace
-                />
-              }
-            />
+              <div className="app">
 
+                <header className="barra-superior">
 
-            <Route
-              path="/repartos/nuevo"
-              element={
-                <NuevoRepartoPage />
-              }
-            />
+                  <Link
+                    to="/"
+                    className="marca"
+                  >
+                    Logística Talca
+                  </Link>
 
 
-            <Route
-              path="/repartos"
-              element={
-                <HistorialRepartosPage />
-              }
-            />
+                  <nav className="navegacion">
+
+                    <Link to="/">
+                      Inicio
+                    </Link>
+
+                  </nav>
+
+                </header>
 
 
-            <Route
-              path="/repartos/:id/editar"
-              element={
-                <EditarRepartoPage />
-              }
-            />
+                <main>
+
+                  <Routes>
+
+                    {/* ============================= */}
+                    {/* PANEL PRINCIPAL */}
+                    {/* ============================= */}
+
+                    <Route
+                      path="/"
+                      element={
+                        <PanelPrincipalPage />
+                      }
+                    />
 
 
-            <Route
-              path="/repartos/recargas"
-              element={
-                <ReporteRecargasPage />
-              }
-            />
+                    {/* ============================= */}
+                    {/* REPARTOS / RECARGAS */}
+                    {/* ============================= */}
+
+                    <Route
+                      path="/repartos/nuevo"
+                      element={
+                        <NuevoRepartoPage />
+                      }
+                    />
+
+                    <Route
+                      path="/repartos"
+                      element={
+                        <HistorialRepartosPage />
+                      }
+                    />
+
+                    <Route
+                      path="/repartos/:id/editar"
+                      element={
+                        <EditarRepartoPage />
+                      }
+                    />
+
+                    <Route
+                      path="/repartos/recargas"
+                      element={
+                        <ReporteRecargasPage />
+                      }
+                    />
 
 
-            <Route
-              path="/rechazos/nuevo"
-              element={
-                <NuevoRechazoPage />
-              }
-            />
+                    {/* ============================= */}
+                    {/* RECHAZOS */}
+                    {/* ============================= */}
+
+                    <Route
+                      path="/rechazos/nuevo"
+                      element={
+                        <NuevoRechazoPage />
+                      }
+                    />
+
+                    <Route
+                      path="/rechazos"
+                      element={
+                        <HistorialRechazosPage />
+                      }
+                    />
+
+                    <Route
+                      path="/rechazos/:id/editar"
+                      element={
+                        <EditarRechazoPage />
+                      }
+                    />
+
+                    <Route
+                      path="/rechazos/estadisticas"
+                      element={
+                        <EstadisticasRechazosPage />
+                      }
+                    />
 
 
-            <Route
-              path="/rechazos"
-              element={
-                <HistorialRechazosPage />
-              }
-            />
+                    {/* ============================= */}
+                    {/* CAMBIOS */}
+                    {/* ============================= */}
 
+                    <Route
+                      path="/cambios/nuevo"
+                      element={
+                        <NuevoReciboCambioPage />
+                      }
+                    />
 
-            <Route
-              path="/rechazos/:id/editar"
-              element={
-                <EditarRechazoPage />
-              }
-            />
+                    <Route
+                      path="/cambios"
+                      element={
+                        <HistorialRecibosCambioPage />
+                      }
+                    />
 
+                    <Route
+                      path="/cambios/recibos/:id"
+                      element={
+                        <DetalleReciboCambioPage />
+                      }
+                    />
 
-            <Route
-              path="/rechazos/estadisticas"
-              element={
-                <EstadisticasRechazosPage />
-              }
-            />
+                    <Route
+                      path="/cambios/recibos/:id/editar"
+                      element={
+                        <EditarReciboCambioPage />
+                      }
+                    />
 
-            <Route
-              path="/cambios/nuevo"
-              element={
-                <NuevoReciboCambioPage />
-              }
-            />
+                    <Route
+                      path="/cambios/estadisticas"
+                      element={
+                        <EstadisticasCambiosPage />
+                      }
+                    />
 
-            <Route
-              path="/cambios"
-              element={
-              <HistorialRecibosCambioPage />
-              }
-            />
+                    <Route
+                      path="/repartos/inicio"
+                      element={<InicioRepartosPage />}
+                    />
 
-          <Route
-            path="/cambios/recibos/:id"
-            element={
-              <DetalleReciboCambioPage />
-            }
-          />
+                    <Route
+                      path="/rechazos/inicio"
+                      element={<InicioRechazosPage />}
+                    />
 
-          <Route
-            path="/cambios/recibos/:id/editar"
-            element={
-              <EditarReciboCambioPage />
-            }
-          />
+                    <Route
+                      path="/cambios/inicio"
+                      element={<InicioCambiosPage />}
+                    />
 
-          <Route
-            path="/cambios/recibos/:id/editar"
-            element={
-              <EditarReciboCambioPage />
-            }
-          />
+                  </Routes>
 
-          <Route
-            path="/cambios/estadisticas"
-            element={
-              <EstadisticasCambiosPage />
-            }
-          />
+                </main>
 
-          </Routes>
+              </div>
 
-        </main>
+            </RutaProtegida>
+          }
+        />
 
-      </div>
+      </Routes>
 
     </BrowserRouter>
   );
