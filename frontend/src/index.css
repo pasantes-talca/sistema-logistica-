@@ -549,3 +549,58 @@ textarea {
     padding: 10px;
   }
 }
+
+/* =========================================
+   RECIBOS DE CAMBIOS
+========================================= */
+
+.grid-dos-columnas {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+.grid-tres-columnas {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.fila-producto-cambio {
+  display: grid;
+
+  grid-template-columns:
+    minmax(260px, 2fr)
+    minmax(100px, 0.7fr)
+    minmax(220px, 1.5fr)
+    minmax(220px, 1.5fr)
+    auto;
+
+  gap: 12px;
+
+  align-items: end;
+
+  padding: 16px;
+
+  margin-bottom: 12px;
+
+  background: #f9fafb;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+}
+
+@media (max-width: 1000px) {
+
+  .grid-dos-columnas,
+  .grid-tres-columnas,
+  .fila-producto-cambio {
+    grid-template-columns: 1fr;
+  }
+}
+
+.acciones-detalle {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}

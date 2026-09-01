@@ -17,6 +17,12 @@ import EditarRechazoPage from "./pages/EditarRechazoPage";
 import EstadisticasRechazosPage from "./pages/EstadisticasRechazosPage";
 
 
+import NuevoReciboCambioPage from "./pages/NuevoReciboCambioPage";
+import HistorialRecibosCambioPage from "./pages/HistorialRecibosCambioPage";
+import DetalleReciboCambioPage from "./pages/DetalleReciboCambioPage";
+import EditarReciboCambioPage from "./pages/EditarReciboCambioPage";
+import EstadisticasCambiosPage from "./pages/EstadisticasCambiosPage";
+
 function App() {
 
   return (
@@ -55,6 +61,18 @@ function App() {
 
             <Link to="/rechazos/estadisticas">
               Estadísticas rechazos
+            </Link>
+
+            <Link to="/cambios/nuevo">
+              Nuevo recibo
+            </Link>
+
+            <Link to="/cambios">
+              Historial cambios
+            </Link>
+
+            <Link to="/cambios/estadisticas">
+              Estadísticas cambios
             </Link>
 
           </nav>
@@ -139,6 +157,48 @@ function App() {
                 <EstadisticasRechazosPage />
               }
             />
+
+            <Route
+              path="/cambios/nuevo"
+              element={
+                <NuevoReciboCambioPage />
+              }
+            />
+
+            <Route
+              path="/cambios"
+              element={
+              <HistorialRecibosCambioPage />
+              }
+            />
+
+          <Route
+            path="/cambios/recibos/:id"
+            element={
+              <DetalleReciboCambioPage />
+            }
+          />
+
+          <Route
+            path="/cambios/recibos/:id/editar"
+            element={
+              <EditarReciboCambioPage />
+            }
+          />
+
+          <Route
+            path="/cambios/recibos/:id/editar"
+            element={
+              <EditarReciboCambioPage />
+            }
+          />
+
+          <Route
+            path="/cambios/estadisticas"
+            element={
+              <EstadisticasCambiosPage />
+            }
+          />
 
           </Routes>
 

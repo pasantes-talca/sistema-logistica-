@@ -10,6 +10,13 @@ import type {
   Rechazo,
   CrearRechazoPayload,
   EstadisticasRechazos,
+  Concesionario,
+  Producto,
+  MotivoCambio,
+  CrearReciboCambioPayload,
+  RespuestaGuardarReciboCambio,
+  ReciboCambio,
+  EstadisticasCambios,
 } from "../types/logistica";
 
 
@@ -256,5 +263,127 @@ export function obtenerEstadisticasRechazos(
 
   return getJson<EstadisticasRechazos>(
     `${API_URL}/rechazos/estadisticas/?${parametros.toString()}`
+  );
+}
+
+export function obtenerConcesionarios(): Promise<Concesionario[]> {
+  return getJson<Concesionario[]>(
+    `${API_URL}/maestros/concesionarios/`
+  );
+}
+
+export function obtenerProductos(): Promise<Producto[]> {
+  return getJson<Producto[]>(
+    `${API_URL}/maestros/productos/`
+  );
+}
+
+export function obtenerMotivosCambio(
+  familia: string
+): Promise<MotivoCambio[]> {
+  return getJson<MotivoCambio[]>(
+    `${API_URL}/maestros/motivos-cambio/?familia=${encodeURIComponent(familia)}`
+  );
+}
+
+export async function guardarReciboCambio(
+  datos: CrearReciboCambioPayload
+): Promise<RespuestaGuardarReciboCambio> {
+  const response = await fetch(
+    `${API_URL}/cambios/recibos/`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(datos),
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.json();
+
+    throw new Error(
+      JSON.stringify(error)
+    );
+  }
+
+  return response.json();
+}
+
+export function obtenerRecibosCambio(): Promise<ReciboCambio[]> {
+  return getJson<ReciboCambio[]>(
+    `${API_URL}/cambios/recibos/`
+  );
+}
+
+
+export function obtenerReciboCambio(
+  id: number
+): Promise<ReciboCambio> {
+  return getJson<ReciboCambio>(
+    `${API_URL}/cambios/recibos/${id}/`
+  );
+}
+
+export async function actualizarReciboCambio(
+  id: number,
+  datos: CrearReciboCambioPayload
+): Promise<ReciboCambio> {
+
+  const response = await fetch(
+    `${API_URL}/cambios/recibos/${id}/`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(datos),
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.json();
+
+    throw new Error(
+      JSON.stringify(error)
+    );
+  }
+
+  return response.json();
+}
+
+export function obtenerEstadisticasCambios(
+  desde: string,
+  hasta: string,
+  concesionarioId: number | null
+): Promise<EstadisticasCambios> {
+
+  const parametros =
+    new URLSearchParams();
+
+  parametros.set(
+    "desde",
+    desde
+  );
+
+  parametros.set(
+    "hasta",
+    hasta
+  );
+
+  if (
+    concesionarioId !== null
+  ) {
+    parametros.set(
+      "concesionario_id",
+      String(
+        concesionarioId
+      )
+    );
+  }
+
+  return getJson<EstadisticasCambios>(
+    `${API_URL}/cambios/estadisticas/?${parametros.toString()}`
   );
 }
