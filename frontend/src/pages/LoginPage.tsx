@@ -22,13 +22,13 @@ export default function LoginPage() {
   }
   return <div className="pagina-login">
     <section className="login-visual">
-      <div className="login-brand"><div className="login-brand-mark"><Icon name="route" size={30}/></div><div><strong>Logística Talca</strong><span>Sistema de gestión logística</span></div></div>
+      <div className="login-brand"><img className="login-logo" src="/logo-talca.png" alt="Talca"/><div><strong>Logística</strong><span>Sistema de gestión logística</span></div></div>
       <div className="login-message"><span className="login-eyebrow">CONTROL OPERATIVO CENTRALIZADO</span><h1>La operación logística, clara y conectada.</h1><p>Gestioná repartos, incidencias y movimientos de mercadería desde una única plataforma segura.</p></div>
       <div className="logistics-visual" aria-hidden="true"><div className="route-line route-line-one"/><div className="route-line route-line-two"/><span className="route-node node-a"><Icon name="truck"/></span><span className="route-node node-b"><Icon name="package"/></span><span className="route-node node-c"><Icon name="shield"/></span></div>
       <div className="login-features"><span><Icon name="activity"/>Operación centralizada</span><span><Icon name="shield"/>Acceso interno seguro</span></div>
     </section>
     <section className="login-access"><div className="login-card">
-      <div className="login-mobile-brand"><Icon name="route"/><strong>Logística Talca</strong></div>
+      <div className="login-mobile-brand"><img src="/logo-talca.png" alt="Talca"/><strong>Logística</strong></div>
       <div className="login-marca"><span className="login-kicker">Acceso al sistema</span><h2>Bienvenido</h2><p>Ingresá tus credenciales para continuar.</p></div>
       <form className="login-formulario" onSubmit={enviar}>
         <div className="campo campo-login"><label htmlFor="username">Usuario</label><div className="input-with-icon"><Icon name="user" size={19}/><input id="username" type="text" value={username} onChange={event => setUsername(event.target.value)} autoComplete="username" autoFocus placeholder="Ingresá tu usuario"/></div></div>

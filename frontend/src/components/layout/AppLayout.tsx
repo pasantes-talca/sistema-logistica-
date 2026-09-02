@@ -56,7 +56,7 @@ export default function AppLayout({ children }: Props) {
 
   return <div className="app-shell">
     <aside className={`sidebar ${open ? "sidebar-open" : ""}`}>
-      <div className="sidebar-brand"><div className="brand-mark"><Icon name="route" size={25}/></div><div><strong>Logística Talca</strong><span>Gestión operativa</span></div><button className="sidebar-close" onClick={() => setOpen(false)} aria-label="Cerrar menú"><Icon name="close"/></button></div>
+      <div className="sidebar-brand"><img className="sidebar-logo" src="/logo-talca.png" alt="Talca"/><div className="sidebar-brand-copy"><strong>Logística</strong><span>Gestión operativa</span></div><button className="sidebar-close" onClick={() => setOpen(false)} aria-label="Cerrar menú"><Icon name="close"/></button></div>
       <nav className="sidebar-nav" onClick={() => setOpen(false)}>
         <span className="nav-caption">Plataforma</span>
         <NavLink to="/" end className={({isActive}) => `nav-item ${isActive ? "active" : ""}`}><Icon name="home"/><span>Panel general</span></NavLink>
