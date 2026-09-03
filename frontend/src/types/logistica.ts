@@ -293,3 +293,33 @@ export interface LoginPayload {
   username: string;
   password: string;
 }
+
+export interface InterpretacionAsistente {
+  tipo:
+    | "repartos"
+    | "recargas"
+    | "rechazos"
+    | "cambios"
+    | "general";
+
+  accion: string;
+
+  desde: string | null;
+  hasta: string | null;
+
+  asignacion_codigo?: string | null;
+  empleado?: string | null;
+  concesionario?: string | null;
+  producto?: string | null;
+}
+
+
+export interface RespuestaAsistente {
+  respuesta: string;
+
+  interpretacion:
+    InterpretacionAsistente;
+
+  datos:
+    Record<string, unknown>;
+}

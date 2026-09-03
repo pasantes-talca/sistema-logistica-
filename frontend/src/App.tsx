@@ -26,6 +26,7 @@ import InicioRechazosPage from "./pages/InicioRechazosPage";
 import InicioCambiosPage from "./pages/InicioCambiosPage";
 import AppLayout from "./components/layout/AppLayout";
 
+import AsistenteIAPage from "./pages/AsistenteIAPage";
 
 function App() {
 
@@ -189,6 +190,13 @@ function App() {
                     <Route
                       path="/cambios/inicio"
                       element={<InicioCambiosPage />}
+                    />
+
+                    <Route
+                      path="/asistente"
+                      element={
+                        <AsistenteIAPage />
+                      }
                     />
 
                   </Routes>

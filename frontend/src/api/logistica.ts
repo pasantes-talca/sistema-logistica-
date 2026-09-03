@@ -19,10 +19,12 @@ import type {
   EstadisticasCambios,
   LoginPayload,
   UsuarioActual,
+  RespuestaAsistente,
 } from "../types/logistica";
 
 
 const API_URL = "http://127.0.0.1:8000/api";
+
 
 
 async function getJson<T>(url: string): Promise<T> {
@@ -456,4 +458,72 @@ Promise<void> {
       "No se pudo cerrar la sesión."
     );
   }
+}
+
+export async function preguntarAsistente(
+  pregunta: string
+): Promise<RespuestaAsistente> {
+
+  const csrfToken =
+    obtenerCookie("csrftoken");
+
+
+  const response = await fetch(
+    `${API_URL}/asistente/preguntar/`,
+    {
+      method: "POST",
+
+      credentials: "include",
+
+      headers: {
+        "Content-Type": "application/json",
+
+        ...(csrfToken
+          ? {
+              "X-CSRFToken":
+                csrfToken,
+            }
+          : {}),
+      },
+
+      body: JSON.stringify({
+        pregunta,
+      }),
+    }
+  );
+
+
+  const datos =
+    await response.json();
+
+
+  if (!response.ok) {
+
+    throw new Error(
+      datos.error
+      ??
+      datos.detail
+      ??
+      `Error HTTP ${response.status}`
+    );
+  }
+
+
+  return datos;
+}
+
+function obtenerCookie(nombre: string): string | null {
+  const cookies = document.cookie.split(";");
+
+  for (const cookie of cookies) {
+    const [clave, ...resto] = cookie.trim().split("=");
+
+    if (clave === nombre) {
+      return decodeURIComponent(
+        resto.join("=")
+      );
+    }
+  }
+
+  return null;
 }

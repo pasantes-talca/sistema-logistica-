@@ -23,6 +23,10 @@ env = environ.Env(
 
 environ.Env.read_env(BASE_DIR / ".env")
 
+GEMINI_API_KEY = env(
+    "GEMINI_API_KEY",
+    default=""
+)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -63,6 +67,8 @@ INSTALLED_APPS = [
     "repartos",
     "rechazos",
     "cambios",
+
+    "asistente",
 ]
 
 

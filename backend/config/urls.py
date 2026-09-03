@@ -35,4 +35,14 @@ urlpatterns = [
         include("core.urls"),
     ),
 
+    path(
+        "api/asistente/",
+        include("asistente.urls"),
+    ),
+
+    path(
+        "api/asistente/",
+        include("asistente.urls"),
+    ),
+
 ]

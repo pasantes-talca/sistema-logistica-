@@ -27,3 +27,162 @@
 @media(max-width:1180px){.dashboard-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-modulos{grid-template-columns:1fr}.modulo-card p{min-height:0}.fila-producto-cambio{grid-template-columns:repeat(2,minmax(0,1fr))}.fila-producto-cambio>.boton-eliminar{justify-self:start}.pagina-login{grid-template-columns:1fr 440px}.login-visual{padding:40px}.login-message h1{font-size:42px}}
 @media(max-width:940px){.sidebar{transform:translateX(-100%);transition:transform .24s}.sidebar.sidebar-open{transform:translateX(0)}.sidebar-close,.menu-toggle{display:grid;place-items:center}.sidebar-overlay{display:block;position:fixed;z-index:35;inset:0;border:0;background:rgba(5,13,27,.5)}.app-main{margin-left:0}.app-header{padding:0 18px}.breadcrumb{margin-right:auto;margin-left:12px}.logout-button span,.user-copy{display:none}.pagina-login{grid-template-columns:1fr}.login-visual{display:none}.login-access{min-height:100vh}.login-mobile-brand{display:flex;align-items:center;gap:8px;margin-bottom:38px;color:#10203a}.panel-modulos{grid-template-columns:1fr}}
 @media(max-width:720px){.pagina{padding:18px 12px 30px}.contenedor,.contenedor-grande{padding:20px 16px;border-radius:13px}.app-header{height:62px}.app-content{min-height:calc(100vh - 62px)}.breadcrumb-item:not(:last-child){display:none}.header-user{gap:5px}.formulario,.formulario-grid,.grid-dos-columnas,.grid-tres-columnas{grid-template-columns:1fr}.formulario>.campo{grid-column:1}.encabezado-pagina,.dashboard-bienvenida,.section-heading{align-items:flex-start;flex-direction:column}.dashboard-bienvenida{padding:24px}.dashboard-status{display:none}.dashboard-kpis,.resumen-reporte{grid-template-columns:1fr}.section-heading>small{display:none}.fila-producto-cambio{grid-template-columns:1fr}.filtros-reporte{align-items:stretch}.filtros-reporte .campo{width:100%}.boton-generar{width:100%}.login-access{padding:25px}.acciones-formulario>*{flex:1}.grafico-rechazos{height:330px;padding-left:0}.sidebar{width:min(290px,86vw)}}
+
+
+.asistente-sugerencias {
+  margin-bottom: 24px;
+}
+
+.asistente-sugerencias > span {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #64748b;
+}
+
+.asistente-sugerencias-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.asistente-sugerencias-lista button {
+  border: 1px solid #dbe3ef;
+  background: #f8fafc;
+  color: #1d4ed8;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.asistente-sugerencias-lista button:hover {
+  background: #eff6ff;
+}
+
+.asistente-chat {
+  min-height: 380px;
+  max-height: 550px;
+  overflow-y: auto;
+
+  padding: 24px;
+
+  background: #f8fafc;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mensaje {
+  max-width: 75%;
+
+  padding: 14px 16px;
+
+  border-radius: 16px;
+}
+
+.mensaje-usuario {
+  margin-left: auto;
+
+  background: #1d4ed8;
+  color: white;
+}
+
+.mensaje-asistente {
+  margin-right: auto;
+
+  background: white;
+
+  border: 1px solid #e2e8f0;
+
+  color: #0f172a;
+}
+
+.mensaje-autor {
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 5px;
+  opacity: 0.7;
+}
+
+.mensaje-texto {
+  line-height: 1.55;
+}
+
+.mensaje-datos {
+  margin-top: 12px;
+
+  border-top: 1px solid #e2e8f0;
+
+  padding-top: 10px;
+}
+
+.mensaje-datos span {
+  display: block;
+
+  font-size: 12px;
+
+  color: #64748b;
+}
+
+.mensaje-datos strong {
+  display: block;
+
+  font-size: 24px;
+}
+
+.mensaje-datos small {
+  display: block;
+
+  margin-top: 6px;
+
+  color: #64748b;
+}
+
+.asistente-formulario {
+  margin-top: 18px;
+
+  display: flex;
+  gap: 12px;
+
+  align-items: flex-end;
+}
+
+.asistente-formulario textarea {
+  flex: 1;
+
+  resize: vertical;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+
+  padding: 14px 16px;
+
+  outline: none;
+}
+
+.asistente-formulario textarea:focus {
+  border-color: #2563eb;
+
+  box-shadow:
+    0 0 0 4px
+    rgba(37, 99, 235, 0.1);
+}
+
+@media (max-width: 760px) {
+
+  .mensaje {
+    max-width: 90%;
+  }
+
+  .asistente-formulario {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+}
