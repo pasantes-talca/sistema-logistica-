@@ -1,9 +1,12 @@
 import {
-  FormEvent,
-  KeyboardEvent,
   useEffect,
   useRef,
   useState,
+} from "react";
+
+import type {
+  FormEvent,
+  KeyboardEvent,
 } from "react";
 
 import {
