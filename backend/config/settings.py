@@ -14,22 +14,28 @@ from pathlib import Path
 
 import environ
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
+# Variables de entorno
 env = environ.Env(
     DEBUG=(bool, False)
 )
 
 environ.Env.read_env(BASE_DIR / ".env")
 
+
+# Gemini
 GEMINI_API_KEY = env(
     "GEMINI_API_KEY",
     default=""
 )
 
+
 # Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
+# https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("SECRET_KEY")
@@ -38,12 +44,20 @@ SECRET_KEY = env("SECRET_KEY")
 DEBUG = env.bool("DEBUG")
 
 
-# #### ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
-
-ALLOWED_HOSTS = env.list(
-    "ALLOWED_HOSTS",
-    default=["localhost", "127.0.0.1"]
-)
+# Hosts permitidos
+#
+# Local:
+#   http://127.0.0.1
+#   http://localhost
+#
+# Servidor Talca:
+#   http://10.242.4.13
+#
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "localhost",
+    "10.242.4.13",
+]
 
 
 # Application definition
@@ -67,50 +81,54 @@ INSTALLED_APPS = [
     "repartos",
     "rechazos",
     "cambios",
-
     "asistente",
 ]
 
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = 'config.urls'
+
+ROOT_URLCONF = "config.urls"
+
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
+
+WSGI_APPLICATION = "config.wsgi.application"
 
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-
 DATABASES = {
     "default": env.db("DATABASE_URL")
 }
 
+# IMPORTANTE:
+# Todo este sistema trabaja únicamente dentro del schema "log".
+# No tocar el schema "public".
 DATABASES["default"]["OPTIONS"] = {
     "options": "-c search_path=log"
 }
@@ -121,16 +139,16 @@ DATABASES["default"]["OPTIONS"] = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -138,9 +156,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
@@ -150,22 +168,48 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = "static/"
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+
+# ============================================================
+# CORS
+# ============================================================
+#
+# Permite que el frontend React se comunique con Django.
+#
+# Desarrollo:
+#   http://localhost:5173
+#   http://127.0.0.1:5173
+#
+# Producción Talca:
+#   http://10.242.4.13:8001
+#
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "http://10.242.4.13:8001",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 
+
+# ============================================================
+# CSRF
+# ============================================================
+#
+# Necesario porque usamos autenticación mediante sesiones de
+# Django y React realiza peticiones POST al backend.
+#
+
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "http://10.242.4.13:8001",
 ]
