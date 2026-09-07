@@ -24,6 +24,7 @@ from .services import (
     guardar_recibo_cambio,
 )
 
+from .email import enviar_recibo_cambio_por_email
 
 class ReciboCambioListCreateAPIView(APIView):
     """
@@ -198,6 +199,25 @@ class ReciboCambioListCreateAPIView(APIView):
             ).data
         )
 
+        # =========================================
+        # ENVIAR RECIBO POR EMAIL
+        # =========================================
+
+        email_enviado = True
+        email_error = None
+
+        try:
+
+            enviar_recibo_cambio_por_email(
+                recibo,
+                actualizado=not resultado["creado"],
+            )
+
+        except Exception as error:
+
+            email_enviado = False
+            email_error = str(error)
+
 
         respuesta = {
             "creado":
@@ -278,6 +298,22 @@ class ReciboCambioDetailAPIView(APIView):
         serializer = ReciboCambioSerializer(
             recibo
         )
+
+
+        try:
+
+            enviar_recibo_cambio_por_email(
+                recibo,
+                actualizado=True,
+            )
+
+        except Exception as error:
+
+            print(
+                "Error enviando recibo por email:",
+                error,
+            )
+
 
         return Response(
             serializer.data

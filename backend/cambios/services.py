@@ -289,51 +289,23 @@ def guardar_recibo_cambio(
     creado_por=None,
 ):
     """
-    Crea un recibo nuevo o acumula información
-    sobre uno existente.
+    Crea un recibo nuevo.
 
-    REGLA PRINCIPAL:
+    Si ya existe un recibo para la misma
+    FECHA + CONCESIONARIO, reemplaza completamente
+    sus valores con la nueva carga.
 
-        FECHA + CONCESIONARIO
-        identifica un único recibo.
-
-    Si ya existe:
-        - suma pallets
-        - suma pallets descargados
-        - suma prensados
-        - suma cantidades de productos repetidos
-
-    Si un producto no estaba:
-        crea un nuevo detalle.
+    IMPORTANTE:
+    NO acumula ni suma cantidades anteriores.
     """
 
     detalles = list(
         detalles or []
     )
 
-    concesionario = (
-        obtener_concesionario(
-            concesionario
-        )
+    concesionario = obtener_concesionario(
+        concesionario
     )
-
-    pallets = convertir_decimal(
-        pallets,
-        "pallets",
-    )
-
-    pallets_descargados = (
-        convertir_decimal(
-            pallets_descargados,
-            "pallets_descargados",
-        )
-    )
-
-    prensados = convertir_decimal(
-        prensados,
-        "prensados",
-    )
-
 
     # =====================================================
     # BUSCAR RECIBO EXISTENTE
@@ -349,114 +321,124 @@ def guardar_recibo_cambio(
         .first()
     )
 
-    creado = False
-
-
     # =====================================================
-    # CREAR NUEVO RECIBO
+    # SI YA EXISTE → REEMPLAZAR
     # =====================================================
 
-    if recibo is None:
+    if recibo is not None:
 
-        recibo = ReciboCambio.objects.create(
+        recibo = actualizar_recibo_cambio(
+            recibo=recibo,
 
             fecha=fecha,
 
-            concesionario=
-                concesionario,
+            concesionario=concesionario,
 
-            pallets=
-                pallets,
+            detalles=detalles,
+
+            pallets=pallets,
 
             pallets_observacion=
-                str(
-                    pallets_observacion
-                    or ""
-                ).strip(),
+                pallets_observacion,
 
             pallets_descargados=
                 pallets_descargados,
 
             pallets_descargados_observacion=
-                str(
-                    pallets_descargados_observacion
-                    or ""
-                ).strip(),
+                pallets_descargados_observacion,
 
-            prensados=
-                prensados,
+            prensados=prensados,
 
             prensados_observacion=
-                str(
-                    prensados_observacion
-                    or ""
-                ).strip(),
-
-            creado_por=
-                creado_por,
-        )
-
-        creado = True
-
-
-    # =====================================================
-    # ACUMULAR SOBRE RECIBO EXISTENTE
-    # =====================================================
-
-    else:
-
-        recibo.pallets = (
-            recibo.pallets
-            + pallets
-        )
-
-        recibo.pallets_descargados = (
-            recibo.pallets_descargados
-            + pallets_descargados
-        )
-
-        recibo.prensados = (
-            recibo.prensados
-            + prensados
-        )
-
-        recibo.pallets_observacion = (
-            combinar_observaciones(
-                recibo.pallets_observacion,
-                pallets_observacion,
-            )
-        )
-
-        recibo.pallets_descargados_observacion = (
-            combinar_observaciones(
-                recibo
-                    .pallets_descargados_observacion,
-                pallets_descargados_observacion,
-            )
-        )
-
-        recibo.prensados_observacion = (
-            combinar_observaciones(
-                recibo.prensados_observacion,
                 prensados_observacion,
-            )
         )
 
-        recibo.save()
-
+        return {
+            "recibo": recibo,
+            "creado": False,
+        }
 
     # =====================================================
-    # PROCESAR PRODUCTOS
+    # SI NO EXISTE → CREAR
     # =====================================================
+
+    pallets = convertir_decimal(
+        pallets,
+        "pallets",
+    )
+
+    pallets_descargados = convertir_decimal(
+        pallets_descargados,
+        "pallets_descargados",
+    )
+
+    prensados = convertir_decimal(
+        prensados,
+        "prensados",
+    )
+
+    recibo = ReciboCambio.objects.create(
+
+        fecha=fecha,
+
+        concesionario=concesionario,
+
+        pallets=pallets,
+
+        pallets_observacion=str(
+            pallets_observacion
+            or ""
+        ).strip(),
+
+        pallets_descargados=
+            pallets_descargados,
+
+        pallets_descargados_observacion=str(
+            pallets_descargados_observacion
+            or ""
+        ).strip(),
+
+        prensados=prensados,
+
+        prensados_observacion=str(
+            prensados_observacion
+            or ""
+        ).strip(),
+
+        creado_por=creado_por,
+    )
+
+    # =====================================================
+    # PREPARAR PRODUCTOS
+    # =====================================================
+
+    productos_usados = set()
 
     for detalle_data in detalles:
 
-        producto_id = detalle_data.get(
-            "producto_id"
+        producto = obtener_producto(
+            detalle_data.get(
+                "producto_id"
+            )
         )
 
-        producto = obtener_producto(
-            producto_id
+        # No permitimos repetir el mismo producto
+        # dentro de una misma carga.
+        if producto.id in productos_usados:
+
+            raise ValidationError(
+                {
+                    "detalles":
+                        (
+                            f"El producto "
+                            f"{producto.codigo} "
+                            "está repetido."
+                        )
+                }
+            )
+
+        productos_usados.add(
+            producto.id
         )
 
         cantidad = convertir_decimal(
@@ -467,7 +449,6 @@ def guardar_recibo_cambio(
             "cantidad",
         )
 
-        # Una carga con cantidad 0 no genera detalle.
         if cantidad <= 0:
             continue
 
@@ -490,77 +471,23 @@ def guardar_recibo_cambio(
             or ""
         ).strip()
 
+        DetalleReciboCambio.objects.create(
 
-        # =================================================
-        # BUSCAR PRODUCTO EXISTENTE EN EL RECIBO
-        # =================================================
+            recibo=recibo,
 
-        detalle = (
-            DetalleReciboCambio.objects
-            .select_for_update()
-            .filter(
-                recibo=recibo,
-                producto=producto,
-            )
-            .first()
+            producto=producto,
+
+            cantidad=cantidad,
+
+            motivo=motivo,
+
+            observacion=observacion,
         )
-
-
-        # =================================================
-        # PRODUCTO NUEVO
-        # =================================================
-
-        if detalle is None:
-
-            DetalleReciboCambio.objects.create(
-
-                recibo=recibo,
-
-                producto=producto,
-
-                cantidad=cantidad,
-
-                observacion=
-                    observacion,
-
-                motivo=motivo,
-            )
-
-
-        # =================================================
-        # PRODUCTO EXISTENTE → ACUMULAR
-        # =================================================
-
-        else:
-
-            detalle.cantidad = (
-                detalle.cantidad
-                + cantidad
-            )
-
-            detalle.observacion = (
-                combinar_observaciones(
-                    detalle.observacion,
-                    observacion,
-                )
-            )
-
-            # Si llega un motivo nuevo,
-            # reemplaza la clasificación anterior.
-            #
-            # Si no llega motivo,
-            # conserva el que ya tenía.
-            if motivo is not None:
-                detalle.motivo = motivo
-
-            detalle.save()
-
 
     return {
         "recibo": recibo,
-        "creado": creado,
+        "creado": True,
     }
-
 
 # =========================================================
 # EDICIÓN
