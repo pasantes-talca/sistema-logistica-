@@ -62,6 +62,28 @@ class Rechazo(models.Model):
         related_name="rechazos_creados"
     )
 
+    # =========================================================
+    # ORIGEN DEL REGISTRO
+    # =========================================================
+
+    origen = models.CharField(
+        max_length=30,
+        default="manual"
+    )
+
+    # Identificador único del origen externo.
+    #
+    # Para Google Forms usaremos un identificador
+    # construido a partir de la fila / marca temporal.
+    #
+    # Los registros manuales pueden dejarlo vacío.
+    origen_id = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        unique=True
+    )
+
     creado_en = models.DateTimeField(
         auto_now_add=True
     )
@@ -90,6 +112,10 @@ class Rechazo(models.Model):
             models.Index(
                 fields=["motivo"],
                 name="idx_rechazo_motivo"
+            ),
+            models.Index(
+                fields=["origen"],
+                name="idx_rechazo_origen"
             ),
         ]
 

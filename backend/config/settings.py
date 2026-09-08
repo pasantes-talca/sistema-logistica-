@@ -237,3 +237,8 @@ RECIBOS_EMAIL_DESTINO = env(
     "RECIBOS_EMAIL_DESTINO",
     default="pasantes@talca.com.ar",
 )
+
+GOOGLE_RECHAZOS_URL = env(
+    "GOOGLE_RECHAZOS_URL",
+    default=""
+)
