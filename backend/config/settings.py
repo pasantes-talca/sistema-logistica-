@@ -84,6 +84,8 @@ INSTALLED_APPS = [
     "asistente",
 
     "planillas_recargas",
+
+    "viaticos",
 ]
 
 
@@ -244,3 +246,9 @@ GOOGLE_RECHAZOS_URL = env(
     "GOOGLE_RECHAZOS_URL",
     default=""
 )
+
+# =========================================================
+# SESIONES
+# =========================================================
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True

@@ -50,4 +50,9 @@ urlpatterns = [
         include("planillas_recargas.urls"),
     ),
 
+    path(
+        "api/viaticos/",
+        include("viaticos.urls"),
+    ),
+
 ]
