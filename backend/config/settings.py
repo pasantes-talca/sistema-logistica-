@@ -15,44 +15,49 @@ from pathlib import Path
 import environ
 
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# ============================================================
+# RUTAS BASE
+# ============================================================
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Variables de entorno
+# ============================================================
+# VARIABLES DE ENTORNO
+# ============================================================
+
 env = environ.Env(
     DEBUG=(bool, False)
 )
 
-environ.Env.read_env(BASE_DIR / ".env")
+environ.Env.read_env(
+    BASE_DIR / ".env"
+)
 
 
-# Gemini
+# ============================================================
+# GEMINI
+# ============================================================
+
 GEMINI_API_KEY = env(
     "GEMINI_API_KEY",
     default=""
 )
 
 
-# Quick-start development settings - unsuitable for production
-# https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
+# ============================================================
+# SEGURIDAD GENERAL
+# ============================================================
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env("SECRET_KEY")
+SECRET_KEY = env(
+    "SECRET_KEY"
+)
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env.bool("DEBUG")
+DEBUG = env.bool(
+    "DEBUG"
+)
 
 
-# Hosts permitidos
-#
-# Local:
-#   http://127.0.0.1
-#   http://localhost
-#
-# Servidor Talca:
-#   http://10.242.4.13
-#
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
@@ -60,9 +65,12 @@ ALLOWED_HOSTS = [
 ]
 
 
-# Application definition
+# ============================================================
+# APLICACIONES
+# ============================================================
 
 INSTALLED_APPS = [
+
     # Django
     "django.contrib.admin",
     "django.contrib.auth",
@@ -82,12 +90,14 @@ INSTALLED_APPS = [
     "rechazos",
     "cambios",
     "asistente",
-
     "planillas_recargas",
-
     "viaticos",
 ]
 
+
+# ============================================================
+# MIDDLEWARE
+# ============================================================
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -101,14 +111,31 @@ MIDDLEWARE = [
 ]
 
 
+# ============================================================
+# URLS / WSGI
+# ============================================================
+
 ROOT_URLCONF = "config.urls"
 
 
+WSGI_APPLICATION = (
+    "config.wsgi.application"
+)
+
+
+# ============================================================
+# TEMPLATES
+# ============================================================
+
 TEMPLATES = [
     {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "BACKEND":
+            "django.template.backends.django.DjangoTemplates",
+
         "DIRS": [],
+
         "APP_DIRS": True,
+
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.request",
@@ -120,45 +147,55 @@ TEMPLATES = [
 ]
 
 
-WSGI_APPLICATION = "config.wsgi.application"
-
-
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+# ============================================================
+# BASE DE DATOS
+# ============================================================
 
 DATABASES = {
-    "default": env.db("DATABASE_URL")
+    "default":
+        env.db(
+            "DATABASE_URL"
+        )
 }
 
-# IMPORTANTE:
-# Todo este sistema trabaja únicamente dentro del schema "log".
-# No tocar el schema "public".
+
+# Todo este sistema trabaja únicamente
+# dentro del schema "log".
+#
+# NO tocar el schema "public".
 DATABASES["default"]["OPTIONS"] = {
-    "options": "-c search_path=log"
+    "options":
+        "-c search_path=log"
 }
 
 
-# Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
+# ============================================================
+# VALIDACIÓN DE CONTRASEÑAS
+# ============================================================
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        "NAME":
+            "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "NAME":
+            "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+        "NAME":
+            "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+        "NAME":
+            "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
+# ============================================================
+# INTERNACIONALIZACIÓN
+# ============================================================
 
 LANGUAGE_CODE = "en-us"
 
@@ -169,16 +206,20 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
+# ============================================================
+# ARCHIVOS ESTÁTICOS
+# ============================================================
 
 STATIC_URL = "static/"
 
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
+# ============================================================
+# PRIMARY KEY POR DEFECTO
+# ============================================================
 
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+DEFAULT_AUTO_FIELD = (
+    "django.db.models.BigAutoField"
+)
 
 
 # ============================================================
@@ -208,8 +249,8 @@ CORS_ALLOW_CREDENTIALS = True
 # CSRF
 # ============================================================
 #
-# Necesario porque usamos autenticación mediante sesiones de
-# Django y React realiza peticiones POST al backend.
+# Necesario porque usamos autenticación
+# mediante sesiones de Django.
 #
 
 CSRF_TRUSTED_ORIGINS = [
@@ -218,19 +259,53 @@ CSRF_TRUSTED_ORIGINS = [
     "http://10.242.4.13:8001",
 ]
 
+
+# ============================================================
+# SESIONES
+# ============================================================
+#
+# La sesión permanece activa mientras
+# el navegador esté abierto.
+#
+# Al cerrar completamente el navegador,
+# la cookie de sesión debería expirar.
+#
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+
 # ============================================================
 # EMAIL
 # ============================================================
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_BACKEND = (
+    "django.core.mail.backends.smtp.EmailBackend"
+)
 
-EMAIL_HOST = env("EMAIL_HOST", default="")
-EMAIL_PORT = env.int("EMAIL_PORT", default=587)
+EMAIL_HOST = env(
+    "EMAIL_HOST",
+    default=""
+)
 
-EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
-EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
+EMAIL_PORT = env.int(
+    "EMAIL_PORT",
+    default=587
+)
 
-EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
+EMAIL_HOST_USER = env(
+    "EMAIL_HOST_USER",
+    default=""
+)
+
+EMAIL_HOST_PASSWORD = env(
+    "EMAIL_HOST_PASSWORD",
+    default=""
+)
+
+EMAIL_USE_TLS = env.bool(
+    "EMAIL_USE_TLS",
+    default=True
+)
 
 DEFAULT_FROM_EMAIL = env(
     "DEFAULT_FROM_EMAIL",
@@ -242,13 +317,12 @@ RECIBOS_EMAIL_DESTINO = env(
     default="pasantes@talca.com.ar",
 )
 
+
+# ============================================================
+# GOOGLE FORMS / RECHAZOS
+# ============================================================
+
 GOOGLE_RECHAZOS_URL = env(
     "GOOGLE_RECHAZOS_URL",
     default=""
 )
-
-# =========================================================
-# SESIONES
-# =========================================================
-
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True

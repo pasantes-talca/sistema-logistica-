@@ -1,23 +1,41 @@
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import (
+    authenticate,
+    login,
+    logout,
+)
+
+from django.utils.decorators import (
+    method_decorator,
+)
+
+from django.views.decorators.csrf import (
+    ensure_csrf_cookie,
+)
 
 from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.views import APIView
 
-from django.views.decorators.csrf import ensure_csrf_cookie
-from django.utils.decorators import method_decorator
+from rest_framework.response import (
+    Response,
+)
+
+from rest_framework.views import (
+    APIView,
+)
+
 
 @method_decorator(
     ensure_csrf_cookie,
     name="dispatch",
 )
-
 class LoginAPIView(APIView):
 
     authentication_classes = []
     permission_classes = []
 
-    def post(self, request):
+    def post(
+        self,
+        request,
+    ):
 
         username = request.data.get(
             "username"
@@ -27,12 +45,20 @@ class LoginAPIView(APIView):
             "password"
         )
 
-        if not username or not password:
+
+        if (
+            not username
+            or
+            not password
+        ):
 
             return Response(
                 {
                     "error":
-                        "Usuario y contraseña son obligatorios."
+                        (
+                            "Usuario y contraseña "
+                            "son obligatorios."
+                        )
                 },
                 status=
                     status.HTTP_400_BAD_REQUEST,
@@ -51,7 +77,10 @@ class LoginAPIView(APIView):
             return Response(
                 {
                     "error":
-                        "Usuario o contraseña incorrectos."
+                        (
+                            "Usuario o contraseña "
+                            "incorrectos."
+                        )
                 },
                 status=
                     status.HTTP_401_UNAUTHORIZED,
@@ -61,6 +90,16 @@ class LoginAPIView(APIView):
         login(
             request,
             user,
+        )
+
+
+        # La sesión se mantiene mientras
+        # el navegador esté abierto.
+        #
+        # Al cerrar completamente el navegador,
+        # la cookie de sesión debería expirar.
+        request.session.set_expiry(
+            0
         )
 
 
@@ -79,33 +118,49 @@ class LoginAPIView(APIView):
                     user.last_name,
 
                 "nombre_completo":
-                    user.get_full_name()
-                    or user.username,
+                    (
+                        user.get_full_name()
+                        or
+                        user.username
+                    ),
             }
         )
 
 
 class LogoutAPIView(APIView):
 
-    def post(self, request):
+    def post(
+        self,
+        request,
+    ):
 
         logout(
             request
         )
 
+
         return Response(
             {
                 "mensaje":
-                    "Sesión cerrada correctamente."
+                    (
+                        "Sesión cerrada "
+                        "correctamente."
+                    )
             }
         )
 
 
 class UsuarioActualAPIView(APIView):
 
-    def get(self, request):
+    def get(
+        self,
+        request,
+    ):
 
-        if not request.user.is_authenticated:
+        if (
+            not
+            request.user.is_authenticated
+        ):
 
             return Response(
                 {
@@ -138,7 +193,10 @@ class UsuarioActualAPIView(APIView):
                     user.last_name,
 
                 "nombre_completo":
-                    user.get_full_name()
-                    or user.username,
+                    (
+                        user.get_full_name()
+                        or
+                        user.username
+                    ),
             }
         )
