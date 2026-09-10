@@ -45,4 +45,9 @@ urlpatterns = [
         include("asistente.urls"),
     ),
 
+    path(
+        "api/planillas-recargas/",
+        include("planillas_recargas.urls"),
+    ),
+
 ]

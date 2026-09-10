@@ -35,6 +35,7 @@ const modules: {
   }[];
 }[] = [
 
+
   {
     label: "Repartos y recargas",
     icon: "truck",
@@ -45,6 +46,12 @@ const modules: {
         label: "Nuevo reparto",
         to: "/repartos/nuevo",
         icon: "plus",
+      },
+
+      {
+        label: "Carga desde planillas",
+        to: "/repartos/planillas",
+        icon: "boxes",
       },
 
       {

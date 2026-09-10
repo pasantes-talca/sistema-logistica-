@@ -28,6 +28,9 @@ import AppLayout from "./components/layout/AppLayout";
 
 import AsistenteIAPage from "./pages/AsistenteIAPage";
 
+import ProcesarPlanillasRecargasPage
+  from "./pages/ProcesarPlanillasRecargasPage";
+
 function App() {
 
   return (
@@ -197,6 +200,11 @@ function App() {
                       element={
                         <AsistenteIAPage />
                       }
+                    />
+
+                    <Route
+                      path="/repartos/planillas"
+                      element={<ProcesarPlanillasRecargasPage />}
                     />
 
                   </Routes>

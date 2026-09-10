@@ -82,6 +82,8 @@ INSTALLED_APPS = [
     "rechazos",
     "cambios",
     "asistente",
+
+    "planillas_recargas",
 ]
 
 
