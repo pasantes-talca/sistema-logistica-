@@ -323,3 +323,116 @@ export interface RespuestaAsistente {
   datos:
     Record<string, unknown>;
 }
+
+// =============================================
+// VIÁTICOS
+// =============================================
+
+export type TipoRepartoViatico =
+  | "LOCAL"
+  | "LARGA_DISTANCIA";
+
+
+export interface Viatico {
+
+  id: number;
+
+  chofer: number;
+
+  chofer_nombre: string;
+
+  tipo_reparto:
+    TipoRepartoViatico;
+
+  tipo_reparto_nombre:
+    string;
+
+  fecha: string;
+
+  mes: string;
+
+  valor_viatico: string;
+
+  cantidad_viaticos: number;
+
+  monto_total: string;
+
+  observaciones: string;
+
+  creado_en: string;
+
+  actualizado_en: string;
+
+}
+
+
+export interface CrearViaticoPayload {
+
+  chofer: number;
+
+  tipo_reparto:
+    TipoRepartoViatico;
+
+  fecha: string;
+
+  valor_viatico: number;
+
+  cantidad_viaticos: number;
+
+  observaciones: string;
+
+}
+
+
+export interface ResumenTipoViatico {
+
+  cantidad: number;
+
+  monto: number | string;
+
+}
+
+
+export interface ResumenMesViaticos {
+
+  numero_mes: number;
+
+  mes: string;
+
+  local: ResumenTipoViatico;
+
+  larga_distancia:
+    ResumenTipoViatico;
+
+  total_mes:
+    number | string;
+
+}
+
+
+export interface TotalesResumenViaticos {
+
+  local: ResumenTipoViatico;
+
+  larga_distancia:
+    ResumenTipoViatico;
+
+  cantidad_total: number;
+
+  monto_total:
+    number | string;
+
+}
+
+
+export interface ResumenAnualViaticos {
+
+  anio: number;
+
+  meses:
+    ResumenMesViaticos[];
+
+  totales:
+    TotalesResumenViaticos;
+
+}

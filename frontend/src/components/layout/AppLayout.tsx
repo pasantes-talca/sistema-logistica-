@@ -35,7 +35,6 @@ const modules: {
   }[];
 }[] = [
 
-
   {
     label: "Repartos y recargas",
     icon: "truck",
@@ -122,6 +121,33 @@ const modules: {
     ],
   },
 
+
+  {
+    label: "Viáticos",
+    icon: "truck",
+    base: "/viaticos",
+
+    links: [
+      {
+        label: "Nuevo registro",
+        to: "/viaticos/nuevo",
+        icon: "plus",
+      },
+
+      {
+        label: "Historial",
+        to: "/viaticos",
+        icon: "history",
+      },
+
+      {
+        label: "Resumen anual",
+        to: "/viaticos/resumen",
+        icon: "chart",
+      },
+    ],
+  },
+
 ];
 
 
@@ -138,6 +164,9 @@ const pageNames: Record<
 
   cambios:
     "Recibos de cambios",
+
+  viaticos:
+    "Viáticos",
 
   asistente:
     "Asistente IA",
@@ -156,6 +185,12 @@ const pageNames: Record<
 
   recibos:
     "Detalle de recibo",
+
+  planillas:
+    "Carga desde planillas",
+
+  resumen:
+    "Resumen anual",
 
   inicio:
     "Resumen",

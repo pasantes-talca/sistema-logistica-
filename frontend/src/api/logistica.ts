@@ -20,6 +20,9 @@ import type {
   LoginPayload,
   UsuarioActual,
   RespuestaAsistente,
+  Viatico,
+  CrearViaticoPayload,
+  ResumenAnualViaticos,
 } from "../types/logistica";
 
 
@@ -529,4 +532,131 @@ function obtenerCookie(nombre: string): string | null {
   }
 
   return null;
+}
+
+// =============================================
+// VIÁTICOS
+// =============================================
+
+
+export function obtenerViaticos():
+Promise<Viatico[]> {
+
+  return getJson<Viatico[]>(
+    `${API_URL}/viaticos/`
+  );
+}
+
+
+export function obtenerViatico(
+  id: number
+): Promise<Viatico> {
+
+  return getJson<Viatico>(
+    `${API_URL}/viaticos/${id}/`
+  );
+}
+
+
+export async function crearViatico(
+  datos: CrearViaticoPayload
+): Promise<Viatico> {
+
+  const response = await fetch(
+    `${API_URL}/viaticos/`,
+    {
+      method: "POST",
+
+      headers: {
+        "Content-Type":
+          "application/json",
+      },
+
+      body: JSON.stringify(
+        datos
+      ),
+    }
+  );
+
+
+  if (!response.ok) {
+
+    const error =
+      await response.json();
+
+    throw new Error(
+      JSON.stringify(error)
+    );
+  }
+
+
+  return response.json();
+}
+
+
+export async function actualizarViatico(
+  id: number,
+  datos: CrearViaticoPayload
+): Promise<Viatico> {
+
+  const response = await fetch(
+    `${API_URL}/viaticos/${id}/`,
+    {
+      method: "PUT",
+
+      headers: {
+        "Content-Type":
+          "application/json",
+      },
+
+      body: JSON.stringify(
+        datos
+      ),
+    }
+  );
+
+
+  if (!response.ok) {
+
+    const error =
+      await response.json();
+
+    throw new Error(
+      JSON.stringify(error)
+    );
+  }
+
+
+  return response.json();
+}
+
+
+export async function eliminarViatico(
+  id: number
+): Promise<void> {
+
+  const response = await fetch(
+    `${API_URL}/viaticos/${id}/`,
+    {
+      method: "DELETE",
+    }
+  );
+
+
+  if (!response.ok) {
+
+    throw new Error(
+      "No se pudo eliminar el viático."
+    );
+  }
+}
+
+
+export function obtenerResumenAnualViaticos(
+  anio: number
+): Promise<ResumenAnualViaticos> {
+
+  return getJson<ResumenAnualViaticos>(
+    `${API_URL}/viaticos/resumen-anual/?anio=${anio}`
+  );
 }

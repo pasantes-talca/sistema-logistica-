@@ -1,0 +1,646 @@
+/* ==========================================
+   CONTENEDOR GENERAL
+========================================== */
+
+.viaticos-page {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 24px 28px 40px;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+
+/* ==========================================
+   ENCABEZADOS
+========================================== */
+
+.viaticos-header {
+  background: #ffffff;
+  border: 1px solid #dfe7f3;
+  border-radius: 18px;
+
+  padding: 24px 28px;
+
+  box-shadow:
+    0 8px 24px
+    rgba(15, 45, 103, 0.05);
+}
+
+.viaticos-header h1 {
+  margin: 0 0 6px;
+
+  font-size: 28px;
+  font-weight: 800;
+
+  color: #0f2d67;
+}
+
+.viaticos-header p {
+  margin: 0;
+
+  font-size: 15px;
+  line-height: 1.5;
+
+  color: #6b7a99;
+}
+
+
+/* ==========================================
+   TARJETAS
+========================================== */
+
+.viaticos-card {
+  background: #ffffff;
+
+  border: 1px solid #dfe7f3;
+  border-radius: 18px;
+
+  padding: 22px;
+
+  box-shadow:
+    0 8px 24px
+    rgba(15, 45, 103, 0.05);
+}
+
+
+/* ==========================================
+   FILTRO AÑO
+========================================== */
+
+.viaticos-filter {
+  display: flex;
+  align-items: end;
+  gap: 14px;
+}
+
+.viaticos-filter .campo {
+  flex: 1;
+  margin: 0;
+}
+
+
+/* ==========================================
+   RESUMEN EN TARJETAS
+========================================== */
+
+.viaticos-summary-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 16px;
+}
+
+.viaticos-summary-card {
+  background: #ffffff;
+
+  border: 1px solid #dfe7f3;
+  border-radius: 16px;
+
+  padding: 20px 22px;
+
+  box-shadow:
+    0 8px 20px
+    rgba(15, 45, 103, 0.05);
+}
+
+.viaticos-summary-card span {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #7181a0;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.viaticos-summary-card strong {
+  display: block;
+
+  color: #0f2d67;
+
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.viaticos-summary-card small {
+  display: block;
+
+  margin-top: 7px;
+
+  color: #7181a0;
+
+  font-size: 13px;
+}
+
+
+/* ==========================================
+   TABLA
+========================================== */
+
+.viaticos-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.viaticos-table {
+  width: 100%;
+
+  min-width: 900px;
+
+  border-collapse: collapse;
+}
+
+.viaticos-table thead tr {
+  background: #f4f7fb;
+}
+
+.viaticos-table th {
+  padding: 14px 15px;
+
+  text-align: left;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  color: #46597a;
+
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+
+  border-bottom:
+    1px solid #dfe7f3;
+}
+
+.viaticos-table td {
+  padding: 14px 15px;
+
+  font-size: 14px;
+
+  color: #23314d;
+
+  border-bottom:
+    1px solid #edf2f8;
+
+  vertical-align: middle;
+}
+
+.viaticos-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.viaticos-table tbody tr:hover {
+  background: #fafcff;
+}
+
+
+/* ==========================================
+   MONTO
+========================================== */
+
+.viaticos-money {
+  color: #0f2d67;
+  font-weight: 800;
+}
+
+
+/* ==========================================
+   BADGES
+========================================== */
+
+.viaticos-badge {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 5px 10px;
+
+  border-radius: 999px;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.viaticos-badge-local {
+  background: #e9f8ef;
+  color: #198754;
+}
+
+.viaticos-badge-larga {
+  background: #fff2dd;
+  color: #a96000;
+}
+
+
+/* ==========================================
+   VACÍO
+========================================== */
+
+.viaticos-empty {
+  padding: 30px;
+
+  text-align: center;
+
+  color: #7181a0;
+}
+
+
+/* ==========================================
+   INICIO DEL MÓDULO
+========================================== */
+
+.viaticos-home-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 18px;
+}
+
+.viaticos-home-card {
+  display: flex;
+  align-items: center;
+
+  gap: 16px;
+
+  min-height: 110px;
+
+  padding: 20px;
+
+  background: #ffffff;
+
+  border:
+    1px solid #dfe7f3;
+
+  border-radius: 16px;
+
+  box-shadow:
+    0 8px 20px
+    rgba(15, 45, 103, 0.05);
+
+  color: inherit;
+  text-decoration: none;
+
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.viaticos-home-card:hover {
+  transform:
+    translateY(-2px);
+
+  border-color:
+    #c9d8ef;
+
+  box-shadow:
+    0 12px 28px
+    rgba(15, 45, 103, 0.08);
+}
+
+.viaticos-home-icon {
+  width: 42px;
+  height: 42px;
+
+  flex:
+    0 0 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background: #edf4ff;
+
+  color: #1746c6;
+
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.viaticos-home-card h2 {
+  margin: 0 0 5px;
+
+  font-size: 17px;
+  font-weight: 800;
+
+  color: #0f2d67;
+}
+
+.viaticos-home-card p {
+  margin: 0;
+
+  font-size: 13px;
+  line-height: 1.5;
+
+  color: #7181a0;
+}
+
+.viaticos-home-arrow {
+  margin-left: auto;
+
+  color: #1746c6;
+
+  font-size: 20px;
+  font-weight: 800;
+}
+
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 1000px) {
+
+  .viaticos-summary-grid,
+  .viaticos-home-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+@media (max-width: 760px) {
+
+  .viaticos-page {
+    padding:
+      18px 14px 30px;
+  }
+
+  .viaticos-header {
+    padding:
+      20px;
+  }
+
+  .viaticos-header h1 {
+    font-size:
+      24px;
+  }
+
+  .viaticos-card {
+    padding:
+      16px;
+  }
+
+}
+
+/* ==========================================================
+   INICIO DE VIÁTICOS
+   Misma línea visual que Repartos / Rechazos / Cambios
+========================================================== */
+
+.viaticos-inicio-page {
+  width: 100%;
+  padding: 30px 24px 50px;
+  box-sizing: border-box;
+}
+
+
+.viaticos-inicio-panel {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+
+  padding: 30px 32px;
+
+  background: #ffffff;
+
+  border: 1px solid #dbe4f0;
+  border-radius: 16px;
+
+  box-shadow:
+    0 12px 32px
+    rgba(15, 45, 103, 0.06);
+}
+
+
+/* ==========================================================
+   ENCABEZADO
+========================================================== */
+
+.viaticos-inicio-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+
+.viaticos-inicio-main-icon {
+  width: 48px;
+  height: 48px;
+
+  flex: 0 0 48px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background: #eaf3ff;
+  color: #1473e6;
+}
+
+
+.viaticos-inicio-title {
+  min-width: 0;
+}
+
+
+.viaticos-inicio-eyebrow {
+  display: block;
+
+  margin-bottom: 5px;
+
+  font-size: 10px;
+  line-height: 1;
+
+  font-weight: 800;
+
+  letter-spacing: 0.08em;
+
+  color: #0866ff;
+}
+
+
+.viaticos-inicio-title h1 {
+  margin: 0;
+
+  font-size: 28px;
+  line-height: 1.15;
+
+  font-weight: 800;
+
+  color: #071b40;
+}
+
+
+.viaticos-inicio-title p {
+  margin: 6px 0 0;
+
+  font-size: 14px;
+
+  color: #70809d;
+}
+
+
+/* ==========================================================
+   DIVISOR
+========================================================== */
+
+.viaticos-inicio-divider {
+  width: 100%;
+  height: 1px;
+
+  margin: 22px 0 20px;
+
+  background: #e5ebf3;
+}
+
+
+/* ==========================================================
+   TARJETAS
+========================================================== */
+
+.viaticos-inicio-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 14px;
+}
+
+
+.viaticos-inicio-card {
+  min-height: 170px;
+
+  padding: 18px;
+
+  display: flex;
+  flex-direction: column;
+
+  background: #ffffff;
+
+  border: 1px solid #d9e3ef;
+  border-radius: 12px;
+
+  text-decoration: none;
+
+  color: inherit;
+
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+
+
+.viaticos-inicio-card:hover {
+  transform: translateY(-2px);
+
+  border-color: #b9cde8;
+
+  box-shadow:
+    0 8px 22px
+    rgba(15, 45, 103, 0.07);
+}
+
+
+.viaticos-inicio-card-icon {
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 14px;
+
+  border-radius: 10px;
+
+  background: #eaf3ff;
+
+  color: #1473e6;
+}
+
+
+.viaticos-inicio-card h2 {
+  margin: 0 0 6px;
+
+  font-size: 16px;
+
+  font-weight: 800;
+
+  color: #071b40;
+}
+
+
+.viaticos-inicio-card p {
+  margin: 0;
+
+  max-width: 290px;
+
+  font-size: 12px;
+  line-height: 1.5;
+
+  color: #71809c;
+}
+
+
+.viaticos-inicio-card-link {
+  display: flex;
+  align-items: center;
+
+  gap: 5px;
+
+  margin-top: auto;
+  padding-top: 20px;
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+  color: #0866ff;
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width: 900px) {
+
+  .viaticos-inicio-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+@media (max-width: 650px) {
+
+  .viaticos-inicio-page {
+    padding: 18px 14px 35px;
+  }
+
+
+  .viaticos-inicio-panel {
+    padding: 22px 18px;
+  }
+
+
+  .viaticos-inicio-title h1 {
+    font-size: 24px;
+  }
+
+}
