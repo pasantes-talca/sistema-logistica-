@@ -23,6 +23,10 @@ import type {
   Viatico,
   CrearViaticoPayload,
   ResumenAnualViaticos,
+  DestinoKilometraje,
+  ControlKilometraje,
+  CrearControlKilometrajePayload,
+  EstadisticasKilometrajes,
 } from "../types/logistica";
 
 
@@ -658,5 +662,179 @@ export function obtenerResumenAnualViaticos(
 
   return getJson<ResumenAnualViaticos>(
     `${API_URL}/viaticos/resumen-anual/?anio=${anio}`
+  );
+}
+
+// ============================================================
+// KILOMETRAJES
+// ============================================================
+
+
+export function obtenerDestinosKilometraje():
+Promise<DestinoKilometraje[]> {
+
+  return getJson<DestinoKilometraje[]>(
+    `${API_URL}/kilometrajes/destinos/`
+  );
+}
+
+
+export function obtenerControlesKilometraje():
+Promise<ControlKilometraje[]> {
+
+  return getJson<ControlKilometraje[]>(
+    `${API_URL}/kilometrajes/`
+  );
+}
+
+
+export function obtenerControlKilometraje(
+  id: number
+): Promise<ControlKilometraje> {
+
+  return getJson<ControlKilometraje>(
+    `${API_URL}/kilometrajes/${id}/`
+  );
+}
+
+
+export async function crearControlKilometraje(
+  datos: CrearControlKilometrajePayload
+): Promise<ControlKilometraje> {
+
+  const csrfToken =
+    obtenerCookie("csrftoken");
+
+
+  const response = await fetch(
+    `${API_URL}/kilometrajes/`,
+    {
+      method: "POST",
+
+      credentials: "include",
+
+      headers: {
+        "Content-Type":
+          "application/json",
+
+        ...(csrfToken
+          ? {
+              "X-CSRFToken":
+                csrfToken,
+            }
+          : {}),
+      },
+
+      body: JSON.stringify(
+        datos
+      ),
+    }
+  );
+
+
+  if (!response.ok) {
+
+    const error =
+      await response
+        .json()
+        .catch(
+          () => null
+        );
+
+
+    throw new Error(
+      error?.detail
+      ??
+      error?.error
+      ??
+      JSON.stringify(error)
+      ??
+      "No se pudo crear el control de kilometraje."
+    );
+  }
+
+
+  return response.json();
+}
+
+
+export async function eliminarControlKilometraje(
+  id: number
+): Promise<void> {
+
+  const csrfToken =
+    obtenerCookie("csrftoken");
+
+
+  const response = await fetch(
+    `${API_URL}/kilometrajes/${id}/`,
+    {
+      method: "DELETE",
+
+      credentials: "include",
+
+      headers: {
+        ...(csrfToken
+          ? {
+              "X-CSRFToken":
+                csrfToken,
+            }
+          : {}),
+      },
+    }
+  );
+
+
+  if (!response.ok) {
+
+    const error =
+      await response
+        .json()
+        .catch(
+          () => null
+        );
+
+
+    throw new Error(
+      error?.detail
+      ??
+      error?.error
+      ??
+      "No se pudo eliminar el control de kilometraje."
+    );
+  }
+}
+
+export function obtenerEstadisticasKilometrajes(
+  desde?: string,
+  hasta?: string
+): Promise<EstadisticasKilometrajes> {
+
+  const parametros =
+    new URLSearchParams();
+
+  if (desde) {
+    parametros.set(
+      "desde",
+      desde
+    );
+  }
+
+  if (hasta) {
+    parametros.set(
+      "hasta",
+      hasta
+    );
+  }
+
+  const query =
+    parametros.toString();
+
+  return getJson<EstadisticasKilometrajes>(
+    `${API_URL}/kilometrajes/estadisticas/${
+      query
+        ? `?${query}`
+        : ""
+    }`
   );
 }

@@ -148,6 +148,29 @@ const modules: {
     ],
   },
 
+  {
+    label: "Kilometrajes",
+    icon: "truck",
+    base: "/kilometrajes",
+    links: [
+      {
+        label: "Nuevo control",
+        to: "/kilometrajes/nuevo",
+        icon: "plus",
+      },
+      {
+        label: "Historial",
+        to: "/kilometrajes",
+        icon: "history",
+      },
+      {
+        label: "Estadísticas",
+        to: "/kilometrajes/estadisticas",
+        icon: "chart",
+      },
+    ],
+  },
+
 ];
 
 

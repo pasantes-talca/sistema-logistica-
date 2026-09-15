@@ -156,19 +156,14 @@ export default function PanelPrincipalPage() {
         "navy",
     },
 
+
     {
-      label:
-        "Áreas operativas",
-
-      value:
-        4,
-
-      icon:
-        "activity",
-
-      tone:
-        "navy",
+      label: "Áreas operativas",
+      value: 5,
+      icon: "activity",
+      tone: "navy",
     },
+
 
   ];
 
@@ -336,6 +331,26 @@ export default function PanelPrincipalPage() {
         },
       ],
     },
+
+    {
+      title: "Kilometrajes",
+      description:
+        "Registrá y consultá los kilómetros recorridos por chofer y destino.",
+      icon: "truck",
+      tone: "blue",
+      home: "/kilometrajes/nuevo",
+      links: [
+        {
+          to: "/kilometrajes/nuevo",
+          label: "Nuevo control",
+        },
+        {
+          to: "/kilometrajes",
+          label: "Ver historial",
+        },
+      ],
+    },
+
 
   ];
 

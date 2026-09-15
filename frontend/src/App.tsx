@@ -64,6 +64,12 @@ import InicioViaticosPage from "./pages/InicioViaticosPage";
 
 import AsistenteIAPage from "./pages/AsistenteIAPage";
 
+import NuevoControlKilometrajePage from "./pages/NuevoControlKilometrajePage";
+import InicioKilometrajesPage from "./pages/InicioKilometrajesPage";
+import HistorialKilometrajesPage from "./pages/HistorialKilometrajesPage";
+import DetalleKilometrajePage from "./pages/DetalleKilometrajePage";
+import EstadisticasKilometrajesPage from "./pages/EstadisticasKilometrajesPage";
+
 
 function App() {
   return (
@@ -285,6 +291,31 @@ function App() {
                     element={
                       <AsistenteIAPage />
                     }
+                  />
+
+                  <Route
+                    path="/kilometrajes/nuevo"
+                    element={<NuevoControlKilometrajePage />}
+                  />
+
+                  <Route
+                    path="/kilometrajes/inicio"
+                    element={<InicioKilometrajesPage />}
+                  />
+
+                  <Route
+                    path="/kilometrajes"
+                    element={<HistorialKilometrajesPage />}
+                  />
+
+                  <Route
+                    path="/kilometrajes/:id"
+                    element={<DetalleKilometrajePage />}
+                  />
+
+                  <Route
+                    path="/kilometrajes/estadisticas"
+                    element={<EstadisticasKilometrajesPage />}
                   />
 
 

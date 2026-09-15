@@ -436,3 +436,75 @@ export interface ResumenAnualViaticos {
     TotalesResumenViaticos;
 
 }
+
+export interface DestinoKilometraje {
+  id: number;
+  nombre: string;
+  distancia_km: string;
+  activo: boolean;
+}
+
+export interface RegistroKilometraje {
+  id: number;
+  fecha: string;
+  destino: number;
+  destino_nombre: string;
+  cantidad_viajes: number;
+  distancia_km: string;
+  kilometros: string;
+  observaciones: string;
+}
+
+export interface ControlKilometraje {
+  id: number;
+  chofer: number;
+  chofer_nombre: string;
+  fecha_desde: string;
+  fecha_hasta: string;
+  observaciones: string;
+  total_km: string;
+  registros: RegistroKilometraje[];
+  creado_en: string;
+  actualizado_en: string;
+}
+
+export interface RegistroKilometrajeEntrada {
+  fecha: string;
+  destino: number;
+  cantidad_viajes: number;
+  observaciones?: string;
+}
+
+export interface CrearControlKilometrajePayload {
+  chofer: number;
+  fecha_desde: string;
+  fecha_hasta: string;
+  observaciones?: string;
+  registros: RegistroKilometrajeEntrada[];
+}
+
+export interface EstadisticaKilometrajeChofer {
+  id: number;
+  nombre: string;
+  kilometros: string;
+}
+
+export interface EstadisticaKilometrajeDestino {
+  id: number;
+  nombre: string;
+  kilometros: string;
+  viajes: number;
+}
+
+export interface EstadisticasKilometrajes {
+  total_km: string;
+  cantidad_registros: number;
+
+  mejor_chofer: EstadisticaKilometrajeChofer | null;
+
+  mejor_destino: EstadisticaKilometrajeDestino | null;
+
+  por_chofer: EstadisticaKilometrajeChofer[];
+
+  por_destino: EstadisticaKilometrajeDestino[];
+}

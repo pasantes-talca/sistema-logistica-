@@ -1,0 +1,704 @@
+.kilometrajes-page {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 30px 28px 50px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+
+.kilometrajes-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+
+.kilometrajes-header h1 {
+  margin: 5px 0 8px;
+  font-size: 29px;
+  line-height: 1.15;
+  color: #12223d;
+  letter-spacing: -0.5px;
+}
+
+
+.kilometrajes-header p {
+  margin: 0;
+  max-width: 650px;
+  color: #71809a;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+
+.kilometrajes-eyebrow {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  color: #1671e8;
+}
+
+
+/* ========================================= */
+/* RESUMEN */
+/* ========================================= */
+
+.kilometrajes-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+
+.kilometrajes-summary-card {
+  background: #ffffff;
+  border: 1px solid #dfe6ef;
+  border-radius: 13px;
+  padding: 18px 20px;
+  min-height: 112px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: 0 5px 18px rgba(25, 50, 85, 0.035);
+}
+
+
+.kilometrajes-summary-card > span {
+  color: #7b879b;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+
+.kilometrajes-summary-card strong {
+  margin-top: 6px;
+  color: #10203a;
+  font-size: 24px;
+  line-height: 1.1;
+}
+
+
+.kilometrajes-summary-card small {
+  margin-top: 7px;
+  color: #a0aabb;
+  font-size: 11px;
+}
+
+
+/* ========================================= */
+/* CONTENEDOR */
+/* ========================================= */
+
+.kilometrajes-card {
+  background: #ffffff;
+  border: 1px solid #dfe6ef;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(25, 50, 85, 0.04);
+}
+
+
+.kilometrajes-card-header {
+  padding: 20px 24px 17px;
+  border-bottom: 1px solid #edf1f6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+
+.kilometrajes-card-header > div:first-child > span {
+  display: block;
+  margin-bottom: 3px;
+  color: #1671e8;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+
+.kilometrajes-card-header h2 {
+  margin: 0;
+  color: #15243d;
+  font-size: 19px;
+}
+
+
+.kilometrajes-counter {
+  padding: 7px 11px;
+  border-radius: 8px;
+  background: #f1f6fd;
+  color: #536680;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+
+/* ========================================= */
+/* TABLA */
+/* ========================================= */
+
+.kilometrajes-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+
+.kilometrajes-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
+}
+
+
+.kilometrajes-table thead {
+  background: #f8fafc;
+}
+
+
+.kilometrajes-table th {
+  padding: 12px 20px;
+  text-align: left;
+  color: #8390a5;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  border-bottom: 1px solid #e8edf3;
+}
+
+
+.kilometrajes-table td {
+  padding: 16px 20px;
+  color: #35445a;
+  font-size: 13px;
+  border-bottom: 1px solid #edf1f5;
+  vertical-align: middle;
+}
+
+
+.kilometrajes-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+
+.kilometrajes-table tbody tr {
+  transition:
+    background-color 0.15s ease;
+}
+
+
+.kilometrajes-table tbody tr:hover {
+  background: #f9fbfe;
+}
+
+
+/* ========================================= */
+/* CHOFER */
+/* ========================================= */
+
+.kilometrajes-driver {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+
+.kilometrajes-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: #eaf3ff;
+  color: #1971de;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+
+.kilometrajes-driver > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+
+.kilometrajes-driver strong {
+  color: #17263d;
+  font-size: 13px;
+}
+
+
+.kilometrajes-driver span {
+  color: #9aa5b5;
+  font-size: 11px;
+}
+
+
+/* ========================================= */
+/* PERÍODO */
+/* ========================================= */
+
+.kilometrajes-periodo {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+
+.kilometrajes-periodo strong {
+  font-size: 12px;
+  color: #40516a;
+}
+
+
+.kilometrajes-periodo span {
+  color: #a4adba;
+  font-size: 11px;
+}
+
+
+/* ========================================= */
+/* KILÓMETROS */
+/* ========================================= */
+
+.kilometrajes-total {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+
+.kilometrajes-total strong {
+  color: #10213a;
+  font-size: 17px;
+}
+
+
+.kilometrajes-total span {
+  color: #7c8da5;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+
+/* ========================================= */
+/* BADGES */
+/* ========================================= */
+
+.kilometrajes-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 9px;
+  border-radius: 7px;
+  background: #eef5ff;
+  color: #2b6fc8;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+
+.kilometrajes-observacion {
+  display: block;
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #66758b;
+}
+
+
+/* ========================================= */
+/* ESTADOS */
+/* ========================================= */
+
+.kilometrajes-state {
+  padding: 54px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+}
+
+
+.kilometrajes-state strong {
+  color: #23344e;
+  font-size: 15px;
+}
+
+
+.kilometrajes-state span {
+  color: #8996a8;
+  font-size: 13px;
+}
+
+
+.kilometrajes-state.error strong {
+  color: #c44747;
+}
+
+
+/* ========================================= */
+/* RESPONSIVE */
+/* ========================================= */
+
+@media (
+  max-width: 1000px
+) {
+
+  .kilometrajes-summary-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+
+}
+
+
+@media (
+  max-width: 650px
+) {
+
+  .kilometrajes-page {
+    padding:
+      20px 16px 35px;
+  }
+
+
+  .kilometrajes-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+
+  .kilometrajes-header h1 {
+    font-size: 24px;
+  }
+
+}
+
+/* ========================================= */
+/* DETALLE DE KILOMETRAJE */
+/* ========================================= */
+
+.kilometrajes-detail-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+
+.kilometrajes-detail-top h1 {
+  margin: 5px 0 8px;
+  font-size: 29px;
+  color: #12223d;
+  letter-spacing: -0.5px;
+}
+
+
+.kilometrajes-detail-top p {
+  margin: 0;
+  color: #71809a;
+  font-size: 14px;
+}
+
+
+.kilometrajes-back {
+  margin-top: 8px;
+  padding: 9px 13px;
+  border: 1px solid #dce5ef;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #52657f;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+
+.kilometrajes-back:hover {
+  background: #f5f8fc;
+  color: #176ed4;
+}
+
+
+.kilometrajes-detail-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 11px;
+  border-radius: 7px;
+  background: #edf5ff;
+  color: #176ed4;
+  font-size: 11px;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+
+.kilometrajes-detail-button:hover {
+  background: #dfeeff;
+}
+
+
+.kilometrajes-detail-observation {
+  padding: 17px 20px;
+  background: #ffffff;
+  border: 1px solid #dfe6ef;
+  border-radius: 12px;
+}
+
+
+.kilometrajes-detail-observation span {
+  color: #1671e8;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+
+.kilometrajes-detail-observation p {
+  margin: 7px 0 0;
+  color: #53647c;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+
+.kilometrajes-destination {
+  color: #253954;
+  font-weight: 700;
+}
+
+
+.kilometrajes-table tfoot td {
+  border-top: 2px solid #dfe7f1;
+  border-bottom: none;
+  background: #f8fbff;
+}
+
+
+.kilometrajes-detail-total-label {
+  padding: 16px 20px !important;
+  text-align: right;
+  color: #64758c !important;
+  font-size: 11px !important;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+}
+
+
+.kilometrajes-detail-total-value {
+  padding: 16px 20px !important;
+  color: #1269cf !important;
+  font-size: 18px !important;
+  font-weight: 800;
+}
+
+
+@media (
+  max-width: 700px
+) {
+
+  .kilometrajes-detail-top {
+    flex-direction: column;
+  }
+
+}
+
+/* ========================================= */
+/* ESTADÍSTICAS */
+/* ========================================= */
+
+.kilometrajes-filter-card {
+  background: #ffffff;
+  border: 1px solid #dfe6ef;
+  border-radius: 13px;
+  padding: 18px 20px;
+  box-shadow: 0 5px 18px rgba(25, 50, 85, 0.035);
+}
+
+
+.kilometrajes-filter-title {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 15px;
+}
+
+
+.kilometrajes-filter-title span {
+  color: #1671e8;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+
+.kilometrajes-filter-title strong {
+  color: #182941;
+  font-size: 16px;
+}
+
+
+.kilometrajes-filter-grid {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+
+.kilometrajes-filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 190px;
+}
+
+
+.kilometrajes-filter-field label {
+  color: #506079;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+
+.kilometrajes-filter-field input {
+  min-height: 39px;
+  padding: 0 11px;
+  border: 1px solid #cfd9e6;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #273950;
+  font-size: 13px;
+  outline: none;
+}
+
+
+.kilometrajes-filter-field input:focus {
+  border-color: #3f8ee8;
+  box-shadow: 0 0 0 3px rgba(63, 142, 232, 0.08);
+}
+
+
+.kilometrajes-clear-filter {
+  min-height: 39px;
+  padding: 0 14px;
+  border: 1px solid #d5deea;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #53647a;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+
+.kilometrajes-clear-filter:hover {
+  background: #eef3f8;
+}
+
+
+.kilometrajes-summary-name {
+  font-size: 16px !important;
+  line-height: 1.25 !important;
+}
+
+
+.kilometrajes-chart-card {
+  background: #ffffff;
+  border: 1px solid #dfe6ef;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(25, 50, 85, 0.04);
+}
+
+
+.kilometrajes-chart {
+  width: 100%;
+  padding: 14px 16px 5px;
+}
+
+
+.kilometrajes-ranking {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 27px;
+  height: 27px;
+  border-radius: 7px;
+  background: #edf5ff;
+  color: #176ed4;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+
+.kilometrajes-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 160px;
+}
+
+
+.kilometrajes-progress {
+  flex: 1;
+  height: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #edf1f6;
+}
+
+
+.kilometrajes-progress-value {
+  height: 100%;
+  border-radius: inherit;
+  background: #2f80ed;
+}
+
+
+.kilometrajes-progress-row > span {
+  min-width: 42px;
+  color: #697b92;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: right;
+}
+
+
+@media (
+  max-width: 650px
+) {
+
+  .kilometrajes-filter-grid {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+
+  .kilometrajes-filter-field {
+    width: 100%;
+  }
+
+
+  .kilometrajes-clear-filter {
+    width: 100%;
+  }
+
+}
