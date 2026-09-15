@@ -55,4 +55,9 @@ urlpatterns = [
         include("viaticos.urls"),
     ),
 
+    path(
+        "api/kilometrajes/",
+        include("kilometrajes.urls"),
+    ),
+
 ]

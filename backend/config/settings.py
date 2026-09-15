@@ -92,6 +92,7 @@ INSTALLED_APPS = [
     "asistente",
     "planillas_recargas",
     "viaticos",
+    "kilometrajes",
 ]
 
 
