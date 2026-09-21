@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 
 import Icon from "../components/ui/Icon";
 
+import "./Viaticos.css";
+
 
 export default function InicioKilometrajesPage() {
 
@@ -37,9 +39,8 @@ export default function InicioKilometrajesPage() {
               </h1>
 
               <p>
-                Registrá y consultá los kilómetros
-                recorridos por cada chofer según
-                destino y período.
+                Gestión de kilómetros recorridos
+                por chofer, destino y período.
               </p>
 
             </div>
@@ -67,6 +68,7 @@ export default function InicioKilometrajesPage() {
 
               </div>
 
+
               <div>
 
                 <h3>
@@ -74,12 +76,19 @@ export default function InicioKilometrajesPage() {
                 </h3>
 
                 <p>
-                  Cargá los viajes realizados
+                  Registrá los viajes realizados
                   por chofer y destino.
                 </p>
 
-                <span>
+                <span className="viaticos-inicio-card-link">
+
                   Abrir sección
+
+                  <Icon
+                    name="chevron"
+                    size={15}
+                  />
+
                 </span>
 
               </div>
@@ -101,6 +110,7 @@ export default function InicioKilometrajesPage() {
 
               </div>
 
+
               <div>
 
                 <h3>
@@ -109,15 +119,64 @@ export default function InicioKilometrajesPage() {
 
                 <p>
                   Consultá los controles de
-                  kilometraje registrados.
+                  kilometraje registrados
+                  y su detalle.
                 </p>
 
-                <span>
+                <span className="viaticos-inicio-card-link">
+
                   Abrir sección
+
+                  <Icon
+                    name="chevron"
+                    size={15}
+                  />
+
                 </span>
 
               </div>
 
+            </Link>
+
+
+            <Link
+              to="/kilometrajes/estadisticas"
+              className="viaticos-inicio-card"
+            >
+
+              <div className="viaticos-inicio-card-icon">
+
+                <Icon
+                  name="chart"
+                  size={24}
+                />
+
+              </div>
+
+
+              <div>
+
+                <h3>
+                  Estadísticas
+                </h3>
+
+                <p>
+                  Analizá kilómetros por chofer,
+                  destino y período.
+                </p>
+
+                <span className="viaticos-inicio-card-link">
+
+                  Abrir sección
+
+                  <Icon
+                    name="chevron"
+                    size={15}
+                  />
+
+                </span>
+
+              </div>
 
             </Link>
 
