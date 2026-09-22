@@ -14,6 +14,25 @@ import Icon, {
 } from "../components/ui/Icon";
 
 
+type ModuleItem = {
+  title: string;
+  description: string;
+  icon: IconName;
+  tone: string;
+
+  home?: string;
+
+  externalUrl?: string;
+
+  links?: {
+    to: string;
+    label: string;
+  }[];
+
+  external?: boolean;
+};
+
+
 export default function PanelPrincipalPage() {
 
   const {
@@ -173,17 +192,7 @@ export default function PanelPrincipalPage() {
   ];
 
 
-  const modules: {
-    title: string;
-    description: string;
-    icon: IconName;
-    tone: string;
-    home: string;
-    links: {
-      to: string;
-      label: string;
-    }[];
-  }[] = [
+  const modules: ModuleItem[] = [
 
     {
       title:
@@ -413,6 +422,29 @@ export default function PanelPrincipalPage() {
       ],
     },
 
+    {
+      title:
+        "Stock de pallets",
+
+      description:
+        (
+          "Accedé al sistema de control de stock " +
+          "de pallets del centro logístico."
+        ),
+
+      icon:
+        "boxes",
+
+      tone:
+        "green",
+
+      external:
+        true,
+
+      externalUrl:
+        "http://10.242.4.13:8000/",
+    },
+
   ];
 
 
@@ -623,7 +655,11 @@ export default function PanelPrincipalPage() {
 
 
                       <span>
-                        Área operativa
+                        {
+                          module.external
+                            ? "Sistema externo"
+                            : "Área operativa"
+                        }
                       </span>
 
                     </div>
@@ -643,50 +679,92 @@ export default function PanelPrincipalPage() {
                     </p>
 
 
-                    <div className="modulo-links">
+                    {
+                      !module.external
+                      &&
+                      module.links
+                      &&
+                      (
 
-                      {
-                        module.links.map(
-                          link => (
+                        <div className="modulo-links">
 
-                            <Link
-                              className="modulo-link"
-                              to={
-                                link.to
-                              }
-                              key={
-                                link.to
-                              }
-                            >
+                          {
+                            module.links.map(
+                              link => (
 
-                              {
-                                link.label
-                              }
+                                <Link
+                                  className="modulo-link"
+                                  to={
+                                    link.to
+                                  }
+                                  key={
+                                    link.to
+                                  }
+                                >
 
-                            </Link>
+                                  {
+                                    link.label
+                                  }
 
-                          )
-                        )
-                      }
+                                </Link>
 
-                    </div>
+                              )
+                            )
+                          }
+
+                        </div>
+
+                      )
+                    }
 
 
-                    <Link
-                      className="module-enter"
-                      to={
-                        module.home
-                      }
-                    >
+                    {
+                      module.external
+                      &&
+                      module.externalUrl
+                      ? (
 
-                      Ingresar al módulo
+                        <a
+                          className="module-enter"
+                          href={
+                            module.externalUrl
+                          }
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
 
-                      <Icon
-                        name="chevron"
-                        size={17}
-                      />
+                          Abrir sistema de stock
 
-                    </Link>
+                          <Icon
+                            name="chevron"
+                            size={17}
+                          />
+
+                        </a>
+
+                      )
+                      : (
+
+                        <Link
+                          className="module-enter"
+                          to={
+                            module.home
+                            ||
+                            "/"
+                          }
+                        >
+
+                          Ingresar al módulo
+
+                          <Icon
+                            name="chevron"
+                            size={17}
+                          />
+
+                        </Link>
+
+                      )
+                    }
 
                   </article>
 
