@@ -27,7 +27,15 @@ import type {
   ControlKilometraje,
   CrearControlKilometrajePayload,
   EstadisticasKilometrajes,
+  ControlDiario,
+  CrearControlDiarioPayload,
+  ProductoControlDiario,
+  ResumenControlDiario,
+  UbicacionControlDiario,
+  EstadisticasControlDiario,
 } from "../types/logistica";
+
+
 
 
 //const API_URL = "http://127.0.0.1:8000/api";
@@ -837,4 +845,301 @@ export function obtenerEstadisticasKilometrajes(
         : ""
     }`
   );
+}
+
+export async function obtenerProductosControlDiario():
+  Promise<ProductoControlDiario[]> {
+
+  const response = await fetch(
+    `${API_URL}/control-diario/productos/`,
+    {
+      credentials: "include",
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      "No se pudieron obtener los productos del control diario."
+    );
+  }
+
+  return response.json();
+}
+
+
+export async function obtenerUbicacionesControlDiario():
+  Promise<UbicacionControlDiario[]> {
+
+  const response = await fetch(
+    `${API_URL}/control-diario/ubicaciones/`,
+    {
+      credentials: "include",
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      "No se pudieron obtener las ubicaciones del control diario."
+    );
+  }
+
+  return response.json();
+}
+
+
+export async function obtenerControlesDiarios(
+  desde?: string,
+  hasta?: string
+): Promise<ControlDiario[]> {
+
+  const params =
+    new URLSearchParams();
+
+
+  if (desde) {
+    params.set(
+      "desde",
+      desde
+    );
+  }
+
+
+  if (hasta) {
+    params.set(
+      "hasta",
+      hasta
+    );
+  }
+
+
+  const query =
+    params.toString();
+
+
+  const url =
+    query
+      ? `${API_URL}/control-diario/?${query}`
+      : `${API_URL}/control-diario/`;
+
+
+  const response = await fetch(
+    url,
+    {
+      credentials: "include",
+    }
+  );
+
+
+  if (!response.ok) {
+    throw new Error(
+      "No se pudieron obtener los controles diarios."
+    );
+  }
+
+
+  return response.json();
+}
+
+
+export async function obtenerControlDiario(
+  id: number
+): Promise<ControlDiario> {
+
+  const response = await fetch(
+    `${API_URL}/control-diario/${id}/`,
+    {
+      credentials: "include",
+    }
+  );
+
+
+  if (!response.ok) {
+    throw new Error(
+      "No se pudo obtener el control diario."
+    );
+  }
+
+
+  return response.json();
+}
+
+
+export async function crearControlDiario(
+  payload: CrearControlDiarioPayload
+): Promise<ControlDiario> {
+
+  const csrfToken =
+    obtenerCookie(
+      "csrftoken"
+    );
+
+
+  const response = await fetch(
+    `${API_URL}/control-diario/`,
+    {
+      method: "POST",
+
+      credentials: "include",
+
+      headers: {
+        "Content-Type":
+          "application/json",
+
+        ...(csrfToken
+          ? {
+              "X-CSRFToken":
+                csrfToken,
+            }
+          : {}),
+      },
+
+      body:
+        JSON.stringify(
+          payload
+        ),
+    }
+  );
+
+
+  if (!response.ok) {
+
+    let mensaje =
+      "No se pudo guardar el control diario.";
+
+
+    try {
+
+      const error =
+        await response.json();
+
+      mensaje =
+        JSON.stringify(
+          error
+        );
+
+    } catch {
+      // dejamos el mensaje original
+    }
+
+
+    throw new Error(
+      mensaje
+    );
+  }
+
+
+  return response.json();
+}
+
+
+export async function eliminarControlDiario(
+  id: number
+): Promise<void> {
+
+  const csrfToken =
+    obtenerCookie(
+      "csrftoken"
+    );
+
+
+  const response = await fetch(
+    `${API_URL}/control-diario/${id}/`,
+    {
+      method: "DELETE",
+
+      credentials: "include",
+
+      headers: {
+        ...(csrfToken
+          ? {
+              "X-CSRFToken":
+                csrfToken,
+            }
+          : {}),
+      },
+    }
+  );
+
+
+  if (!response.ok) {
+    throw new Error(
+      "No se pudo eliminar el control diario."
+    );
+  }
+}
+
+
+export async function obtenerResumenControlDiario(
+  id: number
+): Promise<ResumenControlDiario> {
+
+  const response = await fetch(
+    `${API_URL}/control-diario/${id}/resumen/`,
+    {
+      credentials: "include",
+    }
+  );
+
+
+  if (!response.ok) {
+    throw new Error(
+      "No se pudo obtener el resumen del control diario."
+    );
+  }
+
+
+  return response.json();
+}
+
+export async function obtenerEstadisticasControlDiario(
+  desde?: string,
+  hasta?: string
+): Promise<EstadisticasControlDiario> {
+
+  const params =
+    new URLSearchParams();
+
+
+  if (desde) {
+    params.set(
+      "desde",
+      desde
+    );
+  }
+
+
+  if (hasta) {
+    params.set(
+      "hasta",
+      hasta
+    );
+  }
+
+
+  const query =
+    params.toString();
+
+
+  const url =
+    query
+      ? `${API_URL}/control-diario/estadisticas/?${query}`
+      : `${API_URL}/control-diario/estadisticas/`;
+
+
+  const response = await fetch(
+    url,
+    {
+      credentials: "include",
+    }
+  );
+
+
+  if (!response.ok) {
+    throw new Error(
+      "No se pudieron obtener las estadísticas del control diario."
+    );
+  }
+
+
+  return response.json();
 }

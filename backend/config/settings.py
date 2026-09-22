@@ -93,6 +93,7 @@ INSTALLED_APPS = [
     "planillas_recargas",
     "viaticos",
     "kilometrajes",
+    "control_diario",
 ]
 
 

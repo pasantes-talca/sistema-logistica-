@@ -508,3 +508,180 @@ export interface EstadisticasKilometrajes {
 
   por_destino: EstadisticaKilometrajeDestino[];
 }
+
+export interface ProductoControlDiario {
+  id: number;
+  familia: string;
+  sabor: string;
+  presentacion: string;
+  nombre: string;
+  orden: number;
+  activo: boolean;
+}
+
+
+export interface UbicacionControlDiario {
+  id: number;
+  nombre: string;
+  tipo:
+    | "PLANTA"
+    | "DEPOSITO"
+    | "DISTRIBUIDOR"
+    | "DESTINO"
+    | "OTRO";
+  tipo_nombre: string;
+  orden: number;
+  activo: boolean;
+}
+
+
+export type TipoMovimientoControlDiario =
+  | "DISPONIBLE"
+  | "RESERVA"
+  | "ASIGNACION"
+  | "STOCK_DEPOSITO"
+  | "DISTRIBUCION"
+  | "PENDIENTE"
+  | "AJUSTE";
+
+
+export interface MovimientoControlDiario {
+  id: number;
+
+  producto: number;
+  producto_nombre: string;
+
+  ubicacion: number;
+  ubicacion_nombre: string;
+
+  tipo_movimiento:
+    TipoMovimientoControlDiario;
+
+  tipo_movimiento_nombre: string;
+
+  cantidad: string;
+
+  observaciones: string;
+
+  creado_en: string;
+  actualizado_en: string;
+}
+
+
+export interface ControlDiario {
+  id: number;
+
+  fecha: string;
+
+  observaciones: string;
+
+  creado_por: number | null;
+  creado_por_nombre: string | null;
+
+  creado_en: string;
+  actualizado_en: string;
+
+  movimientos:
+    MovimientoControlDiario[];
+}
+
+
+export interface MovimientoControlDiarioEntrada {
+  producto: number;
+
+  ubicacion: number;
+
+  tipo_movimiento:
+    TipoMovimientoControlDiario;
+
+  cantidad: number | string;
+
+  observaciones?: string;
+}
+
+
+export interface CrearControlDiarioPayload {
+  fecha: string;
+
+  observaciones?: string;
+
+  movimientos:
+    MovimientoControlDiarioEntrada[];
+}
+
+
+export interface ResumenProductoControlDiario {
+  producto_id: number;
+  producto_nombre: string;
+
+  disponible: string;
+  reserva: string;
+  asignacion: string;
+  stock_deposito: string;
+  distribucion: string;
+  pendiente: string;
+  ajuste: string;
+}
+
+
+export interface ResumenControlDiario {
+  control_id: number;
+
+  fecha: string;
+
+  resumen:
+    ResumenProductoControlDiario[];
+}
+
+export interface EstadisticaControlDiarioTipo {
+  tipo_movimiento: string;
+  total: string;
+}
+
+
+export interface EstadisticaControlDiarioProducto {
+  producto_id: number;
+  producto__nombre: string;
+  total: string;
+}
+
+
+export interface EstadisticaControlDiarioDistribuidor {
+  ubicacion_id: number;
+  ubicacion__nombre: string;
+  total: string;
+}
+
+
+export interface EstadisticaControlDiarioFecha {
+  control__fecha: string;
+  total: string;
+}
+
+
+export interface EstadisticasControlDiario {
+  total_movimientos: number;
+
+  total_cantidad: string;
+
+  producto_principal:
+    EstadisticaControlDiarioProducto
+    | null;
+
+  distribuidor_principal:
+    EstadisticaControlDiarioDistribuidor
+    | null;
+
+  por_tipo:
+    EstadisticaControlDiarioTipo[];
+
+  por_producto:
+    EstadisticaControlDiarioProducto[];
+
+  por_distribuidor:
+    EstadisticaControlDiarioDistribuidor[];
+
+  por_fecha:
+    EstadisticaControlDiarioFecha[];
+}
+

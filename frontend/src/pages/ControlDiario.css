@@ -1,0 +1,1309 @@
+.control-diario-page {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 4px 0 32px;
+}
+
+
+.control-diario-header {
+  margin-bottom: 18px;
+}
+
+
+.control-diario-eyebrow {
+  display: block;
+  margin-bottom: 4px;
+
+  color: #1671e8;
+
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.1px;
+}
+
+
+.control-diario-header h1 {
+  margin: 0;
+
+  color: #162a46;
+
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+
+.control-diario-header p {
+  max-width: 650px;
+
+  margin: 6px 0 0;
+
+  color: #718096;
+
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+
+/* ============================== */
+/* DATOS GENERALES */
+/* ============================== */
+
+.control-diario-datos-card {
+  margin-bottom: 18px;
+  padding: 18px 20px;
+
+  background: #ffffff;
+
+  border: 1px solid #dfe6ef;
+  border-radius: 13px;
+
+  box-shadow:
+    0 6px 20px
+    rgba(25, 50, 85, 0.04);
+}
+
+
+.control-diario-datos-grid {
+  display: grid;
+
+  grid-template-columns:
+    220px
+    minmax(300px, 1fr);
+
+  gap: 16px;
+}
+
+
+.control-diario-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+
+.control-diario-field label {
+  color: #53647c;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+
+.control-diario-field input {
+  min-height: 40px;
+
+  padding: 0 11px;
+
+  border: 1px solid #ccd7e4;
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  color: #273950;
+
+  font-family: inherit;
+  font-size: 13px;
+
+  outline: none;
+}
+
+
+.control-diario-field input:focus {
+  border-color: #3182e8;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(49, 130, 232, 0.08);
+}
+
+
+/* ============================== */
+/* SECCIONES */
+/* ============================== */
+
+.control-diario-section {
+  margin-bottom: 18px;
+
+  background: #ffffff;
+
+  border: 1px solid #dde5ee;
+  border-radius: 13px;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 7px 22px
+    rgba(25, 50, 85, 0.04);
+}
+
+
+.control-diario-section-header {
+  padding: 15px 20px;
+
+  border-bottom:
+    1px solid #e7edf4;
+}
+
+
+.control-diario-section-header h2 {
+  margin: 0;
+
+  color: #1d3451;
+
+  font-size: 16px;
+}
+
+
+.control-diario-section-header p {
+  margin: 4px 0 0;
+
+  color: #8190a4;
+
+  font-size: 11px;
+}
+
+
+/* ============================== */
+/* TABLA */
+/* ============================== */
+
+.control-diario-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+
+.control-diario-table {
+  width: 100%;
+
+  min-width: 1750px;
+
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+
+.control-diario-table th {
+  min-width: 92px;
+
+  padding: 10px 7px;
+
+  background: #f7f9fc;
+
+  border-right:
+    1px solid #e7edf3;
+
+  border-bottom:
+    1px solid #dfe6ef;
+
+  text-align: center;
+}
+
+
+.control-diario-table th:first-child {
+  min-width: 165px;
+}
+
+
+.control-diario-product-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 2px;
+}
+
+
+.control-diario-product-header strong {
+  color: #30435d;
+
+  font-size: 10px;
+  font-weight: 800;
+}
+
+
+.control-diario-product-header span {
+  color: #1671e8;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+
+.control-diario-table td {
+  padding: 6px;
+
+  background: #ffffff;
+
+  border-right:
+    1px solid #edf1f5;
+
+  border-bottom:
+    1px solid #edf1f5;
+
+  text-align: center;
+}
+
+
+.control-diario-table tbody tr:hover td {
+  background: #fafcff;
+}
+
+
+.control-diario-table td input {
+  width: 62px;
+  height: 29px;
+
+  padding: 0 5px;
+
+  border: 1px solid #cad5e1;
+  border-radius: 6px;
+
+  background: #ffffff;
+
+  color: #263a53;
+
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+
+  text-align: center;
+
+  outline: none;
+}
+
+
+.control-diario-table td input:focus {
+  border-color: #2f80ed;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(47, 128, 237, 0.08);
+}
+
+
+/* ============================== */
+/* COLUMNA FIJA */
+/* ============================== */
+
+.control-diario-sticky {
+  position: sticky;
+  left: 0;
+  z-index: 4;
+
+  background:
+    #f7f9fc !important;
+
+  box-shadow:
+    1px 0 0
+    #dfe6ef;
+}
+
+
+tbody
+.control-diario-sticky {
+  background:
+    #ffffff !important;
+}
+
+
+.control-diario-row-name {
+  padding-left: 14px !important;
+
+  color: #40536d;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  text-align: left !important;
+
+  white-space: nowrap;
+}
+
+
+/* ============================== */
+/* TOTAL */
+/* ============================== */
+
+.control-diario-table tfoot td {
+  padding: 9px 7px;
+
+  background: #f3f7fc;
+
+  border-top:
+    1px solid #d9e3ef;
+
+  border-bottom: none;
+
+  color: #235080;
+
+  font-size: 11px;
+  font-weight: 800;
+}
+
+
+.control-diario-table tfoot
+.control-diario-sticky {
+  background:
+    #f3f7fc !important;
+}
+
+
+.control-diario-total-label {
+  padding-left: 14px !important;
+
+  text-align: left !important;
+}
+
+
+.control-diario-total-value {
+  color: #116ad8 !important;
+}
+
+
+/* ============================== */
+/* FOOTER */
+/* ============================== */
+
+.control-diario-footer {
+  display: flex;
+
+  justify-content:
+    space-between;
+
+  align-items:
+    center;
+
+  gap: 24px;
+
+  padding: 18px 20px;
+
+  background: #ffffff;
+
+  border: 1px solid #dde5ee;
+  border-radius: 13px;
+
+  box-shadow:
+    0 7px 22px
+    rgba(25, 50, 85, 0.04);
+}
+
+
+.control-diario-resumen {
+  display: flex;
+
+  gap: 38px;
+}
+
+
+.control-diario-resumen > div {
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+
+.control-diario-resumen span {
+  color: #78879b;
+
+  font-size: 10px;
+  font-weight: 700;
+}
+
+
+.control-diario-resumen strong {
+  color: #18304e;
+
+  font-size: 19px;
+}
+
+
+.control-diario-save-button {
+  min-height: 40px;
+
+  padding: 0 18px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #126fe5;
+
+  color: #ffffff;
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 5px 13px
+    rgba(18, 111, 229, 0.2);
+}
+
+
+.control-diario-save-button:hover {
+  background: #0d63cf;
+}
+
+
+.control-diario-save-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+
+/* ============================== */
+/* ESTADO */
+/* ============================== */
+
+.control-diario-state {
+  padding: 35px;
+
+  background: #ffffff;
+
+  border: 1px solid #dfe6ef;
+  border-radius: 13px;
+
+  color: #718096;
+
+  font-size: 13px;
+
+  text-align: center;
+}
+
+
+/* ============================== */
+/* RESPONSIVE */
+/* ============================== */
+
+@media (
+  max-width: 800px
+) {
+
+  .control-diario-datos-grid {
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .control-diario-footer {
+    flex-direction:
+      column;
+
+    align-items:
+      stretch;
+  }
+
+
+  .control-diario-resumen {
+    justify-content:
+      space-between;
+
+    gap: 12px;
+  }
+
+
+  .control-diario-save-button {
+    width: 100%;
+  }
+
+}
+/* ========================================= */
+/* HISTORIAL */
+/* ========================================= */
+
+.control-diario-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+
+.control-diario-summary-card {
+  padding: 16px 18px;
+
+  background: #ffffff;
+
+  border: 1px solid #dde5ee;
+  border-radius: 12px;
+
+  box-shadow:
+    0 6px 20px
+    rgba(25, 50, 85, 0.04);
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+
+.control-diario-summary-card span {
+  color: #7d8ca1;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+
+.control-diario-summary-card strong {
+  color: #19314f;
+  font-size: 23px;
+}
+
+
+.control-diario-history-card {
+  margin-bottom: 18px;
+
+  background: #ffffff;
+
+  border: 1px solid #dde5ee;
+  border-radius: 13px;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 7px 22px
+    rgba(25, 50, 85, 0.04);
+}
+
+
+.control-diario-history-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+
+.control-diario-history-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+
+.control-diario-history-table th {
+  padding: 11px 14px;
+
+  background: #f7f9fc;
+
+  border-bottom: 1px solid #dfe6ef;
+
+  color: #5e6f86;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  text-align: left;
+}
+
+
+.control-diario-history-table td {
+  padding: 12px 14px;
+
+  border-bottom: 1px solid #edf1f5;
+
+  color: #53647b;
+
+  font-size: 11px;
+}
+
+
+.control-diario-history-table tbody tr:hover {
+  background: #fafcff;
+}
+
+
+.control-diario-history-date {
+  color: #263c59;
+}
+
+
+.control-diario-history-badge {
+  display: inline-flex;
+  align-items: center;
+
+  min-height: 24px;
+
+  padding: 0 8px;
+
+  border-radius: 999px;
+
+  background: #edf5ff;
+
+  color: #126fe5;
+
+  font-size: 10px;
+  font-weight: 800;
+}
+
+
+.control-diario-detail-link {
+  color: #126fe5;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  text-decoration: none;
+}
+
+
+.control-diario-detail-link:hover {
+  text-decoration: underline;
+}
+
+
+/* ========================================= */
+/* DETALLE */
+/* ========================================= */
+
+.control-diario-detail-summary {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 14px;
+
+  margin-bottom: 18px;
+}
+
+
+.control-diario-detail-summary > div {
+  padding: 16px 18px;
+
+  background: #ffffff;
+
+  border: 1px solid #dde5ee;
+  border-radius: 12px;
+
+  box-shadow:
+    0 6px 20px
+    rgba(25, 50, 85, 0.04);
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+
+.control-diario-detail-summary span {
+  color: #7d8ca1;
+
+  font-size: 10px;
+  font-weight: 700;
+}
+
+
+.control-diario-detail-summary strong {
+  color: #19314f;
+
+  font-size: 16px;
+}
+
+
+.control-diario-detail-observation {
+  margin-bottom: 18px;
+
+  padding: 16px 18px;
+
+  background: #ffffff;
+
+  border: 1px solid #dde5ee;
+  border-radius: 12px;
+}
+
+
+.control-diario-detail-observation span {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #7d8ca1;
+
+  font-size: 10px;
+  font-weight: 800;
+}
+
+
+.control-diario-detail-observation p {
+  margin: 0;
+
+  color: #425773;
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+
+.control-diario-detail-quantity {
+  color: #145fbf;
+}
+
+
+@media (
+  max-width: 750px
+) {
+
+  .control-diario-summary-grid,
+  .control-diario-detail-summary {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+/* ========================================= */
+/* ESTADÍSTICAS */
+/* ========================================= */
+
+.control-diario-stats-filter {
+  display: flex;
+  align-items: end;
+  gap: 12px;
+
+  margin-bottom: 18px;
+  padding: 16px 18px;
+
+  background: #ffffff;
+
+  border: 1px solid #dde5ee;
+  border-radius: 12px;
+
+  box-shadow:
+    0 6px 20px
+    rgba(25, 50, 85, 0.04);
+}
+
+
+.control-diario-stats-filter > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+
+.control-diario-stats-filter label {
+  color: #69798f;
+
+  font-size: 10px;
+  font-weight: 800;
+}
+
+
+.control-diario-stats-filter input {
+  min-width: 160px;
+  height: 36px;
+
+  padding: 0 10px;
+
+  border: 1px solid #ccd7e4;
+  border-radius: 7px;
+
+  background: #ffffff;
+
+  color: #31445f;
+
+  font-family: inherit;
+  font-size: 11px;
+
+  outline: none;
+}
+
+
+.control-diario-stats-filter input:focus {
+  border-color: #1671e8;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(22, 113, 232, 0.08);
+}
+
+
+.control-diario-stats-filter button {
+  height: 36px;
+
+  padding: 0 13px;
+
+  border: 1px solid #d8e2ee;
+  border-radius: 7px;
+
+  background: #f7f9fc;
+
+  color: #496078;
+
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+
+.control-diario-stats-filter button:hover {
+  background: #edf3fa;
+}
+
+
+.control-diario-stats-kpis {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap: 14px;
+
+  margin-bottom: 18px;
+}
+
+
+.control-diario-stats-kpi {
+  min-height: 105px;
+
+  padding: 16px 18px;
+
+  background: #ffffff;
+
+  border: 1px solid #dde5ee;
+  border-radius: 12px;
+
+  box-shadow:
+    0 6px 20px
+    rgba(25, 50, 85, 0.04);
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+
+.control-diario-stats-kpi span {
+  color: #7c8ba0;
+
+  font-size: 10px;
+  font-weight: 700;
+}
+
+
+.control-diario-stats-kpi strong {
+  color: #18304e;
+
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+
+.control-diario-stats-kpi-text {
+  font-size: 16px !important;
+}
+
+
+.control-diario-stats-kpi small {
+  margin-top: auto;
+
+  color: #96a2b3;
+
+  font-size: 9px;
+}
+
+
+.control-diario-stats-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap: 18px;
+
+  margin-bottom: 18px;
+}
+
+
+.control-diario-stats-card {
+  margin-bottom: 18px;
+
+  background: #ffffff;
+
+  border: 1px solid #dde5ee;
+  border-radius: 13px;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 7px 22px
+    rgba(25, 50, 85, 0.04);
+}
+
+
+.control-diario-stats-grid
+.control-diario-stats-card {
+  margin-bottom: 0;
+}
+
+
+.control-diario-stats-card-wide {
+  grid-column: span 2;
+}
+
+
+.control-diario-stats-card-header {
+  padding: 15px 18px;
+
+  border-bottom:
+    1px solid #e8edf4;
+}
+
+
+.control-diario-stats-card-header h2 {
+  margin: 0;
+
+  color: #203753;
+
+  font-size: 14px;
+}
+
+
+.control-diario-stats-card-header p {
+  margin: 4px 0 0;
+
+  color: #8190a3;
+
+  font-size: 10px;
+}
+
+
+.control-diario-chart {
+  width: 100%;
+  height: 300px;
+
+  padding: 15px;
+}
+
+
+.control-diario-chart-empty {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  color: #8998aa;
+
+  font-size: 11px;
+}
+
+
+@media (
+  max-width: 1000px
+) {
+
+  .control-diario-stats-kpis {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+
+}
+
+
+@media (
+  max-width: 800px
+) {
+
+  .control-diario-stats-grid {
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .control-diario-stats-card-wide {
+    grid-column:
+      span 1;
+  }
+
+
+  .control-diario-stats-filter {
+    align-items:
+      stretch;
+
+    flex-direction:
+      column;
+  }
+
+}
+
+
+@media (
+  max-width: 550px
+) {
+
+  .control-diario-stats-kpis {
+    grid-template-columns:
+      1fr;
+  }
+
+}
+
+/* ========================================= */
+/* ESTADÍSTICAS CONTROL DIARIO */
+/* ========================================= */
+
+.control-diario-stats-filter {
+  display: flex;
+  gap: 14px;
+  align-items: end;
+
+  padding: 16px 18px;
+  margin-bottom: 18px;
+
+  background: #ffffff;
+
+  border: 1px solid #dde5ee;
+  border-radius: 12px;
+}
+
+
+.control-diario-stats-filter > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+
+.control-diario-stats-filter label {
+  font-size: 10px;
+  font-weight: 700;
+
+  color: #6d7c90;
+}
+
+
+.control-diario-stats-filter input {
+  min-width: 160px;
+  height: 36px;
+
+  padding: 0 10px;
+
+  border:
+    1px solid #ccd7e4;
+
+  border-radius: 7px;
+
+  font-family: inherit;
+}
+
+
+.control-diario-stats-filter button {
+  height: 36px;
+
+  padding: 0 14px;
+
+  border:
+    1px solid #d8e2ee;
+
+  border-radius: 7px;
+
+  background: #f6f8fb;
+
+  cursor: pointer;
+}
+
+
+.control-diario-stats-kpis {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap: 14px;
+
+  margin-bottom: 18px;
+}
+
+
+.control-diario-stats-kpi {
+  display: flex;
+  flex-direction: column;
+
+  min-height: 110px;
+
+  padding: 16px 18px;
+
+  background: #ffffff;
+
+  border:
+    1px solid #dde5ee;
+
+  border-radius: 12px;
+}
+
+
+.control-diario-stats-kpi span {
+  color: #7c8ba0;
+
+  font-size: 10px;
+  font-weight: 700;
+}
+
+
+.control-diario-stats-kpi strong {
+  margin-top: 4px;
+
+  color: #18304e;
+
+  font-size: 24px;
+}
+
+
+.control-diario-stats-kpi-text {
+  font-size: 16px !important;
+}
+
+
+.control-diario-stats-kpi small {
+  margin-top: auto;
+
+  color: #96a2b3;
+
+  font-size: 9px;
+}
+
+
+.control-diario-stats-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap: 18px;
+
+  margin-bottom: 18px;
+}
+
+
+.control-diario-stats-card {
+  background: #ffffff;
+
+  border:
+    1px solid #dde5ee;
+
+  border-radius: 12px;
+
+  overflow: hidden;
+
+  margin-bottom: 18px;
+}
+
+
+.control-diario-stats-card-wide {
+  grid-column:
+    span 2;
+}
+
+
+.control-diario-stats-card-header {
+  padding: 15px 18px;
+
+  border-bottom:
+    1px solid #e8edf4;
+}
+
+
+.control-diario-stats-card-header h2 {
+  margin: 0;
+
+  font-size: 14px;
+
+  color: #203753;
+}
+
+
+.control-diario-stats-card-header p {
+  margin: 4px 0 0;
+
+  font-size: 10px;
+
+  color: #8190a3;
+}
+
+
+.control-diario-chart {
+  width: 100%;
+  height: 310px;
+
+  padding: 15px;
+}
+
+
+@media (
+  max-width: 1000px
+) {
+
+  .control-diario-stats-kpis {
+    grid-template-columns:
+      repeat(
+        2,
+        1fr
+      );
+  }
+
+}
+
+
+@media (
+  max-width: 800px
+) {
+
+  .control-diario-stats-grid {
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .control-diario-stats-card-wide {
+    grid-column:
+      span 1;
+  }
+
+
+  .control-diario-stats-filter {
+    flex-direction:
+      column;
+
+    align-items:
+      stretch;
+  }
+
+}

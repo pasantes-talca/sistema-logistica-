@@ -52,11 +52,11 @@ import InicioCambiosPage from "./pages/InicioCambiosPage";
 // VIÁTICOS
 // =============================================
 
-
 import NuevoViaticoPage from "./pages/NuevoViaticoPage";
 import HistorialViaticosPage from "./pages/HistorialViaticosPage";
 import ResumenAnualViaticosPage from "./pages/ResumenAnualViaticosPage";
 import InicioViaticosPage from "./pages/InicioViaticosPage";
+
 
 // =============================================
 // ASISTENTE IA
@@ -64,18 +64,56 @@ import InicioViaticosPage from "./pages/InicioViaticosPage";
 
 import AsistenteIAPage from "./pages/AsistenteIAPage";
 
-import NuevoControlKilometrajePage from "./pages/NuevoControlKilometrajePage";
-import InicioKilometrajesPage from "./pages/InicioKilometrajesPage";
-import HistorialKilometrajesPage from "./pages/HistorialKilometrajesPage";
-import DetalleKilometrajePage from "./pages/DetalleKilometrajePage";
-import EstadisticasKilometrajesPage from "./pages/EstadisticasKilometrajesPage";
+
+// =============================================
+// KILOMETRAJES
+// =============================================
+
+import NuevoControlKilometrajePage
+  from "./pages/NuevoControlKilometrajePage";
+
+import InicioKilometrajesPage
+  from "./pages/InicioKilometrajesPage";
+
+import HistorialKilometrajesPage
+  from "./pages/HistorialKilometrajesPage";
+
+import DetalleKilometrajePage
+  from "./pages/DetalleKilometrajePage";
+
+import EstadisticasKilometrajesPage
+  from "./pages/EstadisticasKilometrajesPage";
+
+
+// =============================================
+// CONTROL DIARIO
+// =============================================
+
+import InicioControlDiarioPage
+  from "./pages/InicioControlDiarioPage";
+
+import NuevoControlDiarioPage
+  from "./pages/NuevoControlDiarioPage";
+
+import HistorialControlDiarioPage
+  from "./pages/HistorialControlDiarioPage";
+
+import DetalleControlDiarioPage
+  from "./pages/DetalleControlDiarioPage";
+
+import EstadisticasControlDiarioPage
+  from "./pages/EstadisticasControlDiarioPage";
+
 
 
 function App() {
+
   return (
+
     <BrowserRouter>
 
       <Routes>
+
 
         {/* ===================================== */}
         {/* LOGIN */}
@@ -96,6 +134,7 @@ function App() {
         <Route
           path="/*"
           element={
+
             <RutaProtegida>
 
               <AppLayout>
@@ -141,6 +180,13 @@ function App() {
                   />
 
                   <Route
+                    path="/repartos/recargas"
+                    element={
+                      <ReporteRecargasPage />
+                    }
+                  />
+
+                  <Route
                     path="/repartos"
                     element={
                       <HistorialRepartosPage />
@@ -151,13 +197,6 @@ function App() {
                     path="/repartos/:id/editar"
                     element={
                       <EditarRepartoPage />
-                    }
-                  />
-
-                  <Route
-                    path="/repartos/recargas"
-                    element={
-                      <ReporteRecargasPage />
                     }
                   />
 
@@ -181,6 +220,13 @@ function App() {
                   />
 
                   <Route
+                    path="/rechazos/estadisticas"
+                    element={
+                      <EstadisticasRechazosPage />
+                    }
+                  />
+
+                  <Route
                     path="/rechazos"
                     element={
                       <HistorialRechazosPage />
@@ -191,13 +237,6 @@ function App() {
                     path="/rechazos/:id/editar"
                     element={
                       <EditarRechazoPage />
-                    }
-                  />
-
-                  <Route
-                    path="/rechazos/estadisticas"
-                    element={
-                      <EstadisticasRechazosPage />
                     }
                   />
 
@@ -217,6 +256,13 @@ function App() {
                     path="/cambios/nuevo"
                     element={
                       <NuevoReciboCambioPage />
+                    }
+                  />
+
+                  <Route
+                    path="/cambios/estadisticas"
+                    element={
+                      <EstadisticasCambiosPage />
                     }
                   />
 
@@ -241,13 +287,6 @@ function App() {
                     }
                   />
 
-                  <Route
-                    path="/cambios/estadisticas"
-                    element={
-                      <EstadisticasCambiosPage />
-                    }
-                  />
-
 
                   {/* ============================= */}
                   {/* VIÁTICOS */}
@@ -268,16 +307,16 @@ function App() {
                   />
 
                   <Route
-                    path="/viaticos"
+                    path="/viaticos/resumen"
                     element={
-                      <HistorialViaticosPage />
+                      <ResumenAnualViaticosPage />
                     }
                   />
 
                   <Route
-                    path="/viaticos/resumen"
+                    path="/viaticos"
                     element={
-                      <ResumenAnualViaticosPage />
+                      <HistorialViaticosPage />
                     }
                   />
 
@@ -293,29 +332,84 @@ function App() {
                     }
                   />
 
-                  <Route
-                    path="/kilometrajes/nuevo"
-                    element={<NuevoControlKilometrajePage />}
-                  />
+
+                  {/* ============================= */}
+                  {/* KILOMETRAJES */}
+                  {/* ============================= */}
 
                   <Route
                     path="/kilometrajes/inicio"
-                    element={<InicioKilometrajesPage />}
+                    element={
+                      <InicioKilometrajesPage />
+                    }
                   />
 
                   <Route
-                    path="/kilometrajes"
-                    element={<HistorialKilometrajesPage />}
-                  />
-
-                  <Route
-                    path="/kilometrajes/:id"
-                    element={<DetalleKilometrajePage />}
+                    path="/kilometrajes/nuevo"
+                    element={
+                      <NuevoControlKilometrajePage />
+                    }
                   />
 
                   <Route
                     path="/kilometrajes/estadisticas"
-                    element={<EstadisticasKilometrajesPage />}
+                    element={
+                      <EstadisticasKilometrajesPage />
+                    }
+                  />
+
+                  <Route
+                    path="/kilometrajes"
+                    element={
+                      <HistorialKilometrajesPage />
+                    }
+                  />
+
+                  <Route
+                    path="/kilometrajes/:id"
+                    element={
+                      <DetalleKilometrajePage />
+                    }
+                  />
+
+
+                  {/* ============================= */}
+                  {/* CONTROL DIARIO */}
+                  {/* ============================= */}
+
+                  <Route
+                    path="/control-diario/inicio"
+                    element={
+                      <InicioControlDiarioPage />
+                    }
+                  />
+
+                  <Route
+                    path="/control-diario/nuevo"
+                    element={
+                      <NuevoControlDiarioPage />
+                    }
+                  />
+
+                  <Route
+                    path="/control-diario/estadisticas"
+                    element={
+                      <EstadisticasControlDiarioPage />
+                    }
+                  />
+
+                  <Route
+                    path="/control-diario"
+                    element={
+                      <HistorialControlDiarioPage />
+                    }
+                  />
+
+                  <Route
+                    path="/control-diario/:id"
+                    element={
+                      <DetalleControlDiarioPage />
+                    }
                   />
 
 
@@ -327,9 +421,11 @@ function App() {
           }
         />
 
+
       </Routes>
 
     </BrowserRouter>
+
   );
 }
 

@@ -60,4 +60,9 @@ urlpatterns = [
         include("kilometrajes.urls"),
     ),
 
+    path(
+        "api/control-diario/",
+        include("control_diario.urls"),
+    ),
+
 ]

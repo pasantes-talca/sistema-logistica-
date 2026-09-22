@@ -156,14 +156,19 @@ export default function PanelPrincipalPage() {
         "navy",
     },
 
-
     {
-      label: "Áreas operativas",
-      value: 5,
-      icon: "activity",
-      tone: "navy",
-    },
+      label:
+        "Áreas operativas",
 
+      value:
+        6,
+
+      icon:
+        "activity",
+
+      tone:
+        "navy",
+    },
 
   ];
 
@@ -333,24 +338,80 @@ export default function PanelPrincipalPage() {
     },
 
     {
-      title: "Kilometrajes",
+      title:
+        "Kilometrajes",
+
       description:
-        "Registrá y consultá los kilómetros recorridos por chofer y destino.",
-      icon: "truck",
-      tone: "blue",
-      home: "/kilometrajes/nuevo",
+        (
+          "Registrá y consultá los kilómetros " +
+          "recorridos por chofer y destino."
+        ),
+
+      icon:
+        "truck",
+
+      tone:
+        "blue",
+
+      home:
+        "/kilometrajes/inicio",
+
       links: [
         {
-          to: "/kilometrajes/nuevo",
-          label: "Nuevo control",
+          to:
+            "/kilometrajes/nuevo",
+
+          label:
+            "Nuevo control",
         },
+
         {
-          to: "/kilometrajes",
-          label: "Ver historial",
+          to:
+            "/kilometrajes",
+
+          label:
+            "Ver historial",
         },
       ],
     },
 
+    {
+      title:
+        "Control diario",
+
+      description:
+        (
+          "Gestioná disponibilidad, asignaciones, " +
+          "stock de depósitos y distribución diaria."
+        ),
+
+      icon:
+        "boxes",
+
+      tone:
+        "blue",
+
+      home:
+        "/control-diario/inicio",
+
+      links: [
+        {
+          to:
+            "/control-diario/nuevo",
+
+          label:
+            "Nueva carga",
+        },
+
+        {
+          to:
+            "/control-diario",
+
+          label:
+            "Ver historial",
+        },
+      ],
+    },
 
   ];
 

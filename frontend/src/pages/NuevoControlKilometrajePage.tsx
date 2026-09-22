@@ -13,6 +13,8 @@ import type {
   RegistroKilometrajeEntrada,
 } from "../types/logistica";
 
+import "./Kilometrajes.css";
+
 
 type ViajesPorFecha = Record<
   string,
@@ -38,13 +40,9 @@ function generarFechas(
   );
 
   if (
-    Number.isNaN(
-      inicio.getTime()
-    )
+    Number.isNaN(inicio.getTime())
     ||
-    Number.isNaN(
-      fin.getTime()
-    )
+    Number.isNaN(fin.getTime())
     ||
     fin < inicio
   ) {
@@ -53,13 +51,9 @@ function generarFechas(
 
   const fechas: string[] = [];
 
-  const actual = new Date(
-    inicio
-  );
+  const actual = new Date(inicio);
 
-  while (
-    actual <= fin
-  ) {
+  while (actual <= fin) {
 
     const anio =
       actual.getFullYear();
@@ -185,13 +179,9 @@ export default function NuevoControlKilometrajePage() {
 
       let total = 0;
 
-      for (
-        const fecha of fechas
-      ) {
+      for (const fecha of fechas) {
 
-        for (
-          const destino of destinos
-        ) {
+        for (const destino of destinos) {
 
           const cantidad =
             viajes[fecha]?.[
@@ -221,15 +211,12 @@ export default function NuevoControlKilometrajePage() {
 
 
   const obtenerTotalDestino = (
-    destino:
-      DestinoKilometraje
+    destino: DestinoKilometraje
   ) => {
 
     let cantidadTotal = 0;
 
-    for (
-      const fecha of fechas
-    ) {
+    for (const fecha of fechas) {
 
       cantidadTotal +=
         viajes[fecha]?.[
@@ -268,9 +255,7 @@ export default function NuevoControlKilometrajePage() {
         ...anterior,
 
         [fecha]: {
-          ...anterior[
-            fecha
-          ],
+          ...anterior[fecha],
 
           [destinoId]:
             numero,
@@ -361,14 +346,9 @@ export default function NuevoControlKilometrajePage() {
       = [];
 
 
-    for (
-      const fecha of fechas
-    ) {
+    for (const fecha of fechas) {
 
-      for (
-        const destino
-        of destinos
-      ) {
+      for (const destino of destinos) {
 
         const cantidad =
           viajes[fecha]?.[
@@ -378,9 +358,7 @@ export default function NuevoControlKilometrajePage() {
           0;
 
 
-        if (
-          cantidad > 0
-        ) {
+        if (cantidad > 0) {
 
           registros.push({
             fecha:
@@ -431,14 +409,19 @@ export default function NuevoControlKilometrajePage() {
 
   return (
 
-    <div className="pagina">
+    <div className="kilometrajes-page">
 
-      <div className="contenedor">
 
-        <div className="subtitulo">
+      <div className="kilometrajes-header">
+
+        <div>
+
+          <span className="kilometrajes-eyebrow">
+            CONTROL DE KILOMETRAJE
+          </span>
 
           <h1>
-            Nuevo control de kilometraje
+            Nuevo control
           </h1>
 
           <p>
@@ -449,19 +432,21 @@ export default function NuevoControlKilometrajePage() {
 
         </div>
 
+      </div>
 
-        <div className="formulario">
 
-          <div className="campo">
+      <div className="kilometrajes-form-card">
+
+        <div className="kilometrajes-form-grid">
+
+          <div className="kilometrajes-form-field">
 
             <label>
               Chofer
             </label>
 
             <select
-              value={
-                choferId
-              }
+              value={choferId}
               onChange={
                 event =>
                   setChoferId(
@@ -479,16 +464,10 @@ export default function NuevoControlKilometrajePage() {
                   chofer => (
 
                     <option
-                      key={
-                        chofer.id
-                      }
-                      value={
-                        chofer.id
-                      }
+                      key={chofer.id}
+                      value={chofer.id}
                     >
-                      {
-                        chofer.nombre
-                      }
+                      {chofer.nombre}
                     </option>
 
                   )
@@ -500,7 +479,7 @@ export default function NuevoControlKilometrajePage() {
           </div>
 
 
-          <div className="campo">
+          <div className="kilometrajes-form-field">
 
             <label>
               Desde
@@ -508,9 +487,7 @@ export default function NuevoControlKilometrajePage() {
 
             <input
               type="date"
-              value={
-                fechaDesde
-              }
+              value={fechaDesde}
               onChange={
                 event =>
                   setFechaDesde(
@@ -522,7 +499,7 @@ export default function NuevoControlKilometrajePage() {
           </div>
 
 
-          <div className="campo">
+          <div className="kilometrajes-form-field">
 
             <label>
               Hasta
@@ -530,9 +507,7 @@ export default function NuevoControlKilometrajePage() {
 
             <input
               type="date"
-              value={
-                fechaHasta
-              }
+              value={fechaHasta}
               onChange={
                 event =>
                   setFechaHasta(
@@ -544,16 +519,14 @@ export default function NuevoControlKilometrajePage() {
           </div>
 
 
-          <div className="campo">
+          <div className="kilometrajes-form-field kilometrajes-form-observation">
 
             <label>
               Observaciones
             </label>
 
             <textarea
-              value={
-                observaciones
-              }
+              value={observaciones}
               onChange={
                 event =>
                   setObservaciones(
@@ -567,45 +540,60 @@ export default function NuevoControlKilometrajePage() {
 
         </div>
 
+      </div>
 
-        {
-          cargandoDestinos
-          ? (
 
-            <p>
+      {
+        cargandoDestinos
+        ? (
+
+          <div className="kilometrajes-state">
+
+            <strong>
               Cargando destinos...
-            </p>
+            </strong>
 
-          )
-          :
-          fechas.length > 0
-          ? (
+          </div>
 
-            <div
-              style={{
-                marginTop:
-                  "28px",
-                overflowX:
-                  "auto",
-              }}
-            >
+        )
+        :
+        fechas.length > 0
+        ? (
 
-              <table
-                style={{
-                  width:
-                    "100%",
-                  borderCollapse:
-                    "collapse",
-                  minWidth:
-                    "1100px",
-                }}
-              >
+          <div className="kilometrajes-grid-card">
+
+
+            <div className="kilometrajes-grid-header">
+
+              <div>
+
+                <span>
+                  CARGA DE VIAJES
+                </span>
+
+                <h2>
+                  Kilómetros por destino
+                </h2>
+
+              </div>
+
+
+              <small>
+                Ingresá la cantidad de viajes realizados
+              </small>
+
+            </div>
+
+
+            <div className="kilometrajes-grid-wrapper">
+
+              <table className="kilometrajes-grid-table">
 
                 <thead>
 
                   <tr>
 
-                    <th>
+                    <th className="kilometrajes-sticky-column">
                       Fecha
                     </th>
 
@@ -614,42 +602,25 @@ export default function NuevoControlKilometrajePage() {
                         destino => (
 
                           <th
-                            key={
-                              destino.id
-                            }
+                            key={destino.id}
                           >
-                            {
-                              destino.nombre
-                            }
-                          </th>
 
-                        )
-                      )
-                    }
+                            <div className="kilometrajes-destino-header">
 
-                  </tr>
+                              <strong>
+                                {destino.nombre}
+                              </strong>
 
+                              <span>
+                                {
+                                  Number(
+                                    destino.distancia_km
+                                  )
+                                } km
+                              </span>
 
-                  <tr>
+                            </div>
 
-                    <th>
-                      Distancia
-                    </th>
-
-                    {
-                      destinos.map(
-                        destino => (
-
-                          <th
-                            key={
-                              destino.id
-                            }
-                          >
-                            {
-                              Number(
-                                destino.distancia_km
-                              )
-                            } km
                           </th>
 
                         )
@@ -668,27 +639,27 @@ export default function NuevoControlKilometrajePage() {
                       fecha => (
 
                         <tr
-                          key={
-                            fecha
-                          }
+                          key={fecha}
                         >
 
-                          <td>
+                          <td className="kilometrajes-sticky-column kilometrajes-date-cell">
+
                             {
                               formatearFecha(
                                 fecha
                               )
                             }
+
                           </td>
+
 
                           {
                             destinos.map(
                               destino => (
 
                                 <td
-                                  key={
-                                    destino.id
-                                  }
+                                  key={destino.id}
+                                  className="kilometrajes-input-cell"
                                 >
 
                                   <input
@@ -696,9 +667,7 @@ export default function NuevoControlKilometrajePage() {
                                     min="0"
                                     step="1"
                                     value={
-                                      viajes[
-                                        fecha
-                                      ]?.[
+                                      viajes[fecha]?.[
                                         destino.id
                                       ]
                                       ??
@@ -712,10 +681,6 @@ export default function NuevoControlKilometrajePage() {
                                           event.target.value
                                         )
                                     }
-                                    style={{
-                                      width:
-                                        "70px",
-                                    }}
                                   />
 
                                 </td>
@@ -730,32 +695,32 @@ export default function NuevoControlKilometrajePage() {
                     )
                   }
 
+                </tbody>
+
+
+                <tfoot>
 
                   <tr>
 
-                    <td>
-                      <strong>
-                        Total km
-                      </strong>
+                    <td className="kilometrajes-sticky-column kilometrajes-total-label">
+                      Total km
                     </td>
+
 
                     {
                       destinos.map(
                         destino => (
 
                           <td
-                            key={
-                              destino.id
-                            }
+                            key={destino.id}
+                            className="kilometrajes-total-cell"
                           >
 
-                            <strong>
-                              {
-                                obtenerTotalDestino(
-                                  destino
-                                )
-                              }
-                            </strong>
+                            {
+                              obtenerTotalDestino(
+                                destino
+                              )
+                            }
 
                           </td>
 
@@ -765,49 +730,14 @@ export default function NuevoControlKilometrajePage() {
 
                   </tr>
 
-                </tbody>
+                </tfoot>
 
               </table>
 
             </div>
 
-          )
-          :
-          (
 
-            <p
-              style={{
-                marginTop:
-                  "24px",
-              }}
-            >
-              Seleccioná un período para
-              cargar los viajes.
-            </p>
-
-          )
-        }
-
-
-        {
-          fechas.length > 0
-          &&
-          (
-
-            <div
-              style={{
-                marginTop:
-                  "24px",
-                display:
-                  "flex",
-                alignItems:
-                  "center",
-                justifyContent:
-                  "space-between",
-                gap:
-                  "20px",
-              }}
-            >
+            <div className="kilometrajes-grid-footer">
 
               <div>
 
@@ -815,21 +745,17 @@ export default function NuevoControlKilometrajePage() {
                   Total del período
                 </span>
 
-                <h2>
-                  {
-                    totalKm
-                  } km
-                </h2>
+                <strong>
+                  {totalKm} km
+                </strong>
 
               </div>
 
 
               <button
-                className="boton-guardar"
                 type="button"
-                onClick={
-                  guardar
-                }
+                className="kilometrajes-save-button"
+                onClick={guardar}
                 disabled={
                   mutation.isPending
                 }
@@ -847,10 +773,28 @@ export default function NuevoControlKilometrajePage() {
 
             </div>
 
-          )
-        }
 
-      </div>
+          </div>
+
+        )
+        :
+        (
+
+          <div className="kilometrajes-empty-period">
+
+            <strong>
+              Seleccioná un período
+            </strong>
+
+            <span>
+              La grilla de carga aparecerá
+              cuando completes las fechas.
+            </span>
+
+          </div>
+
+        )
+      }
 
     </div>
 

@@ -644,3 +644,33 @@
   }
 
 }
+
+.viaticos-inicio-card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  margin-top: 14px;
+
+  color: #0f6fe8;
+
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+
+  transition:
+    color 0.15s ease,
+    gap 0.15s ease;
+}
+
+
+.viaticos-inicio-card:hover
+.viaticos-inicio-card-link {
+  color: #075ec8;
+  gap: 7px;
+}
+
+
+.viaticos-inicio-card-link svg {
+  flex-shrink: 0;
+}

@@ -171,6 +171,29 @@ const modules: {
     ],
   },
 
+  {
+    label: "Control diario",
+    icon: "boxes",
+    base: "/control-diario",
+    links: [
+      {
+        label: "Nueva carga",
+        to: "/control-diario/nuevo",
+        icon: "plus",
+      },
+      {
+        label: "Historial",
+        to: "/control-diario",
+        icon: "history",
+      },
+      {
+        label: "Estadísticas",
+        to: "/control-diario/estadisticas",
+        icon: "chart",
+      },
+    ],
+  },
+
 ];
 
 
