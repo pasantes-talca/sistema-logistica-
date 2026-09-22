@@ -280,13 +280,19 @@ export interface EstadisticasCambios {
     EstadisticaCambioProductoConcesionario[];
 }
 
+
 export interface UsuarioActual {
-  autenticado?: boolean;
+  autenticado: boolean;
   id: number;
   username: string;
   first_name: string;
   last_name: string;
   nombre_completo: string;
+
+  es_superusuario: boolean;
+  es_staff: boolean;
+
+  grupos: string[];
 }
 
 export interface LoginPayload {

@@ -23,6 +23,46 @@ from rest_framework.views import (
 )
 
 
+def obtener_datos_usuario(user):
+
+    grupos = list(
+        user.groups.values_list(
+            "name",
+            flat=True,
+        )
+    )
+
+    return {
+        "id":
+            user.id,
+
+        "username":
+            user.username,
+
+        "first_name":
+            user.first_name,
+
+        "last_name":
+            user.last_name,
+
+        "nombre_completo":
+            (
+                user.get_full_name()
+                or
+                user.username
+            ),
+
+        "es_superusuario":
+            user.is_superuser,
+
+        "es_staff":
+            user.is_staff,
+
+        "grupos":
+            grupos,
+    }
+
+
 @method_decorator(
     ensure_csrf_cookie,
     name="dispatch",
@@ -93,37 +133,20 @@ class LoginAPIView(APIView):
         )
 
 
-        # La sesión se mantiene mientras
-        # el navegador esté abierto.
-        #
-        # Al cerrar completamente el navegador,
-        # la cookie de sesión debería expirar.
         request.session.set_expiry(
             0
         )
 
 
+        datos_usuario = (
+            obtener_datos_usuario(
+                user
+            )
+        )
+
+
         return Response(
-            {
-                "id":
-                    user.id,
-
-                "username":
-                    user.username,
-
-                "first_name":
-                    user.first_name,
-
-                "last_name":
-                    user.last_name,
-
-                "nombre_completo":
-                    (
-                        user.get_full_name()
-                        or
-                        user.username
-                    ),
-            }
+            datos_usuario
         )
 
 
@@ -175,28 +198,18 @@ class UsuarioActualAPIView(APIView):
         user = request.user
 
 
+        datos_usuario = (
+            obtener_datos_usuario(
+                user
+            )
+        )
+
+
         return Response(
             {
                 "autenticado":
                     True,
 
-                "id":
-                    user.id,
-
-                "username":
-                    user.username,
-
-                "first_name":
-                    user.first_name,
-
-                "last_name":
-                    user.last_name,
-
-                "nombre_completo":
-                    (
-                        user.get_full_name()
-                        or
-                        user.username
-                    ),
+                **datos_usuario,
             }
         )

@@ -20,8 +20,9 @@ type ModuleItem = {
   icon: IconName;
   tone: string;
 
-  home?: string;
+  permiso: string;
 
+  home?: string;
   externalUrl?: string;
 
   links?: {
@@ -33,10 +34,20 @@ type ModuleItem = {
 };
 
 
+type KpiItem = {
+  label: string;
+  value: number | string;
+  icon: IconName;
+  tone: string;
+  permiso?: string;
+};
+
+
 export default function PanelPrincipalPage() {
 
   const {
     data: usuario,
+    isLoading: cargandoUsuario,
   } = useQuery({
     queryKey: [
       "usuario-actual",
@@ -48,6 +59,30 @@ export default function PanelPrincipalPage() {
   });
 
 
+  const esSuperusuario =
+    usuario?.es_superusuario
+    ?? false;
+
+
+  const grupos =
+    usuario?.grupos
+    ?? [];
+
+
+  function tienePermiso(
+    permiso: string
+  ) {
+
+    if (esSuperusuario) {
+      return true;
+    }
+
+    return grupos.includes(
+      permiso
+    );
+  }
+
+
   const {
     data: repartos,
     isLoading: cargandoRepartos,
@@ -57,6 +92,12 @@ export default function PanelPrincipalPage() {
     ],
     queryFn:
       obtenerRepartos,
+    enabled:
+      !cargandoUsuario
+      &&
+      tienePermiso(
+        "REPARTOS"
+      ),
   });
 
 
@@ -69,6 +110,12 @@ export default function PanelPrincipalPage() {
     ],
     queryFn:
       obtenerRechazos,
+    enabled:
+      !cargandoUsuario
+      &&
+      tienePermiso(
+        "RECHAZOS"
+      ),
   });
 
 
@@ -81,6 +128,12 @@ export default function PanelPrincipalPage() {
     ],
     queryFn:
       obtenerRecibosCambio,
+    enabled:
+      !cargandoUsuario
+      &&
+      tienePermiso(
+        "CAMBIOS"
+      ),
   });
 
 
@@ -93,6 +146,12 @@ export default function PanelPrincipalPage() {
     ],
     queryFn:
       obtenerViaticos,
+    enabled:
+      !cargandoUsuario
+      &&
+      tienePermiso(
+        "VIATICOS"
+      ),
   });
 
 
@@ -102,94 +161,6 @@ export default function PanelPrincipalPage() {
     usuario?.username
     ||
     "Usuario";
-
-
-  const kpis: {
-    label: string;
-    value: number | string;
-    icon: IconName;
-    tone: string;
-  }[] = [
-
-    {
-      label:
-        "Repartos registrados",
-
-      value:
-        cargandoRepartos
-          ? "—"
-          : repartos?.length ?? 0,
-
-      icon:
-        "truck",
-
-      tone:
-        "blue",
-    },
-
-    {
-      label:
-        "Rechazos registrados",
-
-      value:
-        cargandoRechazos
-          ? "—"
-          : rechazos?.length ?? 0,
-
-      icon:
-        "alert",
-
-      tone:
-        "amber",
-    },
-
-    {
-      label:
-        "Recibos de cambios",
-
-      value:
-        cargandoRecibos
-          ? "—"
-          : recibos?.length ?? 0,
-
-      icon:
-        "boxes",
-
-      tone:
-        "green",
-    },
-
-    {
-      label:
-        "Viáticos registrados",
-
-      value:
-        cargandoViaticos
-          ? "—"
-          : viaticos?.length ?? 0,
-
-      icon:
-        "activity",
-
-      tone:
-        "navy",
-    },
-
-    {
-      label:
-        "Áreas operativas",
-
-      value:
-        6,
-
-      icon:
-        "activity",
-
-      tone:
-        "navy",
-    },
-
-  ];
 
 
   const modules: ModuleItem[] = [
@@ -209,6 +180,9 @@ export default function PanelPrincipalPage() {
 
       tone:
         "blue",
+
+      permiso:
+        "REPARTOS",
 
       home:
         "/repartos/inicio",
@@ -232,6 +206,7 @@ export default function PanelPrincipalPage() {
       ],
     },
 
+
     {
       title:
         "Rechazos",
@@ -247,6 +222,9 @@ export default function PanelPrincipalPage() {
 
       tone:
         "amber",
+
+      permiso:
+        "RECHAZOS",
 
       home:
         "/rechazos/inicio",
@@ -270,6 +248,7 @@ export default function PanelPrincipalPage() {
       ],
     },
 
+
     {
       title:
         "Recibos de cambios",
@@ -285,6 +264,9 @@ export default function PanelPrincipalPage() {
 
       tone:
         "green",
+
+      permiso:
+        "CAMBIOS",
 
       home:
         "/cambios/inicio",
@@ -308,6 +290,7 @@ export default function PanelPrincipalPage() {
       ],
     },
 
+
     {
       title:
         "Viáticos",
@@ -323,6 +306,9 @@ export default function PanelPrincipalPage() {
 
       tone:
         "navy",
+
+      permiso:
+        "VIATICOS",
 
       home:
         "/viaticos/inicio",
@@ -346,6 +332,7 @@ export default function PanelPrincipalPage() {
       ],
     },
 
+
     {
       title:
         "Kilometrajes",
@@ -361,6 +348,9 @@ export default function PanelPrincipalPage() {
 
       tone:
         "blue",
+
+      permiso:
+        "KILOMETRAJES",
 
       home:
         "/kilometrajes/inicio",
@@ -384,6 +374,7 @@ export default function PanelPrincipalPage() {
       ],
     },
 
+
     {
       title:
         "Control diario",
@@ -399,6 +390,9 @@ export default function PanelPrincipalPage() {
 
       tone:
         "blue",
+
+      permiso:
+        "CONTROL_DIARIO",
 
       home:
         "/control-diario/inicio",
@@ -422,6 +416,7 @@ export default function PanelPrincipalPage() {
       ],
     },
 
+
     {
       title:
         "Stock de pallets",
@@ -438,6 +433,9 @@ export default function PanelPrincipalPage() {
       tone:
         "green",
 
+      permiso:
+        "CAMBIOS",
+
       external:
         true,
 
@@ -446,6 +444,164 @@ export default function PanelPrincipalPage() {
     },
 
   ];
+
+
+  const modulesVisibles =
+    esSuperusuario
+      ? modules
+      : modules.filter(
+          module =>
+            grupos.includes(
+              module.permiso
+            )
+        );
+
+
+  const areasInternasDisponibles =
+    modulesVisibles.filter(
+      module =>
+        !module.external
+    ).length;
+
+
+  const kpis: KpiItem[] = [
+
+    {
+      label:
+        "Repartos registrados",
+
+      value:
+        cargandoRepartos
+          ? "—"
+          : repartos?.length ?? 0,
+
+      icon:
+        "truck",
+
+      tone:
+        "blue",
+
+      permiso:
+        "REPARTOS",
+    },
+
+
+    {
+      label:
+        "Rechazos registrados",
+
+      value:
+        cargandoRechazos
+          ? "—"
+          : rechazos?.length ?? 0,
+
+      icon:
+        "alert",
+
+      tone:
+        "amber",
+
+      permiso:
+        "RECHAZOS",
+    },
+
+
+    {
+      label:
+        "Recibos de cambios",
+
+      value:
+        cargandoRecibos
+          ? "—"
+          : recibos?.length ?? 0,
+
+      icon:
+        "boxes",
+
+      tone:
+        "green",
+
+      permiso:
+        "CAMBIOS",
+    },
+
+
+    {
+      label:
+        "Viáticos registrados",
+
+      value:
+        cargandoViaticos
+          ? "—"
+          : viaticos?.length ?? 0,
+
+      icon:
+        "activity",
+
+      tone:
+        "navy",
+
+      permiso:
+        "VIATICOS",
+    },
+
+
+    {
+      label:
+        "Áreas disponibles",
+
+      value:
+        areasInternasDisponibles,
+
+      icon:
+        "activity",
+
+      tone:
+        "navy",
+    },
+
+  ];
+
+
+  const kpisVisibles =
+    kpis.filter(
+      kpi =>
+        !kpi.permiso
+        ||
+        esSuperusuario
+        ||
+        grupos.includes(
+          kpi.permiso
+        )
+    );
+
+
+  if (cargandoUsuario) {
+
+    return (
+
+      <div className="pagina">
+
+        <div className="dashboard-container">
+
+          <div className="dashboard-bienvenida">
+
+            <div>
+
+              <h1>
+                Cargando...
+              </h1>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    );
+  }
 
 
   return (
@@ -500,7 +656,7 @@ export default function PanelPrincipalPage() {
               </strong>
 
               <small>
-                Todos los módulos operativos
+                Módulos habilitados para tu usuario
               </small>
 
             </div>
@@ -532,7 +688,7 @@ export default function PanelPrincipalPage() {
 
 
             <small>
-              Datos actuales del sistema
+              Datos disponibles para tu usuario
             </small>
 
           </div>
@@ -541,7 +697,7 @@ export default function PanelPrincipalPage() {
           <div className="dashboard-kpis">
 
             {
-              kpis.map(
+              kpisVisibles.map(
                 kpi => (
 
                   <div
@@ -581,7 +737,15 @@ export default function PanelPrincipalPage() {
                       </strong>
 
                       <small>
-                        Registros totales
+
+                        {
+                          kpi.label
+                          ===
+                          "Áreas disponibles"
+                            ? "Módulos habilitados"
+                            : "Registros totales"
+                        }
+
                       </small>
 
                     </div>
@@ -628,7 +792,7 @@ export default function PanelPrincipalPage() {
           <div className="grid-modulos">
 
             {
-              modules.map(
+              modulesVisibles.map(
                 module => (
 
                   <article
@@ -655,11 +819,13 @@ export default function PanelPrincipalPage() {
 
 
                       <span>
+
                         {
                           module.external
                             ? "Sistema externo"
                             : "Área operativa"
                         }
+
                       </span>
 
                     </div>

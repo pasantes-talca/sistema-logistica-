@@ -1,9 +1,11 @@
 import { useState } from "react";
+
 import {
   NavLink,
   useLocation,
   useNavigate,
 } from "react-router-dom";
+
 import {
   useQuery,
   useQueryClient,
@@ -24,172 +26,328 @@ interface Props {
 }
 
 
-const modules: {
+type SidebarModule = {
   label: string;
   icon: IconName;
   base: string;
+  permiso: string;
+
   links: {
     label: string;
     to: string;
     icon: IconName;
   }[];
-}[] = [
+};
+
+
+const modules: SidebarModule[] = [
 
   {
-    label: "Repartos y recargas",
-    icon: "truck",
-    base: "/repartos",
+    label:
+      "Repartos y recargas",
+
+    icon:
+      "truck",
+
+    base:
+      "/repartos",
+
+    permiso:
+      "REPARTOS",
 
     links: [
       {
-        label: "Nuevo reparto",
-        to: "/repartos/nuevo",
-        icon: "plus",
+        label:
+          "Nuevo reparto",
+
+        to:
+          "/repartos/nuevo",
+
+        icon:
+          "plus",
       },
 
       {
-        label: "Carga desde planillas",
-        to: "/repartos/planillas",
-        icon: "boxes",
+        label:
+          "Carga desde planillas",
+
+        to:
+          "/repartos/planillas",
+
+        icon:
+          "boxes",
       },
 
       {
-        label: "Historial",
-        to: "/repartos",
-        icon: "history",
+        label:
+          "Historial",
+
+        to:
+          "/repartos",
+
+        icon:
+          "history",
       },
 
       {
-        label: "Reporte de recargas",
-        to: "/repartos/recargas",
-        icon: "chart",
+        label:
+          "Reporte de recargas",
+
+        to:
+          "/repartos/recargas",
+
+        icon:
+          "chart",
       },
     ],
   },
 
 
   {
-    label: "Rechazos",
-    icon: "alert",
-    base: "/rechazos",
+    label:
+      "Rechazos",
+
+    icon:
+      "alert",
+
+    base:
+      "/rechazos",
+
+    permiso:
+      "RECHAZOS",
 
     links: [
       {
-        label: "Nuevo rechazo",
-        to: "/rechazos/nuevo",
-        icon: "plus",
+        label:
+          "Nuevo rechazo",
+
+        to:
+          "/rechazos/nuevo",
+
+        icon:
+          "plus",
       },
 
       {
-        label: "Historial",
-        to: "/rechazos",
-        icon: "history",
+        label:
+          "Historial",
+
+        to:
+          "/rechazos",
+
+        icon:
+          "history",
       },
 
       {
-        label: "Estadísticas",
-        to: "/rechazos/estadisticas",
-        icon: "chart",
+        label:
+          "Estadísticas",
+
+        to:
+          "/rechazos/estadisticas",
+
+        icon:
+          "chart",
       },
     ],
   },
 
 
   {
-    label: "Recibos de cambios",
-    icon: "boxes",
-    base: "/cambios",
+    label:
+      "Recibos de cambios",
+
+    icon:
+      "boxes",
+
+    base:
+      "/cambios",
+
+    permiso:
+      "CAMBIOS",
 
     links: [
       {
-        label: "Nuevo recibo",
-        to: "/cambios/nuevo",
-        icon: "plus",
+        label:
+          "Nuevo recibo",
+
+        to:
+          "/cambios/nuevo",
+
+        icon:
+          "plus",
       },
 
       {
-        label: "Historial",
-        to: "/cambios",
-        icon: "history",
+        label:
+          "Historial",
+
+        to:
+          "/cambios",
+
+        icon:
+          "history",
       },
 
       {
-        label: "Estadísticas",
-        to: "/cambios/estadisticas",
-        icon: "chart",
+        label:
+          "Estadísticas",
+
+        to:
+          "/cambios/estadisticas",
+
+        icon:
+          "chart",
       },
     ],
   },
 
 
   {
-    label: "Viáticos",
-    icon: "truck",
-    base: "/viaticos",
+    label:
+      "Viáticos",
+
+    icon:
+      "truck",
+
+    base:
+      "/viaticos",
+
+    permiso:
+      "VIATICOS",
 
     links: [
       {
-        label: "Nuevo registro",
-        to: "/viaticos/nuevo",
-        icon: "plus",
+        label:
+          "Nuevo registro",
+
+        to:
+          "/viaticos/nuevo",
+
+        icon:
+          "plus",
       },
 
       {
-        label: "Historial",
-        to: "/viaticos",
-        icon: "history",
+        label:
+          "Historial",
+
+        to:
+          "/viaticos",
+
+        icon:
+          "history",
       },
 
       {
-        label: "Resumen anual",
-        to: "/viaticos/resumen",
-        icon: "chart",
+        label:
+          "Resumen anual",
+
+        to:
+          "/viaticos/resumen",
+
+        icon:
+          "chart",
       },
     ],
   },
 
+
   {
-    label: "Kilometrajes",
-    icon: "truck",
-    base: "/kilometrajes",
+    label:
+      "Kilometrajes",
+
+    icon:
+      "truck",
+
+    base:
+      "/kilometrajes",
+
+    permiso:
+      "KILOMETRAJES",
+
     links: [
       {
-        label: "Nuevo control",
-        to: "/kilometrajes/nuevo",
-        icon: "plus",
+        label:
+          "Nuevo control",
+
+        to:
+          "/kilometrajes/nuevo",
+
+        icon:
+          "plus",
       },
+
       {
-        label: "Historial",
-        to: "/kilometrajes",
-        icon: "history",
+        label:
+          "Historial",
+
+        to:
+          "/kilometrajes",
+
+        icon:
+          "history",
       },
+
       {
-        label: "Estadísticas",
-        to: "/kilometrajes/estadisticas",
-        icon: "chart",
+        label:
+          "Estadísticas",
+
+        to:
+          "/kilometrajes/estadisticas",
+
+        icon:
+          "chart",
       },
     ],
   },
 
+
   {
-    label: "Control diario",
-    icon: "boxes",
-    base: "/control-diario",
+    label:
+      "Control diario",
+
+    icon:
+      "boxes",
+
+    base:
+      "/control-diario",
+
+    permiso:
+      "CONTROL_DIARIO",
+
     links: [
       {
-        label: "Nueva carga",
-        to: "/control-diario/nuevo",
-        icon: "plus",
+        label:
+          "Nueva carga",
+
+        to:
+          "/control-diario/nuevo",
+
+        icon:
+          "plus",
       },
+
       {
-        label: "Historial",
-        to: "/control-diario",
-        icon: "history",
+        label:
+          "Historial",
+
+        to:
+          "/control-diario",
+
+        icon:
+          "history",
       },
+
       {
-        label: "Estadísticas",
-        to: "/control-diario/estadisticas",
-        icon: "chart",
+        label:
+          "Estadísticas",
+
+        to:
+          "/control-diario/estadisticas",
+
+        icon:
+          "chart",
       },
     ],
   },
@@ -213,6 +371,12 @@ const pageNames: Record<
 
   viaticos:
     "Viáticos",
+
+  kilometrajes:
+    "Kilometrajes",
+
+  "control-diario":
+    "Control diario",
 
   asistente:
     "Asistente IA",
@@ -248,6 +412,7 @@ function Breadcrumbs() {
   const location =
     useLocation();
 
+
   const segments =
     location.pathname
       .split("/")
@@ -277,8 +442,10 @@ function Breadcrumbs() {
 
   const items =
     segments.filter(
-      (segment) =>
-        !/^\d+$/.test(segment)
+      segment =>
+        !/^\d+$/.test(
+          segment
+        )
     );
 
 
@@ -311,10 +478,12 @@ function Breadcrumbs() {
               />
 
               <span>
+
                 {
                   pageNames[item]
                   ?? item
                 }
+
               </span>
 
             </span>
@@ -336,14 +505,18 @@ export default function AppLayout({
   const [
     open,
     setOpen,
-  ] = useState(false);
+  ] = useState(
+    false
+  );
 
 
   const location =
     useLocation();
 
+
   const navigate =
     useNavigate();
+
 
   const queryClient =
     useQueryClient();
@@ -351,10 +524,11 @@ export default function AppLayout({
 
   const {
     data: user,
+    isLoading: cargandoUsuario,
   } = useQuery({
 
     queryKey: [
-      "usuario-actual"
+      "usuario-actual",
     ],
 
     queryFn:
@@ -366,20 +540,89 @@ export default function AppLayout({
   });
 
 
+  const esSuperusuario =
+    user?.es_superusuario
+    ?? false;
+
+
+  const grupos =
+    user?.grupos
+    ?? [];
+
+
+  function tienePermiso(
+    permiso: string
+  ) {
+
+    if (
+      esSuperusuario
+    ) {
+
+      return true;
+
+    }
+
+
+    return grupos.includes(
+      permiso
+    );
+
+  }
+
+
+  const modulesVisibles =
+    esSuperusuario
+      ? modules
+      : modules.filter(
+          module =>
+            tienePermiso(
+              module.permiso
+            )
+        );
+
+
+  const puedeUsarAsistente =
+    esSuperusuario
+    ||
+    grupos.includes(
+      "ASISTENTE"
+    );
+
+
+  /*
+   * Por ahora el sistema de Stock
+   * queda habilitado para:
+   *
+   * - superusuario
+   * - grupo CAMBIOS
+   *
+   * Carlos pertenece a CAMBIOS.
+   */
+  const puedeVerStock =
+    esSuperusuario
+    ||
+    grupos.includes(
+      "CAMBIOS"
+    );
+
+
   const name =
     user?.nombre_completo
     ||
     user?.username
     ||
-    "Ariel Garro";
+    "Usuario";
 
 
   const initials =
     name
       .split(" ")
-      .slice(0, 2)
+      .slice(
+        0,
+        2
+      )
       .map(
-        (part) =>
+        part =>
           part[0]
       )
       .join("")
@@ -396,20 +639,57 @@ export default function AppLayout({
 
       queryClient.clear();
 
+
       navigate(
         "/login",
         {
-          replace: true,
+          replace:
+            true,
         }
       );
 
     }
+
+  }
+
+
+  if (
+    cargandoUsuario
+  ) {
+
+    return (
+
+      <div className="app-shell">
+
+        <div className="app-main">
+
+          <main className="app-content">
+
+            <div className="pagina">
+
+              <div className="dashboard-container">
+
+                Cargando usuario...
+
+              </div>
+
+            </div>
+
+          </main>
+
+        </div>
+
+      </div>
+
+    );
+
   }
 
 
   return (
 
     <div className="app-shell">
+
 
       {/* ======================================= */}
       {/* SIDEBAR */}
@@ -449,13 +729,18 @@ export default function AppLayout({
 
           <button
             className="sidebar-close"
-            onClick={() =>
-              setOpen(false)
+            onClick={
+              () =>
+                setOpen(
+                  false
+                )
             }
             aria-label="Cerrar menú"
           >
 
-            <Icon name="close" />
+            <Icon
+              name="close"
+            />
 
           </button>
 
@@ -468,8 +753,11 @@ export default function AppLayout({
 
         <nav
           className="sidebar-nav"
-          onClick={() =>
-            setOpen(false)
+          onClick={
+            () =>
+              setOpen(
+                false
+              )
           }
         >
 
@@ -484,7 +772,9 @@ export default function AppLayout({
             to="/"
             end
             className={
-              ({ isActive }) =>
+              ({
+                isActive,
+              }) =>
                 `nav-item ${
                   isActive
                     ? "active"
@@ -493,7 +783,9 @@ export default function AppLayout({
             }
           >
 
-            <Icon name="home" />
+            <Icon
+              name="home"
+            />
 
             <span>
               Panel general
@@ -504,25 +796,37 @@ export default function AppLayout({
 
           {/* ASISTENTE IA */}
 
-          <NavLink
-            to="/asistente"
-            className={
-              ({ isActive }) =>
-                `nav-item ${
-                  isActive
-                    ? "active"
-                    : ""
-                }`
-            }
-          >
+          {
+            puedeUsarAsistente
+            &&
+            (
 
-            <Icon name="chart" />
+              <NavLink
+                to="/asistente"
+                className={
+                  ({
+                    isActive,
+                  }) =>
+                    `nav-item ${
+                      isActive
+                        ? "active"
+                        : ""
+                    }`
+                }
+              >
 
-            <span>
-              Asistente IA
-            </span>
+                <Icon
+                  name="chart"
+                />
 
-          </NavLink>
+                <span>
+                  Asistente IA
+                </span>
+
+              </NavLink>
+
+            )
+          }
 
 
           <span
@@ -538,8 +842,8 @@ export default function AppLayout({
           {/* MÓDULOS */}
 
           {
-            modules.map(
-              (module) => (
+            modulesVisibles.map(
+              module => (
 
                 <div
                   className={
@@ -588,7 +892,7 @@ export default function AppLayout({
 
                     {
                       module.links.map(
-                        (link) => (
+                        link => (
 
                           <NavLink
                             key={
@@ -600,7 +904,7 @@ export default function AppLayout({
                             end
                             className={
                               ({
-                                isActive
+                                isActive,
                               }) =>
                                 `nav-subitem ${
                                   isActive
@@ -637,6 +941,34 @@ export default function AppLayout({
             )
           }
 
+
+          {/* STOCK DE PALLETS */}
+
+          {
+            puedeVerStock
+            &&
+            (
+
+              <a
+                href="http://10.242.4.13:8000/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="nav-item"
+              >
+
+                <Icon
+                  name="boxes"
+                />
+
+                <span>
+                  Stock de pallets
+                </span>
+
+              </a>
+
+            )
+          }
+
         </nav>
 
 
@@ -646,7 +978,9 @@ export default function AppLayout({
 
         <div className="sidebar-status">
 
-          <Icon name="shield" />
+          <Icon
+            name="shield"
+          />
 
           <div>
 
@@ -678,8 +1012,11 @@ export default function AppLayout({
 
           <button
             className="sidebar-overlay"
-            onClick={() =>
-              setOpen(false)
+            onClick={
+              () =>
+                setOpen(
+                  false
+                )
             }
             aria-label="Cerrar menú"
           />
@@ -698,13 +1035,18 @@ export default function AppLayout({
 
           <button
             className="menu-toggle"
-            onClick={() =>
-              setOpen(true)
+            onClick={
+              () =>
+                setOpen(
+                  true
+                )
             }
             aria-label="Abrir menú"
           >
 
-            <Icon name="menu" />
+            <Icon
+              name="menu"
+            />
 
           </button>
 
@@ -715,14 +1057,20 @@ export default function AppLayout({
           <div className="header-user">
 
             <div className="user-avatar">
-              {initials}
+
+              {
+                initials
+              }
+
             </div>
 
 
             <div className="user-copy">
 
               <strong>
-                {name}
+                {
+                  name
+                }
               </strong>
 
               <span>
@@ -734,11 +1082,15 @@ export default function AppLayout({
 
             <button
               className="logout-button"
-              onClick={logout}
+              onClick={
+                logout
+              }
               title="Cerrar sesión"
             >
 
-              <Icon name="logout" />
+              <Icon
+                name="logout"
+              />
 
               <span>
                 Cerrar sesión
@@ -753,7 +1105,9 @@ export default function AppLayout({
 
         <main className="app-content">
 
-          {children}
+          {
+            children
+          }
 
         </main>
 

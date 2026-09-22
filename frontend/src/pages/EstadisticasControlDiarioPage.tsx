@@ -35,8 +35,9 @@ function formatearNumero(
 function formatearFecha(
   fecha: string
 ) {
+
   const [
-    anio,
+    ,
     mes,
     dia,
   ] = fecha.split("-");
