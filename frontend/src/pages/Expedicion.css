@@ -1,0 +1,927 @@
+/* ==========================================================
+   EXPEDICIÓN - ESTILOS GENERALES
+   ========================================================== */
+
+.expedicion-page {
+  width: 100%;
+}
+
+.expedicion-page .dashboard-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+
+/* ==========================================================
+   ENCABEZADO
+   ========================================================== */
+
+.expedicion-page .dashboard-bienvenida {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+
+  padding: 28px 30px;
+
+  background: #ffffff;
+
+  border: 1px solid #e7ebf0;
+  border-radius: 18px;
+
+  box-shadow:
+    0 8px 30px
+    rgba(16, 24, 40, 0.05);
+}
+
+
+.expedicion-page .dashboard-bienvenida > div:first-child {
+  min-width: 0;
+}
+
+
+.expedicion-page .dashboard-bienvenida h1 {
+  margin: 9px 0 8px;
+
+  color: #101828;
+
+  font-size: 30px;
+  font-weight: 750;
+
+  line-height: 1.15;
+}
+
+
+.expedicion-page .dashboard-bienvenida p {
+  max-width: 690px;
+
+  margin: 0;
+
+  color: #667085;
+
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+
+/* ==========================================================
+   BADGE SUPERIOR
+   ========================================================== */
+
+.expedicion-page .badge-panel {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  color: #3976d8;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  letter-spacing: 0.08em;
+
+  text-transform: uppercase;
+}
+
+
+/* ==========================================================
+   ESTADO SUPERIOR
+   ========================================================== */
+
+.expedicion-page .dashboard-status {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+
+  min-width: 210px;
+
+  padding: 13px 16px;
+
+  background: #f8fbff;
+
+  border: 1px solid #e2eaf5;
+  border-radius: 12px;
+}
+
+
+.expedicion-page .dashboard-status > span {
+  width: 9px;
+  height: 9px;
+
+  flex-shrink: 0;
+
+  background: #18a566;
+
+  border-radius: 50%;
+
+  box-shadow:
+    0 0 0 4px
+    rgba(24, 165, 102, 0.12);
+}
+
+
+.expedicion-page .dashboard-status div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+
+.expedicion-page .dashboard-status strong {
+  color: #344054;
+
+  font-size: 13px;
+}
+
+
+.expedicion-page .dashboard-status small {
+  color: #98a2b3;
+
+  font-size: 11px;
+}
+
+
+/* ==========================================================
+   SECCIONES
+   ========================================================== */
+
+.expedicion-page section {
+  padding: 26px 28px;
+
+  background: #ffffff;
+
+  border: 1px solid #e7ebf0;
+  border-radius: 18px;
+
+  box-shadow:
+    0 8px 30px
+    rgba(16, 24, 40, 0.045);
+}
+
+
+/* ==========================================================
+   TÍTULOS DE SECCIÓN
+   ========================================================== */
+
+.expedicion-page .section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-bottom: 22px;
+}
+
+
+.expedicion-page .section-heading > div > span {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #3976d8;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  letter-spacing: 0.08em;
+
+  text-transform: uppercase;
+}
+
+
+.expedicion-page .section-heading h2 {
+  margin: 0;
+
+  color: #101828;
+
+  font-size: 21px;
+  font-weight: 720;
+}
+
+
+.expedicion-page .section-heading small {
+  color: #98a2b3;
+
+  font-size: 12px;
+}
+
+
+/* ==========================================================
+   KPI
+   ========================================================== */
+
+.expedicion-page .dashboard-kpis {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(210px, 1fr)
+    );
+
+  gap: 16px;
+}
+
+
+.expedicion-page .kpi-card {
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+
+  min-height: 92px;
+
+  padding: 17px 18px;
+
+  background: #ffffff;
+
+  border: 1px solid #e8ecf2;
+  border-radius: 14px;
+
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease,
+    border-color 0.16s ease;
+}
+
+
+.expedicion-page .kpi-card:hover {
+  transform: translateY(-2px);
+
+  border-color: #d6dfeb;
+
+  box-shadow:
+    0 8px 22px
+    rgba(16, 24, 40, 0.07);
+}
+
+
+.expedicion-page .kpi-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 46px;
+  height: 46px;
+
+  flex-shrink: 0;
+
+  border-radius: 12px;
+}
+
+
+.expedicion-page .kpi-icon.blue {
+  background: #edf4ff;
+  color: #3976d8;
+}
+
+
+.expedicion-page .kpi-icon.green {
+  background: #edf9f3;
+  color: #1c9b63;
+}
+
+
+.expedicion-page .kpi-icon.amber {
+  background: #fff6e8;
+  color: #d6871f;
+}
+
+
+.expedicion-page .kpi-icon.navy {
+  background: #eef2f8;
+  color: #334c70;
+}
+
+
+.expedicion-page .kpi-card > div:last-child {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+}
+
+
+.expedicion-page .kpi-card span {
+  color: #667085;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+
+.expedicion-page .kpi-card strong {
+  margin: 2px 0;
+
+  color: #101828;
+
+  font-size: 24px;
+  font-weight: 760;
+}
+
+
+.expedicion-page .kpi-card small {
+  color: #98a2b3;
+
+  font-size: 11px;
+}
+
+
+/* ==========================================================
+   TARJETAS DE MÓDULOS
+   ========================================================== */
+
+.expedicion-page .grid-modulos {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(245px, 1fr)
+    );
+
+  gap: 18px;
+}
+
+
+.expedicion-page .modulo-card {
+  display: flex;
+  flex-direction: column;
+
+  min-height: 245px;
+
+  padding: 22px;
+
+  background: #ffffff;
+
+  border: 1px solid #e6ebf1;
+  border-radius: 16px;
+
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+
+.expedicion-page .modulo-card:hover {
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 10px 28px
+    rgba(16, 24, 40, 0.08);
+}
+
+
+.expedicion-page .module-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 14px;
+
+  margin-bottom: 18px;
+}
+
+
+.expedicion-page .module-card-top > span {
+  color: #98a2b3;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: 0.07em;
+
+  text-transform: uppercase;
+}
+
+
+.expedicion-page .module-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 49px;
+  height: 49px;
+
+  border-radius: 13px;
+
+  background: #edf4ff;
+  color: #3976d8;
+}
+
+
+.expedicion-page .modulo-card h3 {
+  margin: 0 0 8px;
+
+  color: #101828;
+
+  font-size: 18px;
+}
+
+
+.expedicion-page .modulo-card p {
+  min-height: 48px;
+
+  margin: 0 0 17px;
+
+  color: #667085;
+
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+
+.expedicion-page .modulo-links {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 8px;
+
+  margin-bottom: 18px;
+}
+
+
+.expedicion-page .modulo-link {
+  color: #3976d8;
+
+  font-size: 12px;
+  font-weight: 650;
+
+  text-decoration: none;
+}
+
+
+.expedicion-page .modulo-link:hover {
+  text-decoration: underline;
+}
+
+
+.expedicion-page .module-enter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  width: fit-content;
+
+  margin-top: auto;
+
+  padding: 9px 14px;
+
+  background: #f1f6ff;
+
+  border: 1px solid #dce8fa;
+  border-radius: 9px;
+
+  color: #2967c7;
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+
+  text-decoration: none;
+
+  cursor: pointer;
+
+  transition:
+    background 0.16s ease,
+    transform 0.16s ease;
+}
+
+
+.expedicion-page .module-enter:hover {
+  background: #e6f0ff;
+
+  transform: translateY(-1px);
+}
+
+
+/* ==========================================================
+   FORMULARIOS
+   ========================================================== */
+
+.expedicion-page .form-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 18px;
+}
+
+
+.expedicion-page .form-group {
+  display: flex;
+  flex-direction: column;
+
+  gap: 7px;
+}
+
+
+.expedicion-page .form-group label {
+  color: #344054;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+
+.expedicion-page .form-group input,
+.expedicion-page .form-group select,
+.expedicion-page .form-group textarea {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 10px 12px;
+
+  background: #ffffff;
+
+  border: 1px solid #d6dce5;
+  border-radius: 9px;
+
+  color: #101828;
+
+  font-family: inherit;
+  font-size: 13px;
+
+  outline: none;
+
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+
+.expedicion-page .form-group input,
+.expedicion-page .form-group select {
+  min-height: 42px;
+}
+
+
+.expedicion-page .form-group textarea {
+  min-height: 105px;
+
+  resize: vertical;
+}
+
+
+.expedicion-page .form-group input:focus,
+.expedicion-page .form-group select:focus,
+.expedicion-page .form-group textarea:focus {
+  border-color: #4a84df;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(74, 132, 223, 0.12);
+}
+
+
+.expedicion-page .form-group input::placeholder,
+.expedicion-page .form-group textarea::placeholder {
+  color: #a3acba;
+}
+
+
+/* ==========================================================
+   BOTONES
+   ========================================================== */
+
+.expedicion-page .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  min-height: 42px;
+
+  padding: 0 18px;
+
+  background: #2867cb;
+
+  border: 1px solid #2867cb;
+  border-radius: 9px;
+
+  color: #ffffff;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 5px 13px
+    rgba(40, 103, 203, 0.18);
+
+  transition:
+    background 0.16s ease,
+    transform 0.16s ease;
+}
+
+
+.expedicion-page .btn-primary:hover {
+  background: #2059b7;
+
+  transform: translateY(-1px);
+}
+
+
+.expedicion-page .btn-primary:disabled {
+  opacity: 0.55;
+
+  cursor: not-allowed;
+
+  transform: none;
+}
+
+
+/* ==========================================================
+   BOTÓN SECUNDARIO
+   ========================================================== */
+
+.expedicion-page button:not(
+  .btn-primary
+):not(
+  .module-enter
+) {
+  font-family: inherit;
+}
+
+
+/* ==========================================================
+   TABLAS
+   ========================================================== */
+
+.expedicion-page table {
+  width: 100%;
+
+  border-collapse: separate;
+  border-spacing: 0;
+
+  font-size: 12px;
+}
+
+
+.expedicion-page thead th {
+  padding: 12px 14px;
+
+  background: #f8fafc;
+
+  border-top: 1px solid #e5eaf0;
+  border-bottom: 1px solid #e5eaf0;
+
+  color: #667085;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  text-align: left;
+
+  letter-spacing: 0.04em;
+
+  text-transform: uppercase;
+}
+
+
+.expedicion-page thead th:first-child {
+  border-left: 1px solid #e5eaf0;
+
+  border-top-left-radius: 10px;
+}
+
+
+.expedicion-page thead th:last-child {
+  border-right: 1px solid #e5eaf0;
+
+  border-top-right-radius: 10px;
+}
+
+
+.expedicion-page tbody td {
+  padding: 14px;
+
+  border-bottom: 1px solid #edf0f4;
+
+  color: #475467;
+
+  vertical-align: middle;
+}
+
+
+.expedicion-page tbody tr {
+  transition:
+    background 0.14s ease;
+}
+
+
+.expedicion-page tbody tr:hover {
+  background: #f8fbff;
+}
+
+
+.expedicion-page tbody td strong {
+  color: #101828;
+}
+
+
+/* ==========================================================
+   LINKS DE TABLAS
+   ========================================================== */
+
+.expedicion-page table a {
+  color: #2867cb;
+
+  font-weight: 700;
+
+  text-decoration: none;
+}
+
+
+.expedicion-page table a:hover {
+  text-decoration: underline;
+}
+
+
+/* ==========================================================
+   BLOQUES DE PRODUCTO / ENTREGA
+   ========================================================== */
+
+.expedicion-page .expedicion-product-row {
+  display: grid;
+
+  grid-template-columns:
+    2fr 1fr auto;
+
+  gap: 14px;
+
+  align-items: end;
+
+  padding: 16px;
+
+  background: #f8fafc;
+
+  border: 1px solid #e5e9ef;
+  border-radius: 12px;
+}
+
+
+.expedicion-page .expedicion-delivery-row {
+  display: grid;
+
+  grid-template-columns:
+    2fr 1fr;
+
+  gap: 16px;
+
+  align-items: end;
+
+  padding: 16px;
+
+  background: #f8fafc;
+
+  border: 1px solid #e5e9ef;
+  border-radius: 12px;
+}
+
+
+/* ==========================================================
+   BOTÓN ELIMINAR
+   ========================================================== */
+
+.expedicion-page .expedicion-remove-button {
+  min-height: 42px;
+
+  padding: 0 14px;
+
+  background: #ffffff;
+
+  border: 1px solid #d6dce5;
+  border-radius: 9px;
+
+  color: #667085;
+
+  font-size: 12px;
+  font-weight: 650;
+
+  cursor: pointer;
+}
+
+
+.expedicion-page .expedicion-remove-button:hover {
+  border-color: #e19b9b;
+
+  background: #fff7f7;
+
+  color: #b44242;
+}
+
+
+.expedicion-page .expedicion-remove-button:disabled {
+  opacity: 0.45;
+
+  cursor: not-allowed;
+}
+
+
+/* ==========================================================
+   ESTADOS
+   ========================================================== */
+
+.expedicion-page .expedicion-empty {
+  padding: 45px 20px;
+
+  color: #667085;
+
+  text-align: center;
+}
+
+
+.expedicion-page .expedicion-empty h3 {
+  margin: 10px 0 6px;
+
+  color: #344054;
+}
+
+
+.expedicion-page .expedicion-empty p {
+  margin: 0;
+
+  font-size: 13px;
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+
+@media (
+  max-width: 1050px
+) {
+
+  .expedicion-page .form-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+
+
+  .expedicion-page .dashboard-bienvenida {
+    align-items: flex-start;
+  }
+
+}
+
+
+@media (
+  max-width: 760px
+) {
+
+  .expedicion-page .dashboard-bienvenida {
+    flex-direction: column;
+
+    padding: 22px;
+  }
+
+
+  .expedicion-page .dashboard-status {
+    width: 100%;
+
+    box-sizing: border-box;
+  }
+
+
+  .expedicion-page section {
+    padding: 21px;
+  }
+
+
+  .expedicion-page .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+
+  .expedicion-page .section-heading {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+
+  .expedicion-page .expedicion-product-row,
+  .expedicion-page .expedicion-delivery-row {
+    grid-template-columns: 1fr;
+  }
+
+
+  .expedicion-page .dashboard-bienvenida h1 {
+    font-size: 25px;
+  }
+
+}

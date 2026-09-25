@@ -43,311 +43,197 @@ type SidebarModule = {
 const modules: SidebarModule[] = [
 
   {
-    label:
-      "Repartos y recargas",
-
-    icon:
-      "truck",
-
-    base:
-      "/repartos",
-
-    permiso:
-      "REPARTOS",
+    label: "Repartos y recargas",
+    icon: "truck",
+    base: "/repartos",
+    permiso: "REPARTOS",
 
     links: [
       {
-        label:
-          "Nuevo reparto",
-
-        to:
-          "/repartos/nuevo",
-
-        icon:
-          "plus",
+        label: "Nuevo reparto",
+        to: "/repartos/nuevo",
+        icon: "plus",
       },
-
       {
-        label:
-          "Carga desde planillas",
-
-        to:
-          "/repartos/planillas",
-
-        icon:
-          "boxes",
+        label: "Carga desde planillas",
+        to: "/repartos/planillas",
+        icon: "boxes",
       },
-
       {
-        label:
-          "Historial",
-
-        to:
-          "/repartos",
-
-        icon:
-          "history",
+        label: "Historial",
+        to: "/repartos",
+        icon: "history",
       },
-
       {
-        label:
-          "Reporte de recargas",
-
-        to:
-          "/repartos/recargas",
-
-        icon:
-          "chart",
+        label: "Reporte de recargas",
+        to: "/repartos/recargas",
+        icon: "chart",
       },
     ],
   },
 
 
   {
-    label:
-      "Rechazos",
-
-    icon:
-      "alert",
-
-    base:
-      "/rechazos",
-
-    permiso:
-      "RECHAZOS",
+    label: "Rechazos",
+    icon: "alert",
+    base: "/rechazos",
+    permiso: "RECHAZOS",
 
     links: [
       {
-        label:
-          "Nuevo rechazo",
-
-        to:
-          "/rechazos/nuevo",
-
-        icon:
-          "plus",
+        label: "Nuevo rechazo",
+        to: "/rechazos/nuevo",
+        icon: "plus",
       },
-
       {
-        label:
-          "Historial",
-
-        to:
-          "/rechazos",
-
-        icon:
-          "history",
+        label: "Historial",
+        to: "/rechazos",
+        icon: "history",
       },
-
       {
-        label:
-          "Estadísticas",
-
-        to:
-          "/rechazos/estadisticas",
-
-        icon:
-          "chart",
+        label: "Estadísticas",
+        to: "/rechazos/estadisticas",
+        icon: "chart",
       },
     ],
   },
 
 
   {
-    label:
-      "Recibos de cambios",
-
-    icon:
-      "boxes",
-
-    base:
-      "/cambios",
-
-    permiso:
-      "CAMBIOS",
+    label: "Recibos de cambios",
+    icon: "boxes",
+    base: "/cambios",
+    permiso: "CAMBIOS",
 
     links: [
       {
-        label:
-          "Nuevo recibo",
-
-        to:
-          "/cambios/nuevo",
-
-        icon:
-          "plus",
+        label: "Nuevo recibo",
+        to: "/cambios/nuevo",
+        icon: "plus",
       },
-
       {
-        label:
-          "Historial",
-
-        to:
-          "/cambios",
-
-        icon:
-          "history",
+        label: "Historial",
+        to: "/cambios",
+        icon: "history",
       },
-
       {
-        label:
-          "Estadísticas",
-
-        to:
-          "/cambios/estadisticas",
-
-        icon:
-          "chart",
+        label: "Estadísticas",
+        to: "/cambios/estadisticas",
+        icon: "chart",
       },
     ],
   },
 
 
   {
-    label:
-      "Viáticos",
-
-    icon:
-      "truck",
-
-    base:
-      "/viaticos",
-
-    permiso:
-      "VIATICOS",
+    label: "Viáticos",
+    icon: "truck",
+    base: "/viaticos",
+    permiso: "VIATICOS",
 
     links: [
       {
-        label:
-          "Nuevo registro",
-
-        to:
-          "/viaticos/nuevo",
-
-        icon:
-          "plus",
+        label: "Nuevo registro",
+        to: "/viaticos/nuevo",
+        icon: "plus",
       },
-
       {
-        label:
-          "Historial",
-
-        to:
-          "/viaticos",
-
-        icon:
-          "history",
+        label: "Historial",
+        to: "/viaticos",
+        icon: "history",
       },
-
       {
-        label:
-          "Resumen anual",
-
-        to:
-          "/viaticos/resumen",
-
-        icon:
-          "chart",
+        label: "Resumen anual",
+        to: "/viaticos/resumen",
+        icon: "chart",
       },
     ],
   },
 
 
   {
-    label:
-      "Kilometrajes",
-
-    icon:
-      "truck",
-
-    base:
-      "/kilometrajes",
-
-    permiso:
-      "KILOMETRAJES",
+    label: "Kilometrajes",
+    icon: "truck",
+    base: "/kilometrajes",
+    permiso: "KILOMETRAJES",
 
     links: [
       {
-        label:
-          "Nuevo control",
-
-        to:
-          "/kilometrajes/nuevo",
-
-        icon:
-          "plus",
+        label: "Nuevo control",
+        to: "/kilometrajes/nuevo",
+        icon: "plus",
       },
-
       {
-        label:
-          "Historial",
-
-        to:
-          "/kilometrajes",
-
-        icon:
-          "history",
+        label: "Historial",
+        to: "/kilometrajes",
+        icon: "history",
       },
-
       {
-        label:
-          "Estadísticas",
-
-        to:
-          "/kilometrajes/estadisticas",
-
-        icon:
-          "chart",
+        label: "Estadísticas",
+        to: "/kilometrajes/estadisticas",
+        icon: "chart",
       },
     ],
   },
 
 
   {
-    label:
-      "Control diario",
-
-    icon:
-      "boxes",
-
-    base:
-      "/control-diario",
-
-    permiso:
-      "CONTROL_DIARIO",
+    label: "Control diario",
+    icon: "boxes",
+    base: "/control-diario",
+    permiso: "CONTROL_DIARIO",
 
     links: [
       {
-        label:
-          "Nueva carga",
-
-        to:
-          "/control-diario/nuevo",
-
-        icon:
-          "plus",
+        label: "Nueva carga",
+        to: "/control-diario/nuevo",
+        icon: "plus",
       },
-
       {
-        label:
-          "Historial",
-
-        to:
-          "/control-diario",
-
-        icon:
-          "history",
+        label: "Historial",
+        to: "/control-diario",
+        icon: "history",
       },
-
       {
-        label:
-          "Estadísticas",
+        label: "Estadísticas",
+        to: "/control-diario/estadisticas",
+        icon: "chart",
+      },
+    ],
+  },
 
-        to:
-          "/control-diario/estadisticas",
 
-        icon:
-          "chart",
+  {
+    label: "Expedición",
+    icon: "boxes",
+    base: "/expedicion",
+    permiso: "EXPEDICION",
+
+    links: [
+      {
+        label: "Órdenes de carga",
+        to: "/expedicion/ordenes",
+        icon: "truck",
+      },
+      {
+        label: "Stock",
+        to: "/expedicion/stock",
+        icon: "boxes",
+      },
+      {
+        label: "Movimientos",
+        to: "/expedicion/movimientos",
+        icon: "history",
+      },
+      {
+        label: "Fleteros",
+        to: "/expedicion/fleteros",
+        icon: "truck",
+      },
+      {
+        label: "Pallets y chapadur",
+        to: "/expedicion/materiales",
+        icon: "boxes",
       },
     ],
   },
@@ -377,6 +263,24 @@ const pageNames: Record<
 
   "control-diario":
     "Control diario",
+
+  expedicion:
+    "Expedición",
+
+  stock:
+    "Stock",
+
+  ordenes:
+    "Órdenes de carga",
+
+  movimientos:
+    "Movimientos",
+
+  fleteros:
+    "Fleteros",
+
+  materiales:
+    "Pallets y chapadur",
 
   asistente:
     "Asistente IA",
@@ -478,12 +382,10 @@ function Breadcrumbs() {
               />
 
               <span>
-
                 {
                   pageNames[item]
                   ?? item
                 }
-
               </span>
 
             </span>
@@ -559,14 +461,12 @@ export default function AppLayout({
     ) {
 
       return true;
-
     }
 
 
     return grupos.includes(
       permiso
     );
-
   }
 
 
@@ -591,12 +491,10 @@ export default function AppLayout({
 
   /*
    * Por ahora el sistema de Stock
-   * queda habilitado para:
+   * de pallets queda habilitado para:
    *
    * - superusuario
    * - grupo CAMBIOS
-   *
-   * Carlos pertenece a CAMBIOS.
    */
   const puedeVerStock =
     esSuperusuario
@@ -682,7 +580,6 @@ export default function AppLayout({
       </div>
 
     );
-
   }
 
 

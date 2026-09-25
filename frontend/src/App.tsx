@@ -105,6 +105,31 @@ import EstadisticasControlDiarioPage
   from "./pages/EstadisticasControlDiarioPage";
 
 
+import InicioExpedicionPage
+  from "./pages/InicioExpedicionPage";
+
+import StockExpedicionPage
+  from "./pages/StockExpedicionPage";
+
+import OrdenesExpedicionPage
+  from "./pages/OrdenesExpedicionPage";
+
+import MovimientosExpedicionPage
+  from "./pages/MovimientosExpedicionPage";
+
+
+import FleterosExpedicionPage
+  from "./pages/FleterosExpedicionPage";
+
+import MaterialesExpedicionPage
+  from "./pages/MaterialesExpedicionPage";
+
+import NuevaOrdenExpedicionPage
+  from "./pages/NuevaOrdenExpedicionPage";
+
+
+import DetalleOrdenExpedicionPage
+  from "./pages/DetalleOrdenExpedicionPage";
 
 function App() {
 
@@ -410,6 +435,46 @@ function App() {
                     element={
                       <DetalleControlDiarioPage />
                     }
+                  />
+
+                  <Route
+                    path="/expedicion/inicio"
+                    element={<InicioExpedicionPage />}
+                  />
+
+                  <Route
+                    path="/expedicion/stock"
+                    element={<StockExpedicionPage />}
+                  />
+
+                  <Route
+                    path="/expedicion/ordenes"
+                    element={<OrdenesExpedicionPage />}
+                  />
+
+                  <Route
+                    path="/expedicion/movimientos"
+                    element={<MovimientosExpedicionPage />}
+                  />
+
+                  <Route
+                    path="/expedicion/fleteros"
+                    element={<FleterosExpedicionPage />}
+                  />
+
+                  <Route
+                    path="/expedicion/materiales"
+                    element={<MaterialesExpedicionPage />}
+                  />
+
+                  <Route
+                    path="/expedicion/ordenes/nueva"
+                    element={<NuevaOrdenExpedicionPage />}
+                  />
+
+                  <Route
+                    path="/expedicion/ordenes/:id"
+                    element={<DetalleOrdenExpedicionPage />}
                   />
 
 

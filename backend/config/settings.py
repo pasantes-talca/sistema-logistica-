@@ -94,6 +94,7 @@ INSTALLED_APPS = [
     "viaticos",
     "kilometrajes",
     "control_diario",
+    "expedicion",
 ]
 
 

@@ -65,4 +65,9 @@ urlpatterns = [
         include("control_diario.urls"),
     ),
 
+    path(
+        "api/expedicion/",
+        include("expedicion.urls"),
+    ),
+
 ]
