@@ -925,3 +925,57 @@
   }
 
 }
+
+/* ==========================================================
+   FIX - ELEMENTOS DECORATIVOS NO DEBEN BLOQUEAR CLICKS
+   ========================================================== */
+
+.expedicion-page .dashboard-bienvenida {
+  position: relative;
+  isolation: isolate;
+}
+
+
+/* Los círculos / adornos del encabezado
+   nunca deben capturar el mouse */
+
+.expedicion-page .dashboard-bienvenida::before,
+.expedicion-page .dashboard-bienvenida::after {
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+
+/* Todo el contenido real queda por encima */
+
+.expedicion-page .dashboard-bienvenida > * {
+  position: relative;
+  z-index: 2;
+}
+
+
+/* Links y botones siempre clickeables */
+
+.expedicion-page button,
+.expedicion-page a {
+  position: relative;
+  z-index: 3;
+  pointer-events: auto;
+}
+
+
+/* Botón principal */
+
+.expedicion-page .btn-primary,
+.expedicion-page .module-enter {
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+
+/* Evitamos que otros adornos invisibles bloqueen contenido */
+
+.expedicion-page section::before,
+.expedicion-page section::after {
+  pointer-events: none;
+}

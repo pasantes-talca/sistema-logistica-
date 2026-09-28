@@ -7,6 +7,20 @@ import {
 } from "@tanstack/react-query";
 
 import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Legend,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+
+import {
   obtenerRepartos,
   obtenerRechazos,
   obtenerRecibosCambio,
@@ -29,42 +43,886 @@ import Icon, {
 import "./PanelPrincipalPage.css";
 
 
-type ModuleItem = {
-  title: string;
-  description: string;
-  icon: IconName;
-  tone: string;
-  home?: string;
-  externalUrl?: string;
+const API_URL =
+  import.meta.env.VITE_API_URL
+  ||
+  "http://127.0.0.1:8000/api";
 
-  links?: {
-    to: string;
-    label: string;
-  }[];
 
-  external?: boolean;
-  permiso: string;
+type ComparisonTrend =
+  | "positive"
+  | "negative"
+  | "neutral";
+
+
+type KpiComparison = {
+  text: string;
+
+  trend:
+    ComparisonTrend;
+
+  direction:
+    | "up"
+    | "down"
+    | "equal";
 };
 
 
 type KpiItem = {
   label: string;
   value: number | string;
+  description: string;
   icon: IconName;
   tone: string;
-  description: string;
+
+  comparison?:
+    KpiComparison;
 };
 
 
+type ModuleItem = {
+  title: string;
+  description: string;
+  icon: IconName;
+  permiso: string;
+  home: string;
+
+  ultimaCarga?:
+    string | null;
+
+  ultimaCargaTexto?:
+    string;
+
+  links: {
+    label: string;
+    to: string;
+  }[];
+};
+
+
+type RegistroGenerico =
+  Record<string, unknown>;
+
+
+const COLORES_PIE = [
+  "#2f75d6",
+  "#e1a13a",
+  "#26a269",
+  "#7a64d1",
+  "#d95c5c",
+  "#64748b",
+];
+
+
+// =========================================================
+// CONSULTAS AUXILIARES
+// =========================================================
+
+async function obtenerListaDashboard(
+  ruta: string
+): Promise<RegistroGenerico[]> {
+
+  const response =
+    await fetch(
+      `${API_URL}${ruta}`,
+      {
+        credentials:
+          "include",
+      }
+    );
+
+
+  if (!response.ok) {
+
+    throw new Error(
+      "No se pudo cargar información del dashboard."
+    );
+  }
+
+
+  return response.json();
+}
+
+
+// =========================================================
+// FECHAS
+// =========================================================
+
+function obtenerFechaRegistro(
+  item: unknown
+): string | null {
+
+  if (
+    !item
+    ||
+    typeof item !== "object"
+  ) {
+
+    return null;
+  }
+
+
+  const registro =
+    item as RegistroGenerico;
+
+
+  const camposFecha = [
+    "creado_en",
+    "creado",
+    "created_at",
+    "fecha_creacion",
+    "fecha_registro",
+    "fecha",
+    "actualizado_en",
+    "updated_at",
+    "updated",
+  ];
+
+
+  for (
+    const campo
+    of camposFecha
+  ) {
+
+    const valor =
+      registro[campo];
+
+
+    if (
+      typeof valor === "string"
+      &&
+      valor.trim()
+    ) {
+
+      return valor;
+    }
+
+  }
+
+
+  return null;
+}
+
+
+function convertirFecha(
+  valor: string
+): Date | null {
+
+  const esFechaSimple =
+    /^\d{4}-\d{2}-\d{2}$/
+      .test(
+        valor
+      );
+
+
+  if (
+    esFechaSimple
+  ) {
+
+    const [
+      anio,
+      mes,
+      dia,
+    ] =
+      valor
+        .split("-")
+        .map(
+          Number
+        );
+
+
+    return new Date(
+      anio,
+      mes - 1,
+      dia,
+      12,
+      0,
+      0
+    );
+  }
+
+
+  const fecha =
+    new Date(
+      valor
+    );
+
+
+  if (
+    Number.isNaN(
+      fecha.getTime()
+    )
+  ) {
+
+    return null;
+  }
+
+
+  return fecha;
+}
+
+
+function obtenerUltimaFecha(
+  registros: unknown[]
+): string | null {
+
+  let ultimaFecha:
+    Date | null = null;
+
+
+  for (
+    const registro
+    of registros
+  ) {
+
+    const valor =
+      obtenerFechaRegistro(
+        registro
+      );
+
+
+    if (!valor) {
+      continue;
+    }
+
+
+    const fecha =
+      convertirFecha(
+        valor
+      );
+
+
+    if (!fecha) {
+      continue;
+    }
+
+
+    if (
+      !ultimaFecha
+      ||
+      fecha >
+      ultimaFecha
+    ) {
+
+      ultimaFecha =
+        fecha;
+    }
+
+  }
+
+
+  return ultimaFecha
+    ? ultimaFecha.toISOString()
+    : null;
+}
+
+
+function formatearUltimaCarga(
+  valor:
+    string
+    |
+    null
+    |
+    undefined
+) {
+
+  if (!valor) {
+
+    return "Sin cargas registradas";
+  }
+
+
+  const fecha =
+    new Date(
+      valor
+    );
+
+
+  if (
+    Number.isNaN(
+      fecha.getTime()
+    )
+  ) {
+
+    return "Sin fecha disponible";
+  }
+
+
+  const tieneHoraReal =
+    fecha.getHours() !== 12
+    ||
+    fecha.getMinutes() !== 0;
+
+
+  if (
+    tieneHoraReal
+  ) {
+
+    return fecha.toLocaleString(
+      "es-AR",
+      {
+        day:
+          "2-digit",
+
+        month:
+          "2-digit",
+
+        year:
+          "numeric",
+
+        hour:
+          "2-digit",
+
+        minute:
+          "2-digit",
+      }
+    );
+  }
+
+
+  return fecha.toLocaleDateString(
+    "es-AR"
+  );
+}
+
+
+// =========================================================
+// COMPARACIÓN DE PERÍODOS
+// =========================================================
+
+function inicioDelDia(
+  fecha: Date
+) {
+
+  const copia =
+    new Date(
+      fecha
+    );
+
+
+  copia.setHours(
+    0,
+    0,
+    0,
+    0
+  );
+
+
+  return copia;
+}
+
+
+function obtenerRangosComparacion() {
+
+  const hoy =
+    inicioDelDia(
+      new Date()
+    );
+
+
+  const finActual =
+    new Date(
+      hoy
+    );
+
+
+  finActual.setDate(
+    finActual.getDate()
+    +
+    1
+  );
+
+
+  const inicioActual =
+    new Date(
+      hoy
+    );
+
+
+  inicioActual.setDate(
+    inicioActual.getDate()
+    -
+    6
+  );
+
+
+  const finAnterior =
+    new Date(
+      inicioActual
+    );
+
+
+  const inicioAnterior =
+    new Date(
+      inicioActual
+    );
+
+
+  inicioAnterior.setDate(
+    inicioAnterior.getDate()
+    -
+    7
+  );
+
+
+  return {
+    inicioActual,
+    finActual,
+    inicioAnterior,
+    finAnterior,
+  };
+}
+
+
+function registrosEnRango(
+  registros: unknown[],
+  desde: Date,
+  hasta: Date
+) {
+
+  return registros.filter(
+    registro => {
+
+      const valor =
+        obtenerFechaRegistro(
+          registro
+        );
+
+
+      if (!valor) {
+        return false;
+      }
+
+
+      const fecha =
+        convertirFecha(
+          valor
+        );
+
+
+      if (!fecha) {
+        return false;
+      }
+
+
+      return (
+        fecha >= desde
+        &&
+        fecha < hasta
+      );
+    }
+  );
+}
+
+
+function crearComparacionCantidad(
+  actual: number,
+  anterior: number,
+  mejorCuandoSube:
+    boolean = true
+): KpiComparison {
+
+  if (
+    actual === anterior
+  ) {
+
+    return {
+      text:
+        "Sin cambios vs. 7 días anteriores",
+
+      trend:
+        "neutral",
+
+      direction:
+        "equal",
+    };
+  }
+
+
+  const subio =
+    actual > anterior;
+
+
+  let trend:
+    ComparisonTrend;
+
+
+  if (
+    mejorCuandoSube
+  ) {
+
+    trend =
+      subio
+        ? "positive"
+        : "negative";
+
+  } else {
+
+    trend =
+      subio
+        ? "negative"
+        : "positive";
+  }
+
+
+  if (
+    anterior === 0
+  ) {
+
+    return {
+      text:
+        `${subio ? "+" : ""}${actual - anterior} vs. 7 días anteriores`,
+
+      trend,
+
+      direction:
+        subio
+          ? "up"
+          : "down",
+    };
+  }
+
+
+  const variacion =
+    (
+      (
+        actual
+        -
+        anterior
+      )
+      /
+      anterior
+    )
+    *
+    100;
+
+
+  const porcentaje =
+    Math.abs(
+      variacion
+    ).toLocaleString(
+      "es-AR",
+      {
+        maximumFractionDigits:
+          1,
+      }
+    );
+
+
+  return {
+    text:
+      `${porcentaje}% vs. 7 días anteriores`,
+
+    trend,
+
+    direction:
+      subio
+        ? "up"
+        : "down",
+  };
+}
+
+
+function crearComparacionPorcentaje(
+  actual: number,
+  anterior: number,
+  mejorCuandoSube:
+    boolean = true
+): KpiComparison {
+
+  const diferencia =
+    actual
+    -
+    anterior;
+
+
+  if (
+    diferencia === 0
+  ) {
+
+    return {
+      text:
+        "Sin cambios vs. 7 días anteriores",
+
+      trend:
+        "neutral",
+
+      direction:
+        "equal",
+    };
+  }
+
+
+  const subio =
+    diferencia > 0;
+
+
+  let trend:
+    ComparisonTrend;
+
+
+  if (
+    mejorCuandoSube
+  ) {
+
+    trend =
+      subio
+        ? "positive"
+        : "negative";
+
+  } else {
+
+    trend =
+      subio
+        ? "negative"
+        : "positive";
+  }
+
+
+  return {
+    text:
+      `${Math.abs(
+        diferencia
+      ).toLocaleString(
+        "es-AR",
+        {
+          maximumFractionDigits:
+            1,
+        }
+      )} pp vs. 7 días anteriores`,
+
+    trend,
+
+    direction:
+      subio
+        ? "up"
+        : "down",
+  };
+}
+
+
+// =========================================================
+// ESTADOS DE EXPEDICIÓN
+// =========================================================
+
+function nombreEstadoOrden(
+  estado: string
+) {
+
+  const nombres:
+    Record<string, string> = {
+
+      RECIBIDA:
+        "Recibidas",
+
+      CARGA_INICIADA:
+        "Carga iniciada",
+
+      PARCIAL:
+        "Parciales",
+
+      COMPLETA:
+        "Completas",
+
+      COMPLETA_CON_CAMBIO:
+        "Completas con cambio",
+
+      PENDIENTE_CONTROL:
+        "Pendientes control",
+
+    };
+
+
+  return (
+    nombres[estado]
+    ??
+    estado
+  );
+}
+
+
+function estaCompleta(
+  orden: {
+    estado: string;
+  }
+) {
+
+  return (
+    orden.estado ===
+      "COMPLETA"
+    ||
+    orden.estado ===
+      "COMPLETA_CON_CAMBIO"
+  );
+}
+
+
+// =========================================================
+// COMPONENTE ÚLTIMA CARGA
+// =========================================================
+
+function UltimaCarga({
+  fecha,
+  texto,
+}: {
+  fecha?:
+    string | null;
+
+  texto?:
+    string;
+}) {
+
+  return (
+
+    <div className="dashboard-module-last-update">
+
+      <div className="dashboard-module-last-icon">
+
+        <Icon
+          name="history"
+          size={14}
+        />
+
+      </div>
+
+
+      <div>
+
+        <span>
+          Última carga
+        </span>
+
+        <strong>
+
+          {
+            texto
+            ??
+            formatearUltimaCarga(
+              fecha
+            )
+          }
+
+        </strong>
+
+      </div>
+
+    </div>
+
+  );
+}
+
+
+// =========================================================
+// COMPONENTE KPI
+// =========================================================
+
+function KpiCard({
+  kpi,
+}: {
+  kpi: KpiItem;
+}) {
+
+  return (
+
+    <div className="dashboard-kpi-card">
+
+      <div
+        className={
+          `dashboard-kpi-icon ${kpi.tone}`
+        }
+      >
+
+        <Icon
+          name={
+            kpi.icon
+          }
+        />
+
+      </div>
+
+
+      <div>
+
+        <span>
+          {
+            kpi.label
+          }
+        </span>
+
+
+        <strong>
+          {
+            kpi.value
+          }
+        </strong>
+
+
+        <small>
+          {
+            kpi.description
+          }
+        </small>
+
+
+        {
+          kpi.comparison
+          &&
+          (
+
+            <div
+              className={
+                `dashboard-kpi-comparison ${kpi.comparison.trend}`
+              }
+            >
+
+              <span className="dashboard-kpi-arrow">
+
+                {
+                  kpi.comparison.direction ===
+                    "up"
+                    ? "↑"
+                    : kpi.comparison.direction ===
+                        "down"
+                      ? "↓"
+                      : "—"
+                }
+
+              </span>
+
+
+              <span>
+                {
+                  kpi.comparison.text
+                }
+              </span>
+
+            </div>
+
+          )
+        }
+
+      </div>
+
+    </div>
+
+  );
+}
+
+
+// =========================================================
+// PANEL
+// =========================================================
+
 export default function PanelPrincipalPage() {
 
-  // =========================================================
+  // =======================================================
   // USUARIO
-  // =========================================================
+  // =======================================================
 
   const {
     data: usuario,
-    isLoading: cargandoUsuario,
+    isLoading:
+      cargandoUsuario,
   } = useQuery({
 
     queryKey: [
@@ -118,9 +976,9 @@ export default function PanelPrincipalPage() {
   }
 
 
-  // =========================================================
-  // PERMISOS GENERALES
-  // =========================================================
+  // =======================================================
+  // PERMISOS
+  // =======================================================
 
   const puedeRepartos =
     tienePermiso(
@@ -188,9 +1046,9 @@ export default function PanelPrincipalPage() {
     puedeStockPallets;
 
 
-  // =========================================================
-  // DATOS DE LOGÍSTICA
-  // =========================================================
+  // =======================================================
+  // LOGÍSTICA
+  // =======================================================
 
   const {
     data: repartos = [],
@@ -207,6 +1065,7 @@ export default function PanelPrincipalPage() {
 
     enabled:
       puedeRepartos,
+
   });
 
 
@@ -225,6 +1084,7 @@ export default function PanelPrincipalPage() {
 
     enabled:
       puedeRechazos,
+
   });
 
 
@@ -243,6 +1103,7 @@ export default function PanelPrincipalPage() {
 
     enabled:
       puedeCambios,
+
   });
 
 
@@ -261,12 +1122,61 @@ export default function PanelPrincipalPage() {
 
     enabled:
       puedeViaticos,
+
   });
 
 
-  // =========================================================
-  // DATOS DE EXPEDICIÓN
-  // =========================================================
+  const {
+    data:
+      kilometrajes = [],
+  } = useQuery({
+
+    queryKey: [
+      "dashboard-kilometrajes",
+    ],
+
+    queryFn:
+      () =>
+        obtenerListaDashboard(
+          "/kilometrajes/"
+        ),
+
+    enabled:
+      puedeKilometrajes,
+
+    retry:
+      false,
+
+  });
+
+
+  const {
+    data:
+      controlesDiarios = [],
+  } = useQuery({
+
+    queryKey: [
+      "controles-diarios",
+    ],
+
+    queryFn:
+      () =>
+        obtenerListaDashboard(
+          "/control-diario/"
+        ),
+
+    enabled:
+      puedeControlDiario,
+
+    retry:
+      false,
+
+  });
+
+
+  // =======================================================
+  // EXPEDICIÓN
+  // =======================================================
 
   const {
     data: ordenes = [],
@@ -283,6 +1193,7 @@ export default function PanelPrincipalPage() {
 
     enabled:
       puedeExpedicion,
+
   });
 
 
@@ -301,13 +1212,15 @@ export default function PanelPrincipalPage() {
 
     enabled:
       puedeExpedicion,
+
   });
 
 
   const {
-    data: movimientosStock = [],
+    data:
+      movimientosStock = [],
     isLoading:
-      cargandoMovimientosStock,
+      cargandoMovimientos,
   } = useQuery({
 
     queryKey: [
@@ -319,6 +1232,7 @@ export default function PanelPrincipalPage() {
 
     enabled:
       puedeExpedicion,
+
   });
 
 
@@ -337,13 +1251,13 @@ export default function PanelPrincipalPage() {
 
     enabled:
       puedeExpedicion,
+
   });
 
 
   const {
-    data: movimientosMaterial = [],
-    isLoading:
-      cargandoMaterial,
+    data:
+      materiales = [],
   } = useQuery({
 
     queryKey: [
@@ -355,22 +1269,252 @@ export default function PanelPrincipalPage() {
 
     enabled:
       puedeExpedicion,
+
   });
 
 
-  // =========================================================
-  // CÁLCULOS EXPEDICIÓN
-  // =========================================================
+  // =======================================================
+  // ÚLTIMAS CARGAS
+  // =======================================================
 
-  const ordenesPendientes =
-    ordenes.filter(
-      orden =>
-        orden.estado !== "COMPLETA"
-        &&
-        orden.estado !==
-          "COMPLETA_CON_CAMBIO"
+  const ultimaCargaRepartos =
+    obtenerUltimaFecha(
+      repartos
     );
 
+
+  const ultimaCargaRechazos =
+    obtenerUltimaFecha(
+      rechazos
+    );
+
+
+  const ultimaCargaCambios =
+    obtenerUltimaFecha(
+      recibos
+    );
+
+
+  const ultimaCargaViaticos =
+    obtenerUltimaFecha(
+      viaticos
+    );
+
+
+  const ultimaCargaKilometrajes =
+    obtenerUltimaFecha(
+      kilometrajes
+    );
+
+
+  const ultimaCargaControlDiario =
+    obtenerUltimaFecha(
+      controlesDiarios
+    );
+
+
+  const ultimaCargaOrdenes =
+    obtenerUltimaFecha(
+      ordenes
+    );
+
+
+  const ultimaCargaStock =
+    obtenerUltimaFecha(
+      movimientosStock
+    );
+
+
+  const ultimaCargaMovimientos =
+    obtenerUltimaFecha(
+      movimientosStock
+    );
+
+
+  const ultimaCargaFleteros =
+    obtenerUltimaFecha(
+      fleteros
+    );
+
+
+  const ultimaCargaMateriales =
+    obtenerUltimaFecha(
+      materiales
+    );
+
+
+  // =======================================================
+  // RANGOS COMPARATIVOS
+  // =======================================================
+
+  const {
+    inicioActual,
+    finActual,
+    inicioAnterior,
+    finAnterior,
+  } =
+    obtenerRangosComparacion();
+
+
+  // =======================================================
+  // LOGÍSTICA - COMPARACIONES
+  // =======================================================
+
+  const repartosActuales =
+    registrosEnRango(
+      repartos,
+      inicioActual,
+      finActual
+    );
+
+
+  const repartosAnteriores =
+    registrosEnRango(
+      repartos,
+      inicioAnterior,
+      finAnterior
+    );
+
+
+  const rechazosActuales =
+    registrosEnRango(
+      rechazos,
+      inicioActual,
+      finActual
+    );
+
+
+  const rechazosAnteriores =
+    registrosEnRango(
+      rechazos,
+      inicioAnterior,
+      finAnterior
+    );
+
+
+  const cambiosActuales =
+    registrosEnRango(
+      recibos,
+      inicioActual,
+      finActual
+    );
+
+
+  const cambiosAnteriores =
+    registrosEnRango(
+      recibos,
+      inicioAnterior,
+      finAnterior
+    );
+
+
+  const viaticosActuales =
+    registrosEnRango(
+      viaticos,
+      inicioActual,
+      finActual
+    );
+
+
+  const viaticosAnteriores =
+    registrosEnRango(
+      viaticos,
+      inicioAnterior,
+      finAnterior
+    );
+
+
+  // =======================================================
+  // EXPEDICIÓN - COMPARACIONES
+  // =======================================================
+
+  const ordenesActuales =
+    registrosEnRango(
+      ordenes,
+      inicioActual,
+      finActual
+    );
+
+
+  const ordenesAnteriores =
+    registrosEnRango(
+      ordenes,
+      inicioAnterior,
+      finAnterior
+    );
+
+
+  const ordenesCompletadasActuales =
+    ordenesActuales.filter(
+      orden =>
+        estaCompleta(
+          orden as {
+            estado: string;
+          }
+        )
+    );
+
+
+  const ordenesCompletadasAnteriores =
+    ordenesAnteriores.filter(
+      orden =>
+        estaCompleta(
+          orden as {
+            estado: string;
+          }
+        )
+    );
+
+
+  const porcentajeCompletadasActual =
+    ordenesActuales.length === 0
+      ? 0
+      : (
+          ordenesCompletadasActuales.length
+          /
+          ordenesActuales.length
+        )
+        *
+        100;
+
+
+  const porcentajeCompletadasAnterior =
+    ordenesAnteriores.length === 0
+      ? 0
+      : (
+          ordenesCompletadasAnteriores.length
+          /
+          ordenesAnteriores.length
+        )
+        *
+        100;
+
+
+  const ordenesPendientesActuales =
+    ordenesActuales.filter(
+      orden =>
+        !estaCompleta(
+          orden as {
+            estado: string;
+          }
+        )
+    );
+
+
+  const ordenesPendientesAnteriores =
+    ordenesAnteriores.filter(
+      orden =>
+        !estaCompleta(
+          orden as {
+            estado: string;
+          }
+        )
+    );
+
+
+  // =======================================================
+  // CÁLCULOS EXPEDICIÓN
+  // =======================================================
 
   const productosSinStock =
     stock.filter(
@@ -388,9 +1532,376 @@ export default function PanelPrincipalPage() {
     );
 
 
-  // =========================================================
+  // =======================================================
+  // GRÁFICO LOGÍSTICA
+  // =======================================================
+
+  const actividadLogistica = [
+
+    {
+      nombre:
+        "Repartos",
+
+      cantidad:
+        puedeRepartos
+          ? repartosActuales.length
+          : 0,
+    },
+
+    {
+      nombre:
+        "Rechazos",
+
+      cantidad:
+        puedeRechazos
+          ? rechazosActuales.length
+          : 0,
+    },
+
+    {
+      nombre:
+        "Cambios",
+
+      cantidad:
+        puedeCambios
+          ? cambiosActuales.length
+          : 0,
+    },
+
+    {
+      nombre:
+        "Viáticos",
+
+      cantidad:
+        puedeViaticos
+          ? viaticosActuales.length
+          : 0,
+    },
+
+  ].filter(
+    item =>
+      item.cantidad > 0
+  );
+
+
+  // =======================================================
+  // ÓRDENES POR ESTADO
+  // =======================================================
+
+  const mapaEstados:
+    Record<string, number> = {};
+
+
+  for (
+    const orden
+    of ordenesActuales
+  ) {
+
+    const estado =
+      (
+        orden as {
+          estado: string;
+        }
+      ).estado;
+
+
+    mapaEstados[
+      estado
+    ] =
+      (
+        mapaEstados[
+          estado
+        ]
+        ??
+        0
+      )
+      +
+      1;
+
+  }
+
+
+  const ordenesPorEstado =
+    Object.entries(
+      mapaEstados
+    ).map(
+      (
+        [
+          estado,
+          cantidad,
+        ]
+      ) => ({
+
+        nombre:
+          nombreEstadoOrden(
+            estado
+          ),
+
+        cantidad,
+
+      })
+    );
+
+
+  // =======================================================
+  // STOCK POR PRODUCTO
+  // =======================================================
+
+  const stockPorProducto =
+    stock
+      .map(
+        item => ({
+
+          producto:
+            `${item.codigo} - ${item.producto}`,
+
+          cantidad:
+            Number(
+              item.cantidad_unidades
+            ),
+
+        })
+      )
+      .sort(
+        (
+          a,
+          b
+        ) =>
+          b.cantidad
+          -
+          a.cantidad
+      )
+      .slice(
+        0,
+        10
+      );
+
+
+  // =======================================================
+  // ENTRADAS / SALIDAS
+  // =======================================================
+
+  const movimientosActuales =
+    registrosEnRango(
+      movimientosStock,
+      inicioActual,
+      finActual
+    );
+
+
+  const totalEntradas =
+    movimientosActuales
+      .filter(
+        movimiento =>
+          (
+            movimiento as {
+              direccion: string;
+            }
+          ).direccion
+          ===
+          "ENTRADA"
+      )
+      .reduce(
+        (
+          total,
+          movimiento
+        ) =>
+          total
+          +
+          Number(
+            (
+              movimiento as {
+                cantidad:
+                  number | string;
+              }
+            ).cantidad
+          ),
+        0
+      );
+
+
+  const totalSalidas =
+    movimientosActuales
+      .filter(
+        movimiento =>
+          (
+            movimiento as {
+              direccion: string;
+            }
+          ).direccion
+          ===
+          "SALIDA"
+      )
+      .reduce(
+        (
+          total,
+          movimiento
+        ) =>
+          total
+          +
+          Number(
+            (
+              movimiento as {
+                cantidad:
+                  number | string;
+              }
+            ).cantidad
+          ),
+        0
+      );
+
+
+  const entradasSalidas = [
+
+    {
+      nombre:
+        "Entradas",
+
+      cantidad:
+        totalEntradas,
+    },
+
+    {
+      nombre:
+        "Salidas",
+
+      cantidad:
+        totalSalidas,
+    },
+
+  ];
+
+
+  // =======================================================
+  // PALLETS Y CHAPADUR
+  // =======================================================
+
+  const materialesActuales =
+    registrosEnRango(
+      materiales,
+      inicioActual,
+      finActual
+    );
+
+
+  const totalPalletsSalida =
+    materialesActuales.reduce(
+      (
+        total,
+        item
+      ) =>
+        total
+        +
+        Number(
+          (
+            item as {
+              pallets_salida:
+                number | string;
+            }
+          ).pallets_salida
+          ??
+          0
+        ),
+      0
+    );
+
+
+  const totalPalletsEntrada =
+    materialesActuales.reduce(
+      (
+        total,
+        item
+      ) =>
+        total
+        +
+        Number(
+          (
+            item as {
+              pallets_entrada:
+                number | string;
+            }
+          ).pallets_entrada
+          ??
+          0
+        ),
+      0
+    );
+
+
+  const totalChapadurSalida =
+    materialesActuales.reduce(
+      (
+        total,
+        item
+      ) =>
+        total
+        +
+        Number(
+          (
+            item as {
+              chapadur_salida:
+                number | string;
+            }
+          ).chapadur_salida
+          ??
+          0
+        ),
+      0
+    );
+
+
+  const totalChapadurEntrada =
+    materialesActuales.reduce(
+      (
+        total,
+        item
+      ) =>
+        total
+        +
+        Number(
+          (
+            item as {
+              chapadur_entrada:
+                number | string;
+            }
+          ).chapadur_entrada
+          ??
+          0
+        ),
+      0
+    );
+
+
+  const materialesGrafico = [
+
+    {
+      material:
+        "Pallets",
+
+      salidas:
+        totalPalletsSalida,
+
+      entradas:
+        totalPalletsEntrada,
+    },
+
+    {
+      material:
+        "Chapadur",
+
+      salidas:
+        totalChapadurSalida,
+
+      entradas:
+        totalChapadurEntrada,
+    },
+
+  ];
+
+
+  // =======================================================
   // KPIS LOGÍSTICA
-  // =========================================================
+  // =======================================================
 
   const kpisLogistica:
     KpiItem[] = [];
@@ -408,7 +1919,10 @@ export default function PanelPrincipalPage() {
       value:
         cargandoRepartos
           ? "—"
-          : repartos.length,
+          : repartosActuales.length,
+
+      description:
+        "Últimos 7 días",
 
       icon:
         "truck",
@@ -416,8 +1930,14 @@ export default function PanelPrincipalPage() {
       tone:
         "blue",
 
-      description:
-        "Repartos registrados",
+      comparison:
+        cargandoRepartos
+          ? undefined
+          : crearComparacionCantidad(
+              repartosActuales.length,
+              repartosAnteriores.length,
+              true
+            ),
 
     });
   }
@@ -435,7 +1955,10 @@ export default function PanelPrincipalPage() {
       value:
         cargandoRechazos
           ? "—"
-          : rechazos.length,
+          : rechazosActuales.length,
+
+      description:
+        "Últimos 7 días",
 
       icon:
         "alert",
@@ -443,8 +1966,14 @@ export default function PanelPrincipalPage() {
       tone:
         "amber",
 
-      description:
-        "Entregas no concretadas",
+      comparison:
+        cargandoRechazos
+          ? undefined
+          : crearComparacionCantidad(
+              rechazosActuales.length,
+              rechazosAnteriores.length,
+              false
+            ),
 
     });
   }
@@ -457,12 +1986,15 @@ export default function PanelPrincipalPage() {
     kpisLogistica.push({
 
       label:
-        "Recibos de cambios",
+        "Cambios",
 
       value:
         cargandoRecibos
           ? "—"
-          : recibos.length,
+          : cambiosActuales.length,
+
+      description:
+        "Últimos 7 días",
 
       icon:
         "boxes",
@@ -470,8 +2002,14 @@ export default function PanelPrincipalPage() {
       tone:
         "green",
 
-      description:
-        "Recibos registrados",
+      comparison:
+        cargandoRecibos
+          ? undefined
+          : crearComparacionCantidad(
+              cambiosActuales.length,
+              cambiosAnteriores.length,
+              true
+            ),
 
     });
   }
@@ -489,7 +2027,10 @@ export default function PanelPrincipalPage() {
       value:
         cargandoViaticos
           ? "—"
-          : viaticos.length,
+          : viaticosActuales.length,
+
+      description:
+        "Últimos 7 días",
 
       icon:
         "activity",
@@ -497,16 +2038,22 @@ export default function PanelPrincipalPage() {
       tone:
         "navy",
 
-      description:
-        "Registros cargados",
+      comparison:
+        cargandoViaticos
+          ? undefined
+          : crearComparacionCantidad(
+              viaticosActuales.length,
+              viaticosAnteriores.length,
+              true
+            ),
 
     });
   }
 
 
-  // =========================================================
+  // =======================================================
   // KPIS EXPEDICIÓN
-  // =========================================================
+  // =======================================================
 
   const kpisExpedicion:
     KpiItem[] = [
@@ -518,7 +2065,10 @@ export default function PanelPrincipalPage() {
         value:
           cargandoOrdenes
             ? "—"
-            : ordenes.length,
+            : ordenesActuales.length,
+
+        description:
+          "Últimos 7 días",
 
         icon:
           "truck",
@@ -526,9 +2076,51 @@ export default function PanelPrincipalPage() {
         tone:
           "blue",
 
-        description:
-          "Órdenes registradas",
+        comparison:
+          cargandoOrdenes
+            ? undefined
+            : crearComparacionCantidad(
+                ordenesActuales.length,
+                ordenesAnteriores.length,
+                true
+              ),
       },
+
+
+      {
+        label:
+          "Órdenes completadas",
+
+        value:
+          cargandoOrdenes
+            ? "—"
+            : `${porcentajeCompletadasActual.toLocaleString(
+                "es-AR",
+                {
+                  maximumFractionDigits:
+                    1,
+                }
+              )}%`,
+
+        description:
+          "Tasa de finalización",
+
+        icon:
+          "activity",
+
+        tone:
+          "green",
+
+        comparison:
+          cargandoOrdenes
+            ? undefined
+            : crearComparacionPorcentaje(
+                porcentajeCompletadasActual,
+                porcentajeCompletadasAnterior,
+                true
+              ),
+      },
+
 
       {
         label:
@@ -537,7 +2129,10 @@ export default function PanelPrincipalPage() {
         value:
           cargandoOrdenes
             ? "—"
-            : ordenesPendientes.length,
+            : ordenesPendientesActuales.length,
+
+        description:
+          "Últimos 7 días",
 
         icon:
           "history",
@@ -545,28 +2140,36 @@ export default function PanelPrincipalPage() {
         tone:
           "amber",
 
-        description:
-          "Órdenes por completar",
+        comparison:
+          cargandoOrdenes
+            ? undefined
+            : crearComparacionCantidad(
+                ordenesPendientesActuales.length,
+                ordenesPendientesAnteriores.length,
+                false
+              ),
       },
+
 
       {
         label:
-          "Productos controlados",
+          "Productos",
 
         value:
           cargandoStock
             ? "—"
             : stock.length,
 
+        description:
+          "Con control de stock",
+
         icon:
           "boxes",
 
         tone:
           "green",
-
-        description:
-          "Productos con stock",
       },
+
 
       {
         label:
@@ -577,60 +2180,42 @@ export default function PanelPrincipalPage() {
             ? "—"
             : productosSinStock.length,
 
+        description:
+          "Requieren atención",
+
         icon:
           "alert",
 
         tone:
           "red",
-
-        description:
-          "Productos sin existencias",
       },
+
 
       {
         label:
-          "Movimientos",
-
-        value:
-          cargandoMovimientosStock
-            ? "—"
-            : movimientosStock.length,
-
-        icon:
-          "activity",
-
-        tone:
-          "navy",
-
-        description:
-          "Movimientos de stock",
-      },
-
-      {
-        label:
-          "Fleteros activos",
+          "Fleteros",
 
         value:
           cargandoFleteros
             ? "—"
             : fleterosActivos.length,
 
+        description:
+          "Activos",
+
         icon:
           "truck",
 
         tone:
-          "green",
-
-        description:
-          "Disponibles para cargas",
+          "navy",
       },
 
     ];
 
 
-  // =========================================================
+  // =======================================================
   // MÓDULOS LOGÍSTICA
-  // =========================================================
+  // =======================================================
 
   const modulosLogistica:
     ModuleItem[] = [
@@ -643,14 +2228,11 @@ export default function PanelPrincipalPage() {
           (
             "Planificá salidas, asigná personal "
             +
-            "y consultá las recargas de cada equipo."
+            "y consultá las recargas."
           ),
 
         icon:
           "truck",
-
-        tone:
-          "blue",
 
         permiso:
           "REPARTOS",
@@ -658,20 +2240,23 @@ export default function PanelPrincipalPage() {
         home:
           "/repartos/inicio",
 
+        ultimaCarga:
+          ultimaCargaRepartos,
+
         links: [
           {
-            to:
-              "/repartos/nuevo",
-
             label:
               "Nuevo reparto",
+
+            to:
+              "/repartos/nuevo",
           },
           {
-            to:
-              "/repartos",
-
             label:
               "Historial",
+
+            to:
+              "/repartos",
           },
         ],
       },
@@ -685,14 +2270,11 @@ export default function PanelPrincipalPage() {
           (
             "Registrá entregas no concretadas "
             +
-            "y analizá sus principales motivos."
+            "y analizá sus motivos."
           ),
 
         icon:
           "alert",
-
-        tone:
-          "amber",
 
         permiso:
           "RECHAZOS",
@@ -700,20 +2282,23 @@ export default function PanelPrincipalPage() {
         home:
           "/rechazos/inicio",
 
+        ultimaCarga:
+          ultimaCargaRechazos,
+
         links: [
           {
-            to:
-              "/rechazos/nuevo",
-
             label:
               "Nuevo rechazo",
+
+            to:
+              "/rechazos/nuevo",
           },
           {
-            to:
-              "/rechazos/estadisticas",
-
             label:
               "Estadísticas",
+
+            to:
+              "/rechazos/estadisticas",
           },
         ],
       },
@@ -725,16 +2310,13 @@ export default function PanelPrincipalPage() {
 
         description:
           (
-            "Controlá devoluciones, productos, "
+            "Controlá devoluciones, productos "
             +
-            "pallets y movimientos."
+            "y movimientos."
           ),
 
         icon:
           "boxes",
-
-        tone:
-          "green",
 
         permiso:
           "CAMBIOS",
@@ -742,20 +2324,23 @@ export default function PanelPrincipalPage() {
         home:
           "/cambios/inicio",
 
+        ultimaCarga:
+          ultimaCargaCambios,
+
         links: [
           {
-            to:
-              "/cambios/nuevo",
-
             label:
               "Nuevo recibo",
+
+            to:
+              "/cambios/nuevo",
           },
           {
-            to:
-              "/cambios",
-
             label:
               "Historial",
+
+            to:
+              "/cambios",
           },
         ],
       },
@@ -767,16 +2352,13 @@ export default function PanelPrincipalPage() {
 
         description:
           (
-            "Registrá y consultá viáticos locales "
+            "Registrá y consultá viáticos "
             +
-            "y de larga distancia."
+            "locales y de larga distancia."
           ),
 
         icon:
           "activity",
-
-        tone:
-          "navy",
 
         permiso:
           "VIATICOS",
@@ -784,20 +2366,23 @@ export default function PanelPrincipalPage() {
         home:
           "/viaticos/inicio",
 
+        ultimaCarga:
+          ultimaCargaViaticos,
+
         links: [
           {
-            to:
-              "/viaticos/nuevo",
-
             label:
               "Nuevo registro",
+
+            to:
+              "/viaticos/nuevo",
           },
           {
+            label:
+              "Resumen",
+
             to:
               "/viaticos/resumen",
-
-            label:
-              "Resumen anual",
           },
         ],
       },
@@ -809,16 +2394,13 @@ export default function PanelPrincipalPage() {
 
         description:
           (
-            "Registrá y consultá los kilómetros "
+            "Control de kilómetros recorridos "
             +
-            "recorridos por chofer y destino."
+            "por chofer y destino."
           ),
 
         icon:
           "truck",
-
-        tone:
-          "blue",
 
         permiso:
           "KILOMETRAJES",
@@ -826,20 +2408,23 @@ export default function PanelPrincipalPage() {
         home:
           "/kilometrajes/inicio",
 
+        ultimaCarga:
+          ultimaCargaKilometrajes,
+
         links: [
           {
-            to:
-              "/kilometrajes/nuevo",
-
             label:
               "Nuevo control",
+
+            to:
+              "/kilometrajes/nuevo",
           },
           {
-            to:
-              "/kilometrajes",
-
             label:
               "Historial",
+
+            to:
+              "/kilometrajes",
           },
         ],
       },
@@ -851,16 +2436,13 @@ export default function PanelPrincipalPage() {
 
         description:
           (
-            "Gestioná disponibilidad, asignaciones, "
+            "Disponibilidad, asignaciones, "
             +
-            "stock de depósitos y distribución diaria."
+            "depósitos y distribución."
           ),
 
         icon:
           "boxes",
-
-        tone:
-          "blue",
 
         permiso:
           "CONTROL_DIARIO",
@@ -868,20 +2450,23 @@ export default function PanelPrincipalPage() {
         home:
           "/control-diario/inicio",
 
+        ultimaCarga:
+          ultimaCargaControlDiario,
+
         links: [
           {
-            to:
-              "/control-diario/nuevo",
-
             label:
               "Nueva carga",
+
+            to:
+              "/control-diario/nuevo",
           },
           {
-            to:
-              "/control-diario",
-
             label:
               "Historial",
+
+            to:
+              "/control-diario",
           },
         ],
       },
@@ -898,9 +2483,9 @@ export default function PanelPrincipalPage() {
     );
 
 
-  // =========================================================
+  // =======================================================
   // MÓDULOS EXPEDICIÓN
-  // =========================================================
+  // =======================================================
 
   const modulosExpedicion:
     ModuleItem[] = [
@@ -911,16 +2496,13 @@ export default function PanelPrincipalPage() {
 
         description:
           (
-            "Gestioná órdenes, productos solicitados "
+            "Gestión de órdenes, productos "
             +
-            "y entregas realizadas."
+            "solicitados y entregas."
           ),
 
         icon:
           "truck",
-
-        tone:
-          "blue",
 
         permiso:
           "EXPEDICION",
@@ -928,20 +2510,23 @@ export default function PanelPrincipalPage() {
         home:
           "/expedicion/ordenes",
 
+        ultimaCarga:
+          ultimaCargaOrdenes,
+
         links: [
           {
-            to:
-              "/expedicion/ordenes/nueva",
-
             label:
               "Nueva orden",
+
+            to:
+              "/expedicion/ordenes/nueva",
           },
           {
-            to:
-              "/expedicion/ordenes",
-
             label:
               "Ver órdenes",
+
+            to:
+              "/expedicion/ordenes",
           },
         ],
       },
@@ -953,16 +2538,13 @@ export default function PanelPrincipalPage() {
 
         description:
           (
-            "Consultá existencias y registrá "
+            "Existencias, ingresos, salidas "
             +
-            "ingresos, salidas y ajustes."
+            "y ajustes de productos."
           ),
 
         icon:
           "boxes",
-
-        tone:
-          "green",
 
         permiso:
           "EXPEDICION",
@@ -970,13 +2552,16 @@ export default function PanelPrincipalPage() {
         home:
           "/expedicion/stock",
 
+        ultimaCarga:
+          ultimaCargaStock,
+
         links: [
           {
-            to:
-              "/expedicion/stock",
-
             label:
               "Ver stock",
+
+            to:
+              "/expedicion/stock",
           },
         ],
       },
@@ -988,16 +2573,13 @@ export default function PanelPrincipalPage() {
 
         description:
           (
-            "Consultá el historial de movimientos "
+            "Historial completo de "
             +
-            "generados sobre los productos."
+            "movimientos de mercadería."
           ),
 
         icon:
           "history",
-
-        tone:
-          "navy",
 
         permiso:
           "EXPEDICION",
@@ -1005,13 +2587,16 @@ export default function PanelPrincipalPage() {
         home:
           "/expedicion/movimientos",
 
+        ultimaCarga:
+          ultimaCargaMovimientos,
+
         links: [
           {
-            to:
-              "/expedicion/movimientos",
-
             label:
               "Ver movimientos",
+
+            to:
+              "/expedicion/movimientos",
           },
         ],
       },
@@ -1023,16 +2608,13 @@ export default function PanelPrincipalPage() {
 
         description:
           (
-            "Administrá los fleteros disponibles "
+            "Administración de fleteros "
             +
-            "para las órdenes de carga."
+            "disponibles para carga."
           ),
 
         icon:
           "truck",
-
-        tone:
-          "blue",
 
         permiso:
           "EXPEDICION",
@@ -1040,13 +2622,16 @@ export default function PanelPrincipalPage() {
         home:
           "/expedicion/fleteros",
 
+        ultimaCarga:
+          ultimaCargaFleteros,
+
         links: [
           {
-            to:
-              "/expedicion/fleteros",
-
             label:
               "Administrar",
+
+            to:
+              "/expedicion/fleteros",
           },
         ],
       },
@@ -1058,16 +2643,13 @@ export default function PanelPrincipalPage() {
 
         description:
           (
-            "Controlá salidas, devoluciones "
+            "Salidas, devoluciones y "
             +
-            "y saldos de materiales."
+            "saldos de materiales."
           ),
 
         icon:
           "boxes",
-
-        tone:
-          "green",
 
         permiso:
           "EXPEDICION",
@@ -1075,13 +2657,16 @@ export default function PanelPrincipalPage() {
         home:
           "/expedicion/materiales",
 
+        ultimaCarga:
+          ultimaCargaMateriales,
+
         links: [
           {
-            to:
-              "/expedicion/materiales",
-
             label:
               "Ver materiales",
+
+            to:
+              "/expedicion/materiales",
           },
         ],
       },
@@ -1089,9 +2674,9 @@ export default function PanelPrincipalPage() {
     ];
 
 
-  // =========================================================
-  // CARGANDO USUARIO
-  // =========================================================
+  // =======================================================
+  // CARGANDO
+  // =======================================================
 
   if (
     cargandoUsuario
@@ -1113,9 +2698,9 @@ export default function PanelPrincipalPage() {
   }
 
 
-  // =========================================================
+  // =======================================================
   // RENDER
-  // =========================================================
+  // =======================================================
 
   return (
 
@@ -1125,7 +2710,7 @@ export default function PanelPrincipalPage() {
 
 
         {/* ===================================== */}
-        {/* CABECERA GENERAL */}
+        {/* HERO */}
         {/* ===================================== */}
 
         <div className="panel-hero">
@@ -1139,7 +2724,7 @@ export default function PanelPrincipalPage() {
                 size={16}
               />
 
-              Panel operativo
+              Panel operativo Talca
 
             </div>
 
@@ -1150,9 +2735,10 @@ export default function PanelPrincipalPage() {
 
 
             <p>
-              Accedé a las áreas de Logística
-              y Expedición desde un único panel
-              de gestión.
+              Vista general de Logística
+              y Expedición con indicadores,
+              comparaciones, gráficos
+              y actividad reciente.
             </p>
 
           </div>
@@ -1169,103 +2755,12 @@ export default function PanelPrincipalPage() {
               </strong>
 
               <small>
-                Sistema operativo Talca
+                Comparación: últimos 7 días
               </small>
 
             </div>
 
           </div>
-
-        </div>
-
-
-        {/* ===================================== */}
-        {/* ACCESO RÁPIDO */}
-        {/* ===================================== */}
-
-        <div className="panel-area-selector">
-
-
-          {
-            puedeVerLogistica
-            &&
-            (
-
-              <a
-                href="#logistica"
-                className="
-                  panel-area-button
-                  panel-area-logistica
-                "
-              >
-
-                <div className="panel-area-icon">
-
-                  <Icon
-                    name="truck"
-                    size={24}
-                  />
-
-                </div>
-
-
-                <div>
-
-                  <strong>
-                    Logística
-                  </strong>
-
-                  <span>
-                    Distribución y gestión operativa
-                  </span>
-
-                </div>
-
-              </a>
-
-            )
-          }
-
-
-          {
-            puedeExpedicion
-            &&
-            (
-
-              <a
-                href="#expedicion"
-                className="
-                  panel-area-button
-                  panel-area-expedicion
-                "
-              >
-
-                <div className="panel-area-icon">
-
-                  <Icon
-                    name="boxes"
-                    size={24}
-                  />
-
-                </div>
-
-
-                <div>
-
-                  <strong>
-                    Expedición
-                  </strong>
-
-                  <span>
-                    Cargas, stock y materiales
-                  </span>
-
-                </div>
-
-              </a>
-
-            )
-          }
 
         </div>
 
@@ -1279,127 +2774,52 @@ export default function PanelPrincipalPage() {
           &&
           (
 
-            <section
-              id="logistica"
-              className="
-                panel-area-section
-                panel-logistica
-              "
-            >
+            <section className="dashboard-area">
 
-              <div className="panel-area-heading">
+              <div className="dashboard-area-header">
 
-                <div className="panel-area-title">
-
-                  <div className="panel-area-title-icon">
-
-                    <Icon
-                      name="truck"
-                      size={23}
-                    />
-
-                  </div>
-
-
-                  <div>
-
-                    <span>
-                      ÁREA OPERATIVA
-                    </span>
-
-                    <h2>
-                      Logística
-                    </h2>
-
-                    <p>
-                      Distribución, entregas,
-                      controles y gestión diaria.
-                    </p>
-
-                  </div>
-
-                </div>
-
-
-                <div className="panel-area-count">
-
-                  {
-                    modulosLogisticaVisibles.length
-                    +
-                    (
-                      puedeStockPallets
-                        ? 1
-                        : 0
-                    )
-                  }
+                <div>
 
                   <span>
-                    módulos disponibles
+                    ÁREA OPERATIVA
                   </span>
+
+                  <h2>
+                    Logística
+                  </h2>
+
+                  <p>
+                    Comparación de los últimos
+                    7 días contra los 7 días
+                    anteriores.
+                  </p>
 
                 </div>
 
               </div>
 
 
-              {/* KPIs */}
+              {/* KPIS */}
 
               {
                 kpisLogistica.length > 0
                 &&
                 (
 
-                  <div className="panel-kpis">
+                  <div className="dashboard-kpi-grid">
 
                     {
                       kpisLogistica.map(
                         kpi => (
 
-                          <div
-                            className="panel-kpi"
+                          <KpiCard
                             key={
                               kpi.label
                             }
-                          >
-
-                            <div
-                              className={
-                                `panel-kpi-icon ${kpi.tone}`
-                              }
-                            >
-
-                              <Icon
-                                name={
-                                  kpi.icon
-                                }
-                              />
-
-                            </div>
-
-
-                            <div>
-
-                              <span>
-                                {
-                                  kpi.label
-                                }
-                              </span>
-
-                              <strong>
-                                {
-                                  kpi.value
-                                }
-                              </strong>
-
-                              <small>
-                                {
-                                  kpi.description
-                                }
-                              </small>
-
-                            </div>
-
-                          </div>
+                            kpi={
+                              kpi
+                            }
+                          />
 
                         )
                       )
@@ -1411,36 +2831,213 @@ export default function PanelPrincipalPage() {
               }
 
 
+              {/* GRÁFICOS */}
+
+              <div className="dashboard-chart-grid">
+
+
+                <article className="dashboard-chart-card">
+
+                  <div className="chart-heading">
+
+                    <div>
+
+                      <span>
+                        ÚLTIMOS 7 DÍAS
+                      </span>
+
+                      <h3>
+                        Registros por módulo
+                      </h3>
+
+                    </div>
+
+                  </div>
+
+
+                  <div className="chart-container">
+
+                    {
+                      actividadLogistica.length === 0
+                        ? (
+
+                            <div className="chart-empty">
+                              Sin registros en este período
+                            </div>
+
+                          )
+                        : (
+
+                            <ResponsiveContainer
+                              width="100%"
+                              height="100%"
+                            >
+
+                              <BarChart
+                                data={
+                                  actividadLogistica
+                                }
+                              >
+
+                                <CartesianGrid
+                                  strokeDasharray="3 3"
+                                  vertical={false}
+                                />
+
+                                <XAxis
+                                  dataKey="nombre"
+                                />
+
+                                <YAxis
+                                  allowDecimals={false}
+                                />
+
+                                <Tooltip />
+
+                                <Bar
+                                  dataKey="cantidad"
+                                  fill="#3678da"
+                                  radius={[
+                                    7,
+                                    7,
+                                    0,
+                                    0,
+                                  ]}
+                                />
+
+                              </BarChart>
+
+                            </ResponsiveContainer>
+
+                          )
+                    }
+
+                  </div>
+
+                </article>
+
+
+                <article className="dashboard-chart-card">
+
+                  <div className="chart-heading">
+
+                    <div>
+
+                      <span>
+                        DISTRIBUCIÓN
+                      </span>
+
+                      <h3>
+                        Participación por módulo
+                      </h3>
+
+                    </div>
+
+                  </div>
+
+
+                  <div className="chart-container">
+
+                    {
+                      actividadLogistica.length === 0
+                        ? (
+
+                            <div className="chart-empty">
+                              Sin registros en este período
+                            </div>
+
+                          )
+                        : (
+
+                            <ResponsiveContainer
+                              width="100%"
+                              height="100%"
+                            >
+
+                              <PieChart>
+
+                                <Pie
+                                  data={
+                                    actividadLogistica
+                                  }
+                                  dataKey="cantidad"
+                                  nameKey="nombre"
+                                  innerRadius={60}
+                                  outerRadius={95}
+                                  paddingAngle={3}
+                                >
+
+                                  {
+                                    actividadLogistica.map(
+                                      (
+                                        _,
+                                        index
+                                      ) => (
+
+                                        <Cell
+                                          key={
+                                            index
+                                          }
+                                          fill={
+                                            COLORES_PIE[
+                                              index
+                                              %
+                                              COLORES_PIE.length
+                                            ]
+                                          }
+                                        />
+
+                                      )
+                                    )
+                                  }
+
+                                </Pie>
+
+                                <Tooltip />
+
+                                <Legend />
+
+                              </PieChart>
+
+                            </ResponsiveContainer>
+
+                          )
+                    }
+
+                  </div>
+
+                </article>
+
+              </div>
+
+
               {/* MÓDULOS */}
 
-              <div className="panel-module-grid">
+              <div className="dashboard-module-grid">
 
                 {
                   modulosLogisticaVisibles.map(
-                    module => (
+                    modulo => (
 
                       <article
-                        className="
-                          panel-module-card
-                          panel-module-logistica
-                        "
+                        className="dashboard-module-card"
                         key={
-                          module.title
+                          modulo.title
                         }
                       >
 
-                        <div className="panel-module-top">
+                        <div className="dashboard-module-top">
 
-                          <div className="panel-module-icon">
+                          <div>
 
                             <Icon
                               name={
-                                module.icon
+                                modulo.icon
                               }
-                              size={23}
                             />
 
                           </div>
+
 
                           <span>
                             Logística
@@ -1451,68 +3048,65 @@ export default function PanelPrincipalPage() {
 
                         <h3>
                           {
-                            module.title
+                            modulo.title
                           }
                         </h3>
 
 
                         <p>
                           {
-                            module.description
+                            modulo.description
                           }
                         </p>
 
 
-                        {
-                          module.links
-                          &&
-                          (
+                        <div className="dashboard-module-links">
 
-                            <div className="panel-module-links">
+                          {
+                            modulo.links.map(
+                              link => (
 
-                              {
-                                module.links.map(
-                                  link => (
+                                <Link
+                                  key={
+                                    link.to
+                                  }
+                                  to={
+                                    link.to
+                                  }
+                                >
 
-                                    <Link
-                                      to={
-                                        link.to
-                                      }
-                                      key={
-                                        link.to
-                                      }
-                                    >
+                                  {
+                                    link.label
+                                  }
 
-                                      {
-                                        link.label
-                                      }
+                                </Link>
 
-                                    </Link>
+                              )
+                            )
+                          }
 
-                                  )
-                                )
-                              }
+                        </div>
 
-                            </div>
 
-                          )
-                        }
+                        <UltimaCarga
+                          fecha={
+                            modulo.ultimaCarga
+                          }
+                        />
 
 
                         <Link
                           to={
-                            module.home
-                            ||
-                            "/"
+                            modulo.home
                           }
-                          className="panel-module-enter"
+                          className="dashboard-module-enter"
                         >
 
                           Ingresar
 
                           <Icon
                             name="chevron"
-                            size={16}
+                            size={15}
                           />
 
                         </Link>
@@ -1524,33 +3118,26 @@ export default function PanelPrincipalPage() {
                 }
 
 
-                {/* STOCK PALLETS */}
-
                 {
                   puedeStockPallets
                   &&
                   (
 
-                    <article
-                      className="
-                        panel-module-card
-                        panel-module-logistica
-                      "
-                    >
+                    <article className="dashboard-module-card">
 
-                      <div className="panel-module-top">
+                      <div className="dashboard-module-top">
 
-                        <div className="panel-module-icon">
+                        <div>
 
                           <Icon
                             name="boxes"
-                            size={23}
                           />
 
                         </div>
 
+
                         <span>
-                          Sistema externo
+                          Externo
                         </span>
 
                       </div>
@@ -1562,23 +3149,37 @@ export default function PanelPrincipalPage() {
 
 
                       <p>
-                        Accedé al sistema externo
-                        de control de stock de pallets.
+                        Sistema externo de control
+                        de stock de pallets.
                       </p>
+
+
+                      <div className="dashboard-module-links">
+
+                        <span className="dashboard-external-label">
+                          Aplicación independiente
+                        </span>
+
+                      </div>
+
+
+                      <UltimaCarga
+                        texto="Sistema externo"
+                      />
 
 
                       <a
                         href="http://10.242.4.13:8000/"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="panel-module-enter"
+                        className="dashboard-module-enter"
                       >
 
                         Abrir sistema
 
                         <Icon
                           name="chevron"
-                          size={16}
+                          size={15}
                         />
 
                       </a>
@@ -1605,120 +3206,62 @@ export default function PanelPrincipalPage() {
           &&
           (
 
-            <section
-              id="expedicion"
-              className="
-                panel-area-section
-                panel-expedicion
-              "
-            >
+            <section className="dashboard-area expedicion-area">
 
-              <div className="panel-area-heading">
+              <div className="dashboard-area-header">
 
-                <div className="panel-area-title">
-
-                  <div
-                    className="
-                      panel-area-title-icon
-                      expedicion
-                    "
-                  >
-
-                    <Icon
-                      name="boxes"
-                      size={23}
-                    />
-
-                  </div>
-
-
-                  <div>
-
-                    <span>
-                      ÁREA OPERATIVA
-                    </span>
-
-                    <h2>
-                      Expedición
-                    </h2>
-
-                    <p>
-                      Órdenes de carga,
-                      productos, stock,
-                      fleteros y materiales.
-                    </p>
-
-                  </div>
-
-                </div>
-
-
-                <div className="panel-area-count">
-
-                  5
+                <div>
 
                   <span>
-                    módulos disponibles
+                    ÁREA OPERATIVA
                   </span>
 
+                  <h2>
+                    Expedición
+                  </h2>
+
+                  <p>
+                    Comparación de órdenes y
+                    actividad de los últimos
+                    7 días.
+                  </p>
+
                 </div>
+
+
+                <Link
+                  to="/expedicion/inicio"
+                  className="dashboard-area-link"
+                >
+
+                  Ver módulo completo
+
+                  <Icon
+                    name="chevron"
+                    size={15}
+                  />
+
+                </Link>
 
               </div>
 
 
-              {/* KPIs */}
+              {/* KPIS */}
 
-              <div className="panel-kpis">
+              <div className="dashboard-kpi-grid">
 
                 {
                   kpisExpedicion.map(
                     kpi => (
 
-                      <div
-                        className="panel-kpi"
+                      <KpiCard
                         key={
                           kpi.label
                         }
-                      >
-
-                        <div
-                          className={
-                            `panel-kpi-icon ${kpi.tone}`
-                          }
-                        >
-
-                          <Icon
-                            name={
-                              kpi.icon
-                            }
-                          />
-
-                        </div>
-
-
-                        <div>
-
-                          <span>
-                            {
-                              kpi.label
-                            }
-                          </span>
-
-                          <strong>
-                            {
-                              kpi.value
-                            }
-                          </strong>
-
-                          <small>
-                            {
-                              kpi.description
-                            }
-                          </small>
-
-                        </div>
-
-                      </div>
+                        kpi={
+                          kpi
+                        }
+                      />
 
                     )
                   )
@@ -1727,88 +3270,369 @@ export default function PanelPrincipalPage() {
               </div>
 
 
-              {/* RESUMEN MATERIAL */}
+              {/* GRÁFICOS */}
 
-              <div className="panel-expedition-summary">
-
-                <div>
-
-                  <span>
-                    Movimientos de materiales
-                  </span>
-
-                  <strong>
-
-                    {
-                      cargandoMaterial
-                        ? "—"
-                        : movimientosMaterial.length
-                    }
-
-                  </strong>
-
-                  <small>
-                    Pallets y chapadur
-                  </small>
-
-                </div>
+              <div className="dashboard-chart-grid">
 
 
-                <div>
+                <article className="dashboard-chart-card">
 
-                  <span>
-                    Fleteros registrados
-                  </span>
+                  <div className="chart-heading">
 
-                  <strong>
+                    <div>
+
+                      <span>
+                        ÚLTIMOS 7 DÍAS
+                      </span>
+
+                      <h3>
+                        Órdenes por estado
+                      </h3>
+
+                    </div>
+
+                  </div>
+
+
+                  <div className="chart-container">
 
                     {
-                      cargandoFleteros
-                        ? "—"
-                        : fleteros.length
+                      ordenesPorEstado.length === 0
+                        ? (
+
+                            <div className="chart-empty">
+                              Sin órdenes en este período
+                            </div>
+
+                          )
+                        : (
+
+                            <ResponsiveContainer
+                              width="100%"
+                              height="100%"
+                            >
+
+                              <PieChart>
+
+                                <Pie
+                                  data={
+                                    ordenesPorEstado
+                                  }
+                                  dataKey="cantidad"
+                                  nameKey="nombre"
+                                  innerRadius={60}
+                                  outerRadius={95}
+                                  paddingAngle={3}
+                                >
+
+                                  {
+                                    ordenesPorEstado.map(
+                                      (
+                                        _,
+                                        index
+                                      ) => (
+
+                                        <Cell
+                                          key={
+                                            index
+                                          }
+                                          fill={
+                                            COLORES_PIE[
+                                              index
+                                              %
+                                              COLORES_PIE.length
+                                            ]
+                                          }
+                                        />
+
+                                      )
+                                    )
+                                  }
+
+                                </Pie>
+
+                                <Tooltip />
+
+                                <Legend />
+
+                              </PieChart>
+
+                            </ResponsiveContainer>
+
+                          )
                     }
 
-                  </strong>
+                  </div>
 
-                  <small>
-                    Total en maestros
-                  </small>
+                </article>
 
-                </div>
+
+                <article className="dashboard-chart-card">
+
+                  <div className="chart-heading">
+
+                    <div>
+
+                      <span>
+                        STOCK ACTUAL
+                      </span>
+
+                      <h3>
+                        Stock por producto
+                      </h3>
+
+                    </div>
+
+                  </div>
+
+
+                  <div className="chart-container">
+
+                    {
+                      stockPorProducto.length === 0
+                        ? (
+
+                            <div className="chart-empty">
+                              Sin stock registrado
+                            </div>
+
+                          )
+                        : (
+
+                            <ResponsiveContainer
+                              width="100%"
+                              height="100%"
+                            >
+
+                              <BarChart
+                                data={
+                                  stockPorProducto
+                                }
+                                layout="vertical"
+                              >
+
+                                <CartesianGrid
+                                  strokeDasharray="3 3"
+                                  horizontal={false}
+                                />
+
+                                <XAxis
+                                  type="number"
+                                />
+
+                                <YAxis
+                                  type="category"
+                                  dataKey="producto"
+                                  width={120}
+                                />
+
+                                <Tooltip />
+
+                                <Bar
+                                  dataKey="cantidad"
+                                  fill="#20a36d"
+                                  radius={[
+                                    0,
+                                    7,
+                                    7,
+                                    0,
+                                  ]}
+                                />
+
+                              </BarChart>
+
+                            </ResponsiveContainer>
+
+                          )
+                    }
+
+                  </div>
+
+                </article>
 
               </div>
 
 
-              {/* MÓDULOS */}
+              <div className="dashboard-chart-grid">
 
-              <div className="panel-module-grid">
 
-                {
-                  modulosExpedicion.map(
-                    module => (
+                <article className="dashboard-chart-card">
 
-                      <article
-                        className="
-                          panel-module-card
-                          panel-module-expedicion
-                        "
-                        key={
-                          module.title
+                  <div className="chart-heading">
+
+                    <div>
+
+                      <span>
+                        ÚLTIMOS 7 DÍAS
+                      </span>
+
+                      <h3>
+                        Entradas vs salidas
+                      </h3>
+
+                    </div>
+
+                  </div>
+
+
+                  <div className="chart-container">
+
+                    <ResponsiveContainer
+                      width="100%"
+                      height="100%"
+                    >
+
+                      <BarChart
+                        data={
+                          entradasSalidas
                         }
                       >
 
-                        <div className="panel-module-top">
+                        <CartesianGrid
+                          strokeDasharray="3 3"
+                          vertical={false}
+                        />
 
-                          <div className="panel-module-icon">
+                        <XAxis
+                          dataKey="nombre"
+                        />
+
+                        <YAxis />
+
+                        <Tooltip />
+
+                        <Bar
+                          dataKey="cantidad"
+                          fill="#2f75d6"
+                          radius={[
+                            7,
+                            7,
+                            0,
+                            0,
+                          ]}
+                        />
+
+                      </BarChart>
+
+                    </ResponsiveContainer>
+
+                  </div>
+
+                </article>
+
+
+                <article className="dashboard-chart-card">
+
+                  <div className="chart-heading">
+
+                    <div>
+
+                      <span>
+                        ÚLTIMOS 7 DÍAS
+                      </span>
+
+                      <h3>
+                        Pallets y chapadur
+                      </h3>
+
+                    </div>
+
+                  </div>
+
+
+                  <div className="chart-container">
+
+                    <ResponsiveContainer
+                      width="100%"
+                      height="100%"
+                    >
+
+                      <BarChart
+                        data={
+                          materialesGrafico
+                        }
+                      >
+
+                        <CartesianGrid
+                          strokeDasharray="3 3"
+                          vertical={false}
+                        />
+
+                        <XAxis
+                          dataKey="material"
+                        />
+
+                        <YAxis />
+
+                        <Tooltip />
+
+                        <Legend />
+
+                        <Bar
+                          dataKey="salidas"
+                          name="Salidas"
+                          fill="#3678da"
+                          radius={[
+                            6,
+                            6,
+                            0,
+                            0,
+                          ]}
+                        />
+
+                        <Bar
+                          dataKey="entradas"
+                          name="Devoluciones"
+                          fill="#20a36d"
+                          radius={[
+                            6,
+                            6,
+                            0,
+                            0,
+                          ]}
+                        />
+
+                      </BarChart>
+
+                    </ResponsiveContainer>
+
+                  </div>
+
+                </article>
+
+              </div>
+
+
+              {/* TARJETAS EXPEDICIÓN */}
+
+              <div className="dashboard-module-grid">
+
+                {
+                  modulosExpedicion.map(
+                    modulo => (
+
+                      <article
+                        className="
+                          dashboard-module-card
+                          dashboard-expedicion-card
+                        "
+                        key={
+                          modulo.title
+                        }
+                      >
+
+                        <div className="dashboard-module-top">
+
+                          <div>
 
                             <Icon
                               name={
-                                module.icon
+                                modulo.icon
                               }
-                              size={23}
                             />
 
                           </div>
+
 
                           <span>
                             Expedición
@@ -1819,68 +3643,65 @@ export default function PanelPrincipalPage() {
 
                         <h3>
                           {
-                            module.title
+                            modulo.title
                           }
                         </h3>
 
 
                         <p>
                           {
-                            module.description
+                            modulo.description
                           }
                         </p>
 
 
-                        {
-                          module.links
-                          &&
-                          (
+                        <div className="dashboard-module-links">
 
-                            <div className="panel-module-links">
+                          {
+                            modulo.links.map(
+                              link => (
 
-                              {
-                                module.links.map(
-                                  link => (
+                                <Link
+                                  key={
+                                    link.to
+                                  }
+                                  to={
+                                    link.to
+                                  }
+                                >
 
-                                    <Link
-                                      to={
-                                        link.to
-                                      }
-                                      key={
-                                        link.to
-                                      }
-                                    >
+                                  {
+                                    link.label
+                                  }
 
-                                      {
-                                        link.label
-                                      }
+                                </Link>
 
-                                    </Link>
+                              )
+                            )
+                          }
 
-                                  )
-                                )
-                              }
+                        </div>
 
-                            </div>
 
-                          )
-                        }
+                        <UltimaCarga
+                          fecha={
+                            modulo.ultimaCarga
+                          }
+                        />
 
 
                         <Link
                           to={
-                            module.home
-                            ||
-                            "/expedicion/inicio"
+                            modulo.home
                           }
-                          className="panel-module-enter"
+                          className="dashboard-module-enter"
                         >
 
                           Ingresar
 
                           <Icon
                             name="chevron"
-                            size={16}
+                            size={15}
                           />
 
                         </Link>
@@ -1890,39 +3711,6 @@ export default function PanelPrincipalPage() {
                     )
                   )
                 }
-
-              </div>
-
-
-              <div className="panel-area-footer">
-
-                <div>
-
-                  <strong>
-                    Panel de Expedición
-                  </strong>
-
-                  <span>
-                    Consultá el resumen completo
-                    del área.
-                  </span>
-
-                </div>
-
-
-                <Link
-                  to="/expedicion/inicio"
-                  className="panel-area-main-link"
-                >
-
-                  Ver Expedición
-
-                  <Icon
-                    name="chevron"
-                    size={16}
-                  />
-
-                </Link>
 
               </div>
 
