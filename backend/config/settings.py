@@ -273,8 +273,17 @@ CSRF_TRUSTED_ORIGINS = [
 # Al cerrar completamente el navegador,
 # la cookie de sesión debería expirar.
 #
+# Además, por seguridad, la sesión tendrá
+# una duración máxima de 8 horas.
+#
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+SESSION_COOKIE_AGE = (
+    60 * 60 * 8
+)
+
+SESSION_SAVE_EVERY_REQUEST = False
 
 
 # ============================================================
