@@ -34,15 +34,23 @@ def calcular_recargas(
     try:
         bultos = int(bultos)
     except (TypeError, ValueError):
-        raise ValidationError("La cantidad de bultos debe ser un número entero.")
+        raise ValidationError(
+            "La cantidad de bultos debe ser un número entero."
+        )
 
     try:
-        cantidad_ayudantes = int(cantidad_ayudantes)
+        cantidad_ayudantes = int(
+            cantidad_ayudantes
+        )
     except (TypeError, ValueError):
-        raise ValidationError("La cantidad de ayudantes es inválida.")
+        raise ValidationError(
+            "La cantidad de ayudantes es inválida."
+        )
 
     if bultos < 0:
-        raise ValidationError("Los bultos no pueden ser negativos.")
+        raise ValidationError(
+            "Los bultos no pueden ser negativos."
+        )
 
     if cantidad_ayudantes < 0:
         raise ValidationError(
@@ -58,15 +66,18 @@ def calcular_recargas(
     if bultos > 480:
         exceso = bultos - 480
 
-        # Cada bloque completo de 480 suma una recarga.
-        bloques_completos = exceso // 480
+        bloques_completos = (
+            exceso // 480
+        )
 
-        # Resto que no completa otro bloque.
-        resto = exceso % 480
+        resto = (
+            exceso % 480
+        )
 
-        recargas = bloques_completos
+        recargas = (
+            bloques_completos
+        )
 
-        # 40% de 480 = 192.
         if resto >= 192:
             recargas += 1
 
@@ -74,7 +85,10 @@ def calcular_recargas(
     # REGLA ESPECIAL: DESDE 483, MÍNIMO UNA RECARGA
     # ---------------------------------------------------------
 
-    if bultos >= 483 and recargas == 0:
+    if (
+        bultos >= 483
+        and recargas == 0
+    ):
         recargas += 1
 
     # ---------------------------------------------------------
@@ -106,16 +120,24 @@ def calcular_recargas(
     }
 
 
-def validar_personal_reparto(*, chofer, ayudantes):
+def validar_personal_reparto(
+    *,
+    chofer,
+    ayudantes
+):
     """
     Aplica las mismas restricciones de selección
     utilizadas actualmente en Recargas 2026.
     """
 
     if chofer is None:
-        raise ValidationError("El reparto debe tener un chofer.")
+        raise ValidationError(
+            "El reparto debe tener un chofer."
+        )
 
-    ayudantes = list(ayudantes or [])
+    ayudantes = list(
+        ayudantes or []
+    )
 
     # ---------------------------------------------------------
     # VALIDAR CHOFER
@@ -150,7 +172,10 @@ def validar_personal_reparto(*, chofer, ayudantes):
             "El chofer no puede aparecer también como ayudante."
         )
 
-    if len(ayudantes_ids) != len(set(ayudantes_ids)):
+    if (
+        len(ayudantes_ids)
+        != len(set(ayudantes_ids))
+    ):
         raise ValidationError(
             "No se puede repetir un ayudante en el mismo reparto."
         )
@@ -171,7 +196,10 @@ def validar_personal_reparto(*, chofer, ayudantes):
                 f"{ayudante.nombre} no se encuentra disponible."
             )
 
-        if ayudante.puesto not in PUESTOS_AYUDANTE_VALIDOS:
+        if (
+            ayudante.puesto
+            not in PUESTOS_AYUDANTE_VALIDOS
+        ):
             raise ValidationError(
                 f"{ayudante.nombre} no puede participar "
                 "como ayudante."
@@ -204,7 +232,9 @@ def crear_reparto(
     Si algo falla, no se guarda un reparto incompleto.
     """
 
-    ayudantes = list(ayudantes or [])
+    ayudantes = list(
+        ayudantes or []
+    )
 
     validar_personal_reparto(
         chofer=chofer,
@@ -213,7 +243,9 @@ def crear_reparto(
 
     calculo = calcular_recargas(
         bultos=bultos,
-        cantidad_ayudantes=len(ayudantes),
+        cantidad_ayudantes=len(
+            ayudantes
+        ),
         hay_chofer=True,
     )
 
@@ -222,9 +254,13 @@ def crear_reparto(
         vehiculo=vehiculo,
         asignacion=asignacion,
         bultos=int(bultos),
-        puntos_venta=str(puntos_venta or "").strip(),
+        puntos_venta=str(
+            puntos_venta or ""
+        ).strip(),
         recargas=calculo["recargas"],
-        observaciones=str(observaciones or "").strip(),
+        observaciones=str(
+            observaciones or ""
+        ).strip(),
         creado_por=creado_por,
     )
 
@@ -253,12 +289,12 @@ def crear_reparto(
             )
             for indice, ayudante in enumerate(
                 ayudantes,
-                start=1
+                start=1,
             )
         ]
     )
 
-    
+    return reparto
 
 
 @transaction.atomic
@@ -284,7 +320,9 @@ def actualizar_reparto(
     - reconstruir chofer y ayudantes.
     """
 
-    ayudantes = list(ayudantes or [])
+    ayudantes = list(
+        ayudantes or []
+    )
 
     validar_personal_reparto(
         chofer=chofer,
@@ -293,19 +331,26 @@ def actualizar_reparto(
 
     calculo = calcular_recargas(
         bultos=bultos,
-        cantidad_ayudantes=len(ayudantes),
+        cantidad_ayudantes=len(
+            ayudantes
+        ),
         hay_chofer=True,
     )
 
     reparto.fecha = fecha
     reparto.vehiculo = vehiculo
     reparto.asignacion = asignacion
-    reparto.bultos = int(bultos)
+    reparto.bultos = int(
+        bultos
+    )
+
     reparto.puntos_venta = str(
         puntos_venta or ""
     ).strip()
 
-    reparto.recargas = calculo["recargas"]
+    reparto.recargas = (
+        calculo["recargas"]
+    )
 
     reparto.observaciones = str(
         observaciones or ""
@@ -316,7 +361,10 @@ def actualizar_reparto(
     # Borramos la composición anterior del reparto.
     reparto.personal.all().delete()
 
-    # Chofer
+    # ---------------------------------------------------------
+    # CHOFER
+    # ---------------------------------------------------------
+
     RepartoPersonal.objects.create(
         reparto=reparto,
         empleado=chofer,
@@ -324,7 +372,10 @@ def actualizar_reparto(
         orden=0,
     )
 
-    # Ayudantes
+    # ---------------------------------------------------------
+    # AYUDANTES
+    # ---------------------------------------------------------
+
     RepartoPersonal.objects.bulk_create(
         [
             RepartoPersonal(
