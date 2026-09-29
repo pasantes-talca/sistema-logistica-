@@ -104,30 +104,68 @@ export async function crearReparto(
   datos: CrearRepartoPayload
 ): Promise<Reparto> {
 
+  const csrfToken =
+    obtenerCookie("csrftoken");
+
   const response = await fetch(
     `${API_URL}/repartos/`,
     {
       method: "POST",
 
+      credentials: "include",
+
       headers: {
         "Content-Type": "application/json",
+
+        ...(csrfToken
+          ? {
+              "X-CSRFToken": csrfToken,
+            }
+          : {}),
       },
 
       body: JSON.stringify(datos),
     }
   );
 
-  if (!response.ok) {
-    const error = await response.json();
+
+  const contenido =
+    await response.text();
+
+
+  let respuesta;
+
+  try {
+
+    respuesta =
+      contenido
+        ? JSON.parse(contenido)
+        : null;
+
+  } catch {
 
     throw new Error(
-      JSON.stringify(error)
+      `El servidor devolvió una respuesta inválida. HTTP ${response.status}`
     );
   }
 
-  return response.json();
-}
 
+  if (!response.ok) {
+
+    throw new Error(
+      respuesta?.error
+      ??
+      respuesta?.detail
+      ??
+      JSON.stringify(respuesta)
+      ??
+      `Error HTTP ${response.status}`
+    );
+  }
+
+
+  return respuesta;
+}
 
 export async function actualizarReparto(
   id: number,
