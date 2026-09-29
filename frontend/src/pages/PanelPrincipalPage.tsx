@@ -1219,8 +1219,6 @@ export default function PanelPrincipalPage() {
   const {
     data:
       movimientosStock = [],
-    isLoading:
-      cargandoMovimientos,
   } = useQuery({
 
     queryKey: [
@@ -1701,7 +1699,7 @@ export default function PanelPrincipalPage() {
           ===
           "ENTRADA"
       )
-      .reduce(
+      .reduce<number>(
         (
           total,
           movimiento
@@ -1732,7 +1730,7 @@ export default function PanelPrincipalPage() {
           ===
           "SALIDA"
       )
-      .reduce(
+      .reduce<number>(
         (
           total,
           movimiento
@@ -1785,7 +1783,7 @@ export default function PanelPrincipalPage() {
 
 
   const totalPalletsSalida =
-    materialesActuales.reduce(
+    materialesActuales.reduce<number>(
       (
         total,
         item
@@ -1807,7 +1805,7 @@ export default function PanelPrincipalPage() {
 
 
   const totalPalletsEntrada =
-    materialesActuales.reduce(
+    materialesActuales.reduce<number>(
       (
         total,
         item
@@ -1829,7 +1827,7 @@ export default function PanelPrincipalPage() {
 
 
   const totalChapadurSalida =
-    materialesActuales.reduce(
+    materialesActuales.reduce<number>(
       (
         total,
         item
@@ -1851,7 +1849,7 @@ export default function PanelPrincipalPage() {
 
 
   const totalChapadurEntrada =
-    materialesActuales.reduce(
+    materialesActuales.reduce<number>(
       (
         total,
         item
