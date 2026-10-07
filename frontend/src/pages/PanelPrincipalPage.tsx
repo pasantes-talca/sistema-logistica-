@@ -1674,6 +1674,14 @@ export default function PanelPrincipalPage() {
         10
       );
 
+  const stockMaximo =
+    Math.max(
+      ...stockPorProducto.map(
+        item => item.cantidad
+      ),
+      1
+    );
+
 
   // =======================================================
   // ENTRADAS / SALIDAS
@@ -3384,7 +3392,7 @@ export default function PanelPrincipalPage() {
                   </div>
 
 
-                  <div className="chart-container">
+                  <div className="stock-ranking-container">
 
                     {
                       stockPorProducto.length === 0
@@ -3397,49 +3405,22 @@ export default function PanelPrincipalPage() {
                           )
                         : (
 
-                            <ResponsiveContainer
-                              width="100%"
-                              height="100%"
-                            >
-
-                              <BarChart
-                                data={
-                                  stockPorProducto
-                                }
-                                layout="vertical"
-                              >
-
-                                <CartesianGrid
-                                  strokeDasharray="3 3"
-                                  horizontal={false}
-                                />
-
-                                <XAxis
-                                  type="number"
-                                />
-
-                                <YAxis
-                                  type="category"
-                                  dataKey="producto"
-                                  width={120}
-                                />
-
-                                <Tooltip />
-
-                                <Bar
-                                  dataKey="cantidad"
-                                  fill="#20a36d"
-                                  radius={[
-                                    0,
-                                    7,
-                                    7,
-                                    0,
-                                  ]}
-                                />
-
-                              </BarChart>
-
-                            </ResponsiveContainer>
+                            <div className="stock-ranking">
+                              {stockPorProducto.map((item, index) => (
+                                <div className="stock-ranking-row" key={item.producto}>
+                                  <span className="stock-ranking-position">{index + 1}</span>
+                                  <div className="stock-ranking-content">
+                                    <div className="stock-ranking-label">
+                                      <strong>{item.producto}</strong>
+                                      <span>{item.cantidad.toLocaleString("es-AR")}</span>
+                                    </div>
+                                    <div className="stock-ranking-track">
+                                      <span style={{ width: `${Math.max((item.cantidad / stockMaximo) * 100, 2)}%` }} />
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
 
                           )
                     }

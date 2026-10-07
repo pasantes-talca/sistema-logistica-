@@ -585,7 +585,7 @@ export default function DetalleOrdenExpedicionPage() {
 
     return (
 
-      <div className="pagina">
+      <div className="pagina expedicion-page">
 
         <div className="dashboard-container">
           Cargando orden...
@@ -605,7 +605,7 @@ export default function DetalleOrdenExpedicionPage() {
 
     return (
 
-      <div className="pagina">
+      <div className="pagina expedicion-page">
 
         <div className="dashboard-container">
 
@@ -622,7 +622,7 @@ export default function DetalleOrdenExpedicionPage() {
 
   return (
 
-    <div className="pagina">
+    <div className="pagina expedicion-page">
 
       <div className="dashboard-container">
 
