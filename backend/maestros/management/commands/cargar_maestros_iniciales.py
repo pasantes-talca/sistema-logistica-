@@ -26,30 +26,37 @@ class Command(BaseCommand):
         productos = [
             {
                 "codigo": "5051",
-                "nombre": "1/5 LT COLA",
-                "presentacion": "1/5 LT",
+                "nombre": "1/2 LT COLA",
+                "presentacion": "1/2 LT",
                 "sabor": "COLA",
                 "familia": Producto.Familia.GASEOSA,
             },
             {
                 "codigo": "5056",
-                "nombre": "1/5 LT LIMA",
-                "presentacion": "1/5 LT",
+                "nombre": "1/2 LT LIMA",
+                "presentacion": "1/2 LT",
                 "sabor": "LIMA",
                 "familia": Producto.Familia.GASEOSA,
             },
             {
                 "codigo": "5066",
-                "nombre": "1/5 LT NARANJA",
-                "presentacion": "1/5 LT",
+                "nombre": "1/2 LT NARANJA",
+                "presentacion": "1/2 LT",
                 "sabor": "NARANJA",
                 "familia": Producto.Familia.GASEOSA,
             },
             {
                 "codigo": "5071",
-                "nombre": "1/5 LT POMELO",
-                "presentacion": "1/5 LT",
+                "nombre": "1/2 LT POMELO",
+                "presentacion": "1/2 LT",
                 "sabor": "POMELO",
+                "familia": Producto.Familia.GASEOSA,
+            },
+            {
+                "codigo": "5061",
+                "nombre": "1/2 LT MANZANA",
+                "presentacion": "1/2 LT",
+                "sabor": "MANZANA",
                 "familia": Producto.Familia.GASEOSA,
             },
 
@@ -81,6 +88,13 @@ class Command(BaseCommand):
                 "sabor": "POMELO",
                 "familia": Producto.Familia.GASEOSA,
             },
+            {
+                "codigo": "5210",
+                "nombre": "2 1/4 LT MANZANA",
+                "presentacion": "2 1/4 LT",
+                "sabor": "MANZANA",
+                "familia": Producto.Familia.GASEOSA,
+            },
 
             {
                 "codigo": "5670",
@@ -108,6 +122,13 @@ class Command(BaseCommand):
                 "nombre": "3 LT POMELO",
                 "presentacion": "3 LT",
                 "sabor": "POMELO",
+                "familia": Producto.Familia.GASEOSA,
+            },
+            {
+                "codigo": "5680",
+                "nombre": "3 LT MANZANA",
+                "presentacion": "3 LT",
+                "sabor": "MANZANA",
                 "familia": Producto.Familia.GASEOSA,
             },
 

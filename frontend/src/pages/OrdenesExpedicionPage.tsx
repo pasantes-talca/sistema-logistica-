@@ -271,6 +271,10 @@ export default function OrdenesExpedicionPage() {
                                 Facturación
                               </th>
 
+                              <th>
+                                Acciones
+                              </th>
+
                             </tr>
 
                           </thead>
@@ -352,6 +356,13 @@ export default function OrdenesExpedicionPage() {
                                         orden
                                           .facturacion
                                       }
+                                    </td>
+
+                                    <td>
+                                      <div className="expedicion-table-actions">
+                                        <Link to={`/expedicion/ordenes/${orden.id}`}>Ver</Link>
+                                        {orden.entregas.length === 0 && <Link to={`/expedicion/ordenes/${orden.id}/editar`}>Editar</Link>}
+                                      </div>
                                     </td>
 
                                   </tr>

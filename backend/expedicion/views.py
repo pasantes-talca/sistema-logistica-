@@ -577,6 +577,115 @@ class OrdenCargaDetailAPIView(
         )
 
 
+    @transaction.atomic
+    def put(
+        self,
+        request,
+        pk,
+    ):
+
+        orden = get_object_or_404(
+            OrdenCarga.objects.select_for_update(),
+            pk=pk,
+        )
+
+        if orden.entregas.exists():
+            return Response(
+                {
+                    "detail": (
+                        "No se puede editar una orden que ya tiene "
+                        "entregas registradas, porque afectaría la "
+                        "trazabilidad del stock."
+                    )
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        entrada = CrearOrdenCargaSerializer(
+            data=request.data
+        )
+        entrada.is_valid(raise_exception=True)
+        datos = entrada.validated_data
+        numero = datos["numero"].strip()
+
+        if OrdenCarga.objects.filter(
+            numero=numero
+        ).exclude(pk=orden.pk).exists():
+            return Response(
+                {"numero": "Ya existe una orden con ese número."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        fletero = get_object_or_404(
+            Fletero,
+            id=datos["fletero_id"],
+            activo=True,
+        )
+        detalles = datos.get("detalles", [])
+
+        if not detalles:
+            return Response(
+                {"detalles": "La orden debe contener al menos un producto."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        productos_utilizados = set()
+        productos_validados = []
+
+        for detalle in detalles:
+            producto_id = detalle["producto_id"]
+            if producto_id in productos_utilizados:
+                return Response(
+                    {"detalles": "Un mismo producto no puede aparecer dos veces en la orden."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            if detalle["cantidad_solicitada"] <= 0:
+                return Response(
+                    {"cantidad_solicitada": "La cantidad solicitada debe ser mayor a cero."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            productos_utilizados.add(producto_id)
+            producto = get_object_or_404(
+                Producto,
+                id=producto_id,
+                activo=True,
+            )
+            productos_validados.append((producto, detalle["cantidad_solicitada"]))
+
+        orden.numero = numero
+        orden.fecha = datos["fecha"]
+        orden.fletero = fletero
+        orden.observaciones = datos.get("observaciones", "")
+        orden.save(update_fields=[
+            "numero", "fecha", "fletero", "observaciones", "actualizado_en"
+        ])
+
+        orden.detalles.all().delete()
+        DetalleOrdenCarga.objects.bulk_create([
+            DetalleOrdenCarga(
+                orden=orden,
+                producto=producto,
+                cantidad_solicitada=cantidad,
+            )
+            for producto, cantidad in productos_validados
+        ])
+
+        orden = (
+            OrdenCarga.objects
+            .select_related("fletero", "creado_por")
+            .prefetch_related(
+                "detalles__producto",
+                "entregas__detalles__producto",
+            )
+            .get(pk=orden.pk)
+        )
+
+        return Response(
+            OrdenCargaSerializer(orden).data,
+            status=status.HTTP_200_OK,
+        )
+
+
 # ============================================================
 # REGISTRAR ENTREGA DE UNA ORDEN
 # ============================================================

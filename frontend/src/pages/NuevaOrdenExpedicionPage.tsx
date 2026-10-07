@@ -1,4 +1,7 @@
 import {
+  useEffect,
+  useMemo,
+  useRef,
   useState,
 } from "react";
 
@@ -10,11 +13,15 @@ import {
 
 import {
   useNavigate,
+  useParams,
 } from "react-router-dom";
 
 import {
+  actualizarOrdenCarga,
+  crearFletero,
   crearOrdenCarga,
   obtenerFleteros,
+  obtenerOrdenCarga,
 } from "../api/expedicion";
 
 import {
@@ -66,6 +73,10 @@ export default function NuevaOrdenExpedicionPage() {
   const navigate =
     useNavigate();
 
+  const params = useParams();
+  const ordenId = Number(params.id);
+  const editando = Number.isInteger(ordenId) && ordenId > 0;
+
 
   const queryClient =
     useQueryClient();
@@ -95,6 +106,13 @@ export default function NuevaOrdenExpedicionPage() {
     observaciones,
     setObservaciones,
   ] = useState("");
+
+  const [busquedaProducto, setBusquedaProducto] = useState("");
+  const [mostrarNuevoFletero, setMostrarNuevoFletero] = useState(false);
+  const [nuevoFleteroNombre, setNuevoFleteroNombre] = useState("");
+  const [nuevoFleteroApellido, setNuevoFleteroApellido] = useState("");
+  const [nuevoFleteroEmpresa, setNuevoFleteroEmpresa] = useState("");
+  const selectProductoRefs = useRef<Array<HTMLSelectElement | null>>([]);
 
 
   const [
@@ -127,6 +145,28 @@ export default function NuevaOrdenExpedicionPage() {
 
   });
 
+  const { data: ordenExistente } = useQuery({
+    queryKey: ["expedicion-orden", ordenId],
+    queryFn: () => obtenerOrdenCarga(ordenId),
+    enabled: editando,
+  });
+
+  useEffect(() => {
+    if (!ordenExistente) return;
+    const cargarFormulario = window.setTimeout(() => {
+      setNumero(ordenExistente.numero);
+      setFecha(ordenExistente.fecha);
+      setFleteroId(String(ordenExistente.fletero));
+      setObservaciones(ordenExistente.observaciones);
+      setProductosOrden(
+        ordenExistente.detalles.map(detalle => ({
+          productoId: String(detalle.producto),
+          cantidad: String(Number(detalle.cantidad_solicitada)),
+        }))
+      );
+    }, 0);
+    return () => window.clearTimeout(cargarFormulario);
+  }, [ordenExistente]);
 
   // =========================================================
   // CONSULTAR PRODUCTOS
@@ -156,7 +196,10 @@ export default function NuevaOrdenExpedicionPage() {
     useMutation({
 
       mutationFn:
-        crearOrdenCarga,
+        (datos: Parameters<typeof crearOrdenCarga>[0]) =>
+          editando
+            ? actualizarOrdenCarga(ordenId, datos)
+            : crearOrdenCarga(datos),
 
       onSuccess: async (
         orden
@@ -171,7 +214,7 @@ export default function NuevaOrdenExpedicionPage() {
 
 
         alert(
-          `Orden ${orden.numero} creada correctamente.`
+          `Orden ${orden.numero} ${editando ? "actualizada" : "creada"} correctamente.`
         );
 
 
@@ -191,6 +234,54 @@ export default function NuevaOrdenExpedicionPage() {
       },
 
     });
+
+  const crearFleteroMutation = useMutation({
+    mutationFn: crearFletero,
+    onSuccess: async fletero => {
+      await queryClient.invalidateQueries({ queryKey: ["expedicion-fleteros"] });
+      setFleteroId(String(fletero.id));
+      setNuevoFleteroNombre("");
+      setNuevoFleteroApellido("");
+      setNuevoFleteroEmpresa("");
+      setMostrarNuevoFletero(false);
+    },
+    onError: error => alert(error instanceof Error ? error.message : "No se pudo registrar el fletero."),
+  });
+
+  const productosOrdenados = useMemo(
+    () => [...productos].sort((a, b) =>
+      a.codigo.localeCompare(b.codigo, "es", { numeric: true })
+    ),
+    [productos]
+  );
+
+  const productosFiltrados = useMemo(() => {
+    const termino = busquedaProducto.trim().toLocaleLowerCase("es");
+    if (!termino) return productosOrdenados;
+    return productosOrdenados.filter(producto =>
+      `${producto.codigo} ${producto.nombre} ${producto.presentacion} ${producto.sabor}`
+        .toLocaleLowerCase("es")
+        .includes(termino)
+    );
+  }, [busquedaProducto, productosOrdenados]);
+
+  function productosVisiblesPara(productoId: string) {
+    if (!productoId) return productosFiltrados;
+    const seleccionado = productosOrdenados.find(
+      producto => String(producto.id) === productoId
+    );
+    if (!seleccionado || productosFiltrados.some(producto => producto.id === seleccionado.id)) {
+      return productosFiltrados;
+    }
+    return [seleccionado, ...productosFiltrados];
+  }
+
+  const esTrillay = useMemo(() => {
+    const seleccionado = fleteros.find(item => String(item.id) === fleteroId);
+    return `${seleccionado?.nombre ?? ""} ${seleccionado?.apellido ?? ""} ${seleccionado?.empresa ?? ""}`
+      .toLocaleLowerCase("es")
+      .includes("trillay");
+  }, [fleteroId, fleteros]);
 
 
   // =========================================================
@@ -265,6 +356,56 @@ export default function NuevaOrdenExpedicionPage() {
         },
       ]
     );
+  }
+
+
+  function ordenarProductosYContinuar() {
+    const codigos = new Map(
+      productos.map(producto => [String(producto.id), producto.codigo])
+    );
+
+    setProductosOrden(actuales => {
+      const completas = actuales
+        .filter(item => item.productoId)
+        .sort((a, b) =>
+          (codigos.get(a.productoId) ?? "").localeCompare(
+            codigos.get(b.productoId) ?? "",
+            "es",
+            { numeric: true }
+          )
+        );
+      const vacias = actuales.filter(item => !item.productoId);
+      return [...completas, ...(vacias.length ? vacias : [{ productoId: "", cantidad: "" }])];
+    });
+
+    window.setTimeout(() => {
+      const referencias = selectProductoRefs.current;
+      referencias[referencias.length - 1]?.focus();
+    }, 0);
+  }
+
+
+  function manejarEnterFormulario(
+    event: React.KeyboardEvent<HTMLFormElement>
+  ) {
+    if (event.key !== "Enter") return;
+    const target = event.target as HTMLElement;
+    if (target.tagName === "TEXTAREA" || target.dataset.enterCantidad === "true") return;
+    event.preventDefault();
+  }
+
+
+  function guardarNuevoFletero() {
+    if (!nuevoFleteroNombre.trim()) {
+      alert("Ingresá el nombre del fletero.");
+      return;
+    }
+    crearFleteroMutation.mutate({
+      nombre: nuevoFleteroNombre.trim(),
+      apellido: nuevoFleteroApellido.trim(),
+      empresa: nuevoFleteroEmpresa.trim(),
+      activo: true,
+    });
   }
 
 
@@ -481,12 +622,12 @@ export default function NuevaOrdenExpedicionPage() {
 
 
             <h1>
-              Nueva orden de carga
+              {editando ? "Editar orden de carga" : "Nueva orden de carga"}
             </h1>
 
 
             <p>
-              Registrá una nueva orden,
+              {editando ? "Actualizá la orden," : "Registrá una nueva orden,"}
               seleccioná el fletero
               y agregá los productos
               solicitados para la carga.
@@ -525,6 +666,7 @@ export default function NuevaOrdenExpedicionPage() {
           onSubmit={
             guardarOrden
           }
+          onKeyDown={manejarEnterFormulario}
         >
 
 
@@ -696,9 +838,29 @@ export default function NuevaOrdenExpedicionPage() {
 
                 </select>
 
+                <button
+                  type="button"
+                  className="expedicion-inline-action"
+                  onClick={() => setMostrarNuevoFletero(valor => !valor)}
+                >
+                  <Icon name="plus" size={15} />
+                  {mostrarNuevoFletero ? "Cancelar alta" : "Registrar nuevo fletero"}
+                </button>
+
               </div>
 
             </div>
+
+            {mostrarNuevoFletero && (
+              <div className="expedicion-inline-form">
+                <div className="form-group"><label>Nombre *</label><input value={nuevoFleteroNombre} onChange={event => setNuevoFleteroNombre(event.target.value)} placeholder="Nombre" /></div>
+                <div className="form-group"><label>Apellido</label><input value={nuevoFleteroApellido} onChange={event => setNuevoFleteroApellido(event.target.value)} placeholder="Apellido" /></div>
+                <div className="form-group"><label>Empresa</label><input value={nuevoFleteroEmpresa} onChange={event => setNuevoFleteroEmpresa(event.target.value)} placeholder="Empresa" /></div>
+                <button type="button" className="btn-primary" onClick={guardarNuevoFletero} disabled={crearFleteroMutation.isPending}>{crearFleteroMutation.isPending ? "Guardando..." : "Guardar fletero"}</button>
+              </div>
+            )}
+
+            {esTrillay && <div className="expedicion-info"><Icon name="activity" size={17}/><div><strong>Formato de cantidades Trillay</strong><span>Usá números enteros para packs completos y decimales para botellas sueltas. Ejemplo: 5.3 representa 5 packs y 3 botellas.</span></div></div>}
 
           </section>
 
@@ -744,6 +906,12 @@ export default function NuevaOrdenExpedicionPage() {
 
             </div>
 
+            <div className="expedicion-product-search">
+              <Icon name="package" size={18}/>
+              <input type="search" value={busquedaProducto} onChange={event => setBusquedaProducto(event.target.value)} placeholder="Buscar producto por código, nombre, sabor o presentación..." />
+              <span>{productosFiltrados.length} productos</span>
+            </div>
+
 
             <div
               style={{
@@ -784,6 +952,7 @@ export default function NuevaOrdenExpedicionPage() {
 
 
                         <select
+                          ref={elemento => { selectProductoRefs.current[index] = elemento; }}
                           value={
                             fila.productoId
                           }
@@ -813,7 +982,7 @@ export default function NuevaOrdenExpedicionPage() {
 
 
                           {
-                            productos.map(
+                            productosVisiblesPara(fila.productoId).map(
                               producto => (
 
                                 <option
@@ -863,6 +1032,15 @@ export default function NuevaOrdenExpedicionPage() {
 
                           step="0.01"
 
+                          data-enter-cantidad="true"
+
+                          onKeyDown={event => {
+                            if (event.key === "Enter") {
+                              event.preventDefault();
+                              ordenarProductosYContinuar();
+                            }
+                          }}
+
                           value={
                             fila.cantidad
                           }
@@ -877,6 +1055,8 @@ export default function NuevaOrdenExpedicionPage() {
 
                           placeholder="Ej: 500"
                         />
+
+                        {esTrillay && <small className="expedicion-field-help">Enteros: packs · Decimales: botellas sueltas</small>}
 
                       </div>
 
@@ -1037,8 +1217,8 @@ export default function NuevaOrdenExpedicionPage() {
 
                 {
                   guardarMutation.isPending
-                    ? "Creando orden..."
-                    : "Crear orden"
+                    ? (editando ? "Guardando cambios..." : "Creando orden...")
+                    : (editando ? "Guardar cambios" : "Crear orden")
                 }
 
               </button>

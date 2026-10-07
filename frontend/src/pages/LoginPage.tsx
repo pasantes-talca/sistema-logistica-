@@ -12,7 +12,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const mutation = useMutation({
     mutationFn: iniciarSesion,
-    onSuccess: async () => { setError(""); await queryClient.invalidateQueries({ queryKey: ["usuario-actual"] }); navigate("/"); },
+    onSuccess: async () => { setError(""); await queryClient.invalidateQueries({ queryKey: ["usuario-actual"] }); navigate("/panel", { replace: true }); },
     onError: (requestError: Error) => setError(requestError.message),
   });
   function enviar(event: React.FormEvent) {

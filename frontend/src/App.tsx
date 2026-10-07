@@ -105,6 +105,10 @@ import EstadisticasControlDiarioPage
   from "./pages/EstadisticasControlDiarioPage";
 
 
+// =============================================
+// EXPEDICIÓN
+// =============================================
+
 import InicioExpedicionPage
   from "./pages/InicioExpedicionPage";
 
@@ -117,7 +121,6 @@ import OrdenesExpedicionPage
 import MovimientosExpedicionPage
   from "./pages/MovimientosExpedicionPage";
 
-
 import FleterosExpedicionPage
   from "./pages/FleterosExpedicionPage";
 
@@ -127,9 +130,9 @@ import MaterialesExpedicionPage
 import NuevaOrdenExpedicionPage
   from "./pages/NuevaOrdenExpedicionPage";
 
-
 import DetalleOrdenExpedicionPage
   from "./pages/DetalleOrdenExpedicionPage";
+
 
 function App() {
 
@@ -141,8 +144,15 @@ function App() {
 
 
         {/* ===================================== */}
-        {/* LOGIN */}
+        {/* ENTRADA AL SISTEMA */}
         {/* ===================================== */}
+
+        <Route
+          path="/"
+          element={
+            <LoginPage />
+          }
+        />
 
         <Route
           path="/login"
@@ -172,7 +182,7 @@ function App() {
                   {/* ============================= */}
 
                   <Route
-                    path="/"
+                    path="/panel"
                     element={
                       <PanelPrincipalPage />
                     }
@@ -437,44 +447,72 @@ function App() {
                     }
                   />
 
+
+                  {/* ============================= */}
+                  {/* EXPEDICIÓN */}
+                  {/* ============================= */}
+
                   <Route
                     path="/expedicion/inicio"
-                    element={<InicioExpedicionPage />}
+                    element={
+                      <InicioExpedicionPage />
+                    }
                   />
 
                   <Route
                     path="/expedicion/stock"
-                    element={<StockExpedicionPage />}
+                    element={
+                      <StockExpedicionPage />
+                    }
                   />
 
                   <Route
                     path="/expedicion/ordenes"
-                    element={<OrdenesExpedicionPage />}
+                    element={
+                      <OrdenesExpedicionPage />
+                    }
                   />
 
                   <Route
                     path="/expedicion/movimientos"
-                    element={<MovimientosExpedicionPage />}
+                    element={
+                      <MovimientosExpedicionPage />
+                    }
                   />
 
                   <Route
                     path="/expedicion/fleteros"
-                    element={<FleterosExpedicionPage />}
+                    element={
+                      <FleterosExpedicionPage />
+                    }
                   />
 
                   <Route
                     path="/expedicion/materiales"
-                    element={<MaterialesExpedicionPage />}
+                    element={
+                      <MaterialesExpedicionPage />
+                    }
                   />
 
                   <Route
                     path="/expedicion/ordenes/nueva"
-                    element={<NuevaOrdenExpedicionPage />}
+                    element={
+                      <NuevaOrdenExpedicionPage />
+                    }
                   />
 
                   <Route
                     path="/expedicion/ordenes/:id"
-                    element={<DetalleOrdenExpedicionPage />}
+                    element={
+                      <DetalleOrdenExpedicionPage />
+                    }
+                  />
+
+                  <Route
+                    path="/expedicion/ordenes/:id/editar"
+                    element={
+                      <NuevaOrdenExpedicionPage />
+                    }
                   />
 
 
@@ -483,6 +521,7 @@ function App() {
               </AppLayout>
 
             </RutaProtegida>
+
           }
         />
 

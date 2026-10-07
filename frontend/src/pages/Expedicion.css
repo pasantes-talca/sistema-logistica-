@@ -979,3 +979,107 @@
 .expedicion-page section::after {
   pointer-events: none;
 }
+
+/* Alta rápida, búsqueda y ayudas de carga */
+.expedicion-inline-action {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 3px;
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: #2867cb;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.expedicion-inline-form {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  align-items: end;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 16px;
+  border: 1px solid #cfe0f7;
+  border-radius: 12px;
+  background: #f7fbff;
+}
+
+.expedicion-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 16px;
+  padding: 12px 14px;
+  border: 1px solid #cfe0f7;
+  border-radius: 10px;
+  background: #f1f7ff;
+  color: #3d5f89;
+}
+
+.expedicion-info > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.expedicion-info strong { font-size: 12px; }
+.expedicion-info span { font-size: 11px; line-height: 1.5; }
+
+.expedicion-product-search {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 16px;
+  padding: 0 12px;
+  border: 1px solid #d6dce5;
+  border-radius: 10px;
+  background: #fff;
+  color: #7c8ca2;
+}
+
+.expedicion-product-search:focus-within {
+  border-color: #5591e8;
+  box-shadow: 0 0 0 3px rgba(40, 103, 203, 0.1);
+}
+
+.expedicion-product-search input {
+  flex: 1;
+  min-width: 0;
+  height: 43px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #26354c;
+}
+
+.expedicion-product-search span {
+  white-space: nowrap;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.expedicion-field-help {
+  color: #687a91;
+  font-size: 10px;
+}
+
+.expedicion-table-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.expedicion-table-actions .module-enter {
+  padding: 7px 10px;
+  border: 1px solid #bcd3f2;
+  border-radius: 8px;
+}
+
+@media (max-width: 760px) {
+  .expedicion-inline-form { grid-template-columns: 1fr; }
+  .expedicion-product-search span { display: none; }
+}

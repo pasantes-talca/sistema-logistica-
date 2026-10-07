@@ -357,7 +357,7 @@ function Breadcrumbs() {
 
     <div className="breadcrumb">
 
-      <NavLink to="/">
+      <NavLink to="/panel">
         Inicio
       </NavLink>
 
@@ -666,7 +666,7 @@ export default function AppLayout({
           {/* PANEL GENERAL */}
 
           <NavLink
-            to="/"
+            to="/panel"
             end
             className={
               ({

@@ -708,12 +708,10 @@ export default function DetalleOrdenExpedicionPage() {
             </div>
 
 
-            <Link
-              to="/expedicion/ordenes"
-              className="modulo-link"
-            >
-              Volver a órdenes
-            </Link>
+            <div className="expedicion-table-actions">
+              {orden.entregas.length === 0 && <Link to={`/expedicion/ordenes/${orden.id}/editar`} className="module-enter"><Icon name="history" size={15}/>Editar orden</Link>}
+              <Link to="/expedicion/ordenes" className="modulo-link">Volver a órdenes</Link>
+            </div>
 
           </div>
 

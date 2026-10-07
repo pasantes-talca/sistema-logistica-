@@ -499,3 +499,16 @@ Promise<MovimientoMaterial[]> {
     `${API_URL}/expedicion/materiales/`
   );
 }
+
+
+export function actualizarOrdenCarga(
+  id: number,
+  datos: CrearOrdenCargaPayload
+): Promise<OrdenCarga> {
+
+  return enviarJson<OrdenCarga>(
+    `${API_URL}/expedicion/ordenes/${id}/`,
+    "PUT",
+    datos
+  );
+}
