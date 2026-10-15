@@ -1,3 +1,5 @@
+import ScrollableChart from "../components/charts/ScrollableChart";
+import ChartCategoryTick from "../components/charts/ChartCategoryTick";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
@@ -7,236 +9,128 @@ import {
   CartesianGrid,
   Line,
   LineChart,
-  ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
 
-import {
-  obtenerEstadisticasControlDiario,
-} from "../api/logistica";
+import { obtenerEstadisticasControlDiario } from "../api/logistica";
 
 import "./ControlDiario.css";
 
-
-function formatearNumero(
-  valor: string | number
-) {
-  return Number(valor).toLocaleString(
-    "es-AR",
-    {
-      maximumFractionDigits: 2,
-    }
-  );
+function formatearNumero(valor: string | number) {
+  return Number(valor).toLocaleString("es-AR", {
+    maximumFractionDigits: 2,
+  });
 }
 
-
-function formatearFecha(
-  fecha: string
-) {
-
-  const [
-    ,
-    mes,
-    dia,
-  ] = fecha.split("-");
+function formatearFecha(fecha: string) {
+  const [, mes, dia] = fecha.split("-");
 
   return `${dia}/${mes}`;
 }
 
-
-function formatearTipo(
-  tipo: string
-) {
-
-  const nombres:
-    Record<string, string> = {
-
-      DISPONIBLE: "Disponible",
-      RESERVA: "Reserva",
-      ASIGNACION: "Asignación",
-      STOCK_DEPOSITO: "Stock depósito",
-      DISTRIBUCION: "Distribución",
-      PENDIENTE: "Pendiente",
-      AJUSTE: "Ajuste",
-    };
+function formatearTipo(tipo: string) {
+  const nombres: Record<string, string> = {
+    DISPONIBLE: "Disponible",
+    RESERVA: "Reserva",
+    ASIGNACION: "Asignación",
+    STOCK_DEPOSITO: "Stock depósito",
+    DISTRIBUCION: "Distribución",
+    PENDIENTE: "Pendiente",
+    AJUSTE: "Ajuste",
+  };
 
   return nombres[tipo] ?? tipo;
 }
 
-
 export default function EstadisticasControlDiarioPage() {
+  const [desde, setDesde] = useState("");
 
-  const [
-    desde,
-    setDesde,
-  ] = useState("");
+  const [hasta, setHasta] = useState("");
 
-  const [
-    hasta,
-    setHasta,
-  ] = useState("");
-
-
-  const {
-    data,
-    isLoading,
-    isError,
-  } = useQuery({
-
-    queryKey: [
-      "estadisticas-control-diario",
-      desde,
-      hasta,
-    ],
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["estadisticas-control-diario", desde, hasta],
 
     queryFn: () =>
-      obtenerEstadisticasControlDiario(
-        desde || undefined,
-        hasta || undefined
-      ),
+      obtenerEstadisticasControlDiario(desde || undefined, hasta || undefined),
   });
 
-
   const productos =
-    data?.por_producto.map(
-      item => ({
-        nombre:
-          item.producto__nombre,
+    data?.por_producto.map((item) => ({
+      nombre: item.producto__nombre,
 
-        total:
-          Number(item.total),
-      })
-    )
-    ?? [];
-
+      total: Number(item.total),
+    })) ?? [];
 
   const distribuidores =
-    data?.por_distribuidor.map(
-      item => ({
-        nombre:
-          item.ubicacion__nombre,
+    data?.por_distribuidor.map((item) => ({
+      nombre: item.ubicacion__nombre,
 
-        total:
-          Number(item.total),
-      })
-    )
-    ?? [];
-
+      total: Number(item.total),
+    })) ?? [];
 
   const evolucion =
-    data?.por_fecha.map(
-      item => ({
-        fecha:
-          formatearFecha(
-            item.control__fecha
-          ),
+    data?.por_fecha.map((item) => ({
+      fecha: formatearFecha(item.control__fecha),
 
-        total:
-          Number(item.total),
-      })
-    )
-    ?? [];
-
+      total: Number(item.total),
+    })) ?? [];
 
   if (isLoading) {
     return (
       <div className="control-diario-page">
-
-        <div className="control-diario-state">
-          Cargando estadísticas...
-        </div>
-
+        <div className="control-diario-state">Cargando estadísticas...</div>
       </div>
     );
   }
-
 
   if (isError || !data) {
     return (
       <div className="control-diario-page">
-
         <div className="control-diario-state">
           No se pudieron cargar las estadísticas.
         </div>
-
       </div>
     );
   }
 
-
   return (
-
     <div className="control-diario-page">
-
-
       <div className="control-diario-header">
-
         <div>
-
           <span className="control-diario-eyebrow">
             CONTROL DIARIO DE LOGÍSTICA
           </span>
 
-          <h1>
-            Estadísticas
-          </h1>
+          <h1>Estadísticas</h1>
 
-          <p>
-            Analizá movimientos,
-            productos y distribución
-            por período.
-          </p>
-
+          <p>Analizá movimientos, productos y distribución por período.</p>
         </div>
-
       </div>
-
 
       {/* FILTROS */}
 
       <div className="control-diario-stats-filter">
-
         <div>
-
-          <label>
-            Desde
-          </label>
+          <label>Desde</label>
 
           <input
             type="date"
             value={desde}
-            onChange={
-              e =>
-                setDesde(
-                  e.target.value
-                )
-            }
+            onChange={(e) => setDesde(e.target.value)}
           />
-
         </div>
 
-
         <div>
-
-          <label>
-            Hasta
-          </label>
+          <label>Hasta</label>
 
           <input
             type="date"
             value={hasta}
-            onChange={
-              e =>
-                setHasta(
-                  e.target.value
-                )
-            }
+            onChange={(e) => setHasta(e.target.value)}
           />
-
         </div>
-
 
         <button
           type="button"
@@ -247,157 +141,92 @@ export default function EstadisticasControlDiarioPage() {
         >
           Limpiar filtros
         </button>
-
       </div>
-
 
       {/* KPIS */}
 
       <div className="control-diario-stats-kpis">
-
         <div className="control-diario-stats-kpi">
+          <span>Movimientos</span>
 
-          <span>
-            Movimientos
-          </span>
+          <strong>{data.total_movimientos}</strong>
 
-          <strong>
-            {data.total_movimientos}
-          </strong>
-
-          <small>
-            Registros del período
-          </small>
-
+          <small>Registros del período</small>
         </div>
 
-
         <div className="control-diario-stats-kpi">
+          <span>Cantidad total</span>
 
-          <span>
-            Cantidad total
-          </span>
+          <strong>{formatearNumero(data.total_cantidad)}</strong>
 
-          <strong>
-            {
-              formatearNumero(
-                data.total_cantidad
-              )
-            }
-          </strong>
-
-          <small>
-            Cantidad registrada
-          </small>
-
+          <small>Cantidad registrada</small>
         </div>
 
-
         <div className="control-diario-stats-kpi">
-
-          <span>
-            Producto principal
-          </span>
+          <span>Producto principal</span>
 
           <strong className="control-diario-stats-kpi-text">
-
-            {
-              data.producto_principal
-                ? data.producto_principal.producto__nombre
-                : "—"
-            }
-
+            {data.producto_principal
+              ? data.producto_principal.producto__nombre
+              : "—"}
           </strong>
 
           <small>
-            {
-              data.producto_principal
-                ? `${formatearNumero(
-                    data.producto_principal.total
-                  )} registrados`
-                : "Sin datos"
-            }
+            {data.producto_principal
+              ? `${formatearNumero(data.producto_principal.total)} registrados`
+              : "Sin datos"}
           </small>
-
         </div>
-
 
         <div className="control-diario-stats-kpi">
-
-          <span>
-            Distribuidor principal
-          </span>
+          <span>Distribuidor principal</span>
 
           <strong className="control-diario-stats-kpi-text">
-
-            {
-              data.distribuidor_principal
-                ? data.distribuidor_principal.ubicacion__nombre
-                : "—"
-            }
-
+            {data.distribuidor_principal
+              ? data.distribuidor_principal.ubicacion__nombre
+              : "—"}
           </strong>
 
           <small>
-            {
-              data.distribuidor_principal
-                ? `${formatearNumero(
-                    data.distribuidor_principal.total
-                  )} registrados`
-                : "Sin datos"
-            }
+            {data.distribuidor_principal
+              ? `${formatearNumero(
+                  data.distribuidor_principal.total,
+                )} registrados`
+              : "Sin datos"}
           </small>
-
         </div>
-
       </div>
-
 
       {/* GRÁFICOS */}
 
       <div className="control-diario-stats-grid">
-
-
         <div className="control-diario-stats-card">
-
           <div className="control-diario-stats-card-header">
+            <h2>Cantidad por producto</h2>
 
-            <h2>
-              Cantidad por producto
-            </h2>
-
-            <p>
-              Comparación de cantidades registradas.
-            </p>
-
+            <p>Comparación de cantidades registradas.</p>
           </div>
 
-
           <div className="control-diario-chart">
-
-            <ResponsiveContainer
-              width="100%"
-              height="100%"
+            <ScrollableChart
+              label="Cantidad por producto"
+              itemCount={productos.length}
+              itemWidth={150}
+              height={380}
             >
-
               <BarChart
                 data={productos}
+                margin={{ top: 20, right: 24, left: 8, bottom: 12 }}
               >
-
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  vertical={false}
-                />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
 
                 <XAxis
                   dataKey="nombre"
-                  angle={-25}
-                  textAnchor="end"
                   interval={0}
-                  height={75}
-                  tick={{
-                    fontSize: 10,
-                  }}
+                  height={82}
+                  tick={<ChartCategoryTick />}
+                  axisLine={{ stroke: "#d9e1eb" }}
+                  tickLine={false}
                 />
 
                 <YAxis
@@ -409,65 +238,43 @@ export default function EstadisticasControlDiarioPage() {
                 <Tooltip />
 
                 <Bar
+                  maxBarSize={48}
                   dataKey="total"
                   fill="#2f80ed"
-                  radius={[
-                    5,
-                    5,
-                    0,
-                    0,
-                  ]}
+                  radius={[5, 5, 0, 0]}
                 />
-
               </BarChart>
-
-            </ResponsiveContainer>
-
+            </ScrollableChart>
           </div>
-
         </div>
-
 
         <div className="control-diario-stats-card">
-
           <div className="control-diario-stats-card-header">
+            <h2>Distribución por distribuidor</h2>
 
-            <h2>
-              Distribución por distribuidor
-            </h2>
-
-            <p>
-              Cantidades acumuladas por distribuidor.
-            </p>
-
+            <p>Cantidades acumuladas por distribuidor.</p>
           </div>
 
-
           <div className="control-diario-chart">
-
-            <ResponsiveContainer
-              width="100%"
-              height="100%"
+            <ScrollableChart
+              label="Cantidades por distribuidor"
+              itemCount={distribuidores.length}
+              itemWidth={156}
+              height={380}
             >
-
               <BarChart
                 data={distribuidores}
+                margin={{ top: 20, right: 24, left: 8, bottom: 12 }}
               >
-
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  vertical={false}
-                />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
 
                 <XAxis
                   dataKey="nombre"
-                  angle={-25}
-                  textAnchor="end"
                   interval={0}
-                  height={75}
-                  tick={{
-                    fontSize: 10,
-                  }}
+                  height={82}
+                  tick={<ChartCategoryTick />}
+                  axisLine={{ stroke: "#d9e1eb" }}
+                  tickLine={false}
                 />
 
                 <YAxis
@@ -479,61 +286,43 @@ export default function EstadisticasControlDiarioPage() {
                 <Tooltip />
 
                 <Bar
+                  maxBarSize={48}
                   dataKey="total"
                   fill="#2f80ed"
-                  radius={[
-                    5,
-                    5,
-                    0,
-                    0,
-                  ]}
+                  radius={[5, 5, 0, 0]}
                 />
-
               </BarChart>
-
-            </ResponsiveContainer>
-
+            </ScrollableChart>
           </div>
-
         </div>
 
-
         <div className="control-diario-stats-card control-diario-stats-card-wide">
-
           <div className="control-diario-stats-card-header">
+            <h2>Evolución diaria</h2>
 
-            <h2>
-              Evolución diaria
-            </h2>
-
-            <p>
-              Cantidad registrada por fecha.
-            </p>
-
+            <p>Cantidad registrada por fecha.</p>
           </div>
 
-
           <div className="control-diario-chart">
-
-            <ResponsiveContainer
-              width="100%"
-              height="100%"
+            <ScrollableChart
+              label="Evolución diaria"
+              itemCount={evolucion.length}
+              itemWidth={90}
+              height={340}
             >
-
               <LineChart
                 data={evolucion}
+                margin={{ top: 20, right: 24, left: 8, bottom: 12 }}
               >
-
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  vertical={false}
-                />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
 
                 <XAxis
                   dataKey="fecha"
-                  tick={{
-                    fontSize: 10,
-                  }}
+                  interval={0}
+                  height={50}
+                  tick={<ChartCategoryTick maxCharacters={12} maxLines={2} />}
+                  axisLine={{ stroke: "#d9e1eb" }}
+                  tickLine={false}
                 />
 
                 <YAxis
@@ -550,105 +339,45 @@ export default function EstadisticasControlDiarioPage() {
                   stroke="#2f80ed"
                   strokeWidth={3}
                 />
-
               </LineChart>
-
-            </ResponsiveContainer>
-
+            </ScrollableChart>
           </div>
-
         </div>
-
-
       </div>
-
 
       {/* TABLA */}
 
       <div className="control-diario-stats-card">
-
         <div className="control-diario-stats-card-header">
+          <h2>Totales por tipo de movimiento</h2>
 
-          <h2>
-            Totales por tipo de movimiento
-          </h2>
-
-          <p>
-            Resumen general de movimientos registrados.
-          </p>
-
+          <p>Resumen general de movimientos registrados.</p>
         </div>
-
 
         <div className="control-diario-history-table-wrapper">
-
           <table className="control-diario-history-table">
-
             <thead>
-
               <tr>
+                <th>Tipo</th>
 
-                <th>
-                  Tipo
-                </th>
-
-                <th>
-                  Cantidad
-                </th>
-
+                <th>Cantidad</th>
               </tr>
-
             </thead>
 
-
             <tbody>
+              {data.por_tipo.map((item) => (
+                <tr key={item.tipo_movimiento}>
+                  <td>{formatearTipo(item.tipo_movimiento)}</td>
 
-              {
-                data.por_tipo.map(
-                  item => (
-
-                    <tr
-                      key={
-                        item.tipo_movimiento
-                      }
-                    >
-
-                      <td>
-                        {
-                          formatearTipo(
-                            item.tipo_movimiento
-                          )
-                        }
-                      </td>
-
-                      <td>
-
-                        <strong>
-                          {
-                            formatearNumero(
-                              item.total
-                            )
-                          }
-                        </strong>
-
-                      </td>
-
-                    </tr>
-
-                  )
-                )
-              }
-
+                  <td>
+                    <strong>{formatearNumero(item.total)}</strong>
+                  </td>
+                </tr>
+              ))}
             </tbody>
-
           </table>
-
         </div>
-
       </div>
-
-
     </div>
-
   );
 }

@@ -67,6 +67,7 @@ class RepartoSerializer(serializers.ModelSerializer):
     recargas_totales = serializers.IntegerField(
         read_only=True
     )
+    recargas_autorizadas = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = Reparto
@@ -86,6 +87,7 @@ class RepartoSerializer(serializers.ModelSerializer):
             "recargas",
             "cantidad_personas",
             "recargas_totales",
+            "recargas_autorizadas",
 
             "observaciones",
 

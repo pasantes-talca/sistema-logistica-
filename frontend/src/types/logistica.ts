@@ -48,6 +48,7 @@ export interface Reparto {
   recargas: number;
   cantidad_personas: number;
   recargas_totales: number;
+  recargas_autorizadas?: boolean;
 
   observaciones: string;
 
@@ -82,6 +83,8 @@ export interface ReporteRecargas {
   cantidad_repartos: number;
   empleados: ReporteRecargasEmpleado[];
   total_general: number;
+  total_por_empleados?: number;
+  diferencia_autorizada?: number;
 }
 
 

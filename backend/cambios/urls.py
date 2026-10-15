@@ -1,4 +1,5 @@
 from django.urls import path
+from .historicos_views import ImportacionesHistoricasAPIView, HistoricoCambiosAPIView
 
 from .views import (
     EstadisticasCambiosAPIView,
@@ -8,6 +9,8 @@ from .views import (
 
 
 urlpatterns = [
+    path('historicos/', ImportacionesHistoricasAPIView.as_view(), name='cambios-historicos'),
+    path('historicos/<int:pk>/<str:contenido>/', HistoricoCambiosAPIView.as_view(), name='cambios-historico-contenido'),
 
     path(
         "recibos/",

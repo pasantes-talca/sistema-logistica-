@@ -1,0 +1,129 @@
+.scrollable-chart {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+.scrollable-chart__tools {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 0 6px 10px;
+}
+.scrollable-chart__tools p {
+  margin: 0;
+  color: var(--theme-muted, #65758b);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.scrollable-chart__arrows {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.scrollable-chart__arrows button {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 30px;
+  border: 1px solid var(--theme-border, #d5dfec);
+  border-radius: 6px;
+  color: var(--theme-accent, #2464af);
+  background: var(--theme-surface, #fff);
+  cursor: pointer;
+}
+.scrollable-chart__arrows button:hover:not(:disabled) {
+  background: var(--theme-surface-muted, #eff5fc);
+}
+.scrollable-chart__arrows button:disabled {
+  color: var(--theme-muted, #a2aebc);
+  cursor: default;
+}
+.scrollable-chart__viewport {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  border-radius: 6px;
+}
+.scrollable-chart__viewport::-webkit-scrollbar {
+  display: none;
+}
+.scrollable-chart__viewport:focus-visible,
+.scrollable-chart__arrows button:focus-visible {
+  outline: 2px solid var(--theme-accent, #3885e9);
+  outline-offset: 2px;
+}
+.scrollable-chart__canvas {
+  width: 100%;
+}
+.scrollable-chart__slider {
+  padding: 2px 4px 0;
+}
+.scrollable-chart__slider input {
+  appearance: none;
+  -webkit-appearance: none;
+  display: block;
+  width: 100%;
+  height: 26px;
+  margin: 0;
+  cursor: ew-resize;
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+.scrollable-chart__slider input::-webkit-slider-runnable-track {
+  height: 12px;
+  background: var(--theme-surface-muted, #edf2f8);
+  border-radius: 8px;
+}
+.scrollable-chart__slider input::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: var(--chart-scroll-thumb, 40px);
+  height: 12px;
+  border: 2px solid var(--theme-border, #edf2f8);
+  border-radius: 8px;
+  background: #879fbf;
+}
+.scrollable-chart__slider input::-moz-range-track {
+  height: 12px;
+  background: var(--theme-surface-muted, #edf2f8);
+  border-radius: 8px;
+}
+.scrollable-chart__slider input::-moz-range-thumb {
+  width: var(--chart-scroll-thumb, 40px);
+  height: 8px;
+  border: 2px solid var(--theme-border, #edf2f8);
+  border-radius: 8px;
+  background: #879fbf;
+}
+.scrollable-chart__slider input:hover::-webkit-slider-thumb {
+  background: #5b7da9;
+}
+.scrollable-chart__slider input:focus-visible {
+  outline: 2px solid var(--theme-accent, #3885e9);
+  outline-offset: 0;
+  border-radius: 6px;
+}
+.grafico-rechazos:has(.scrollable-chart),
+.control-diario-chart:has(.scrollable-chart),
+.chart-container:has(.scrollable-chart) {
+  height: auto;
+  min-width: 0;
+}
+.control-diario-stats-card:has(.scrollable-chart),
+.kilometrajes-chart-card:has(.scrollable-chart) {
+  min-width: 0;
+}
+.grafico-rechazos:has(.scrollable-chart) {
+  padding: 16px 12px 10px;
+}
+@media (max-width: 720px) {
+  .grafico-rechazos:has(.scrollable-chart) {
+    padding: 12px 6px 8px;
+  }
+}

@@ -25,9 +25,9 @@
 
   padding: 28px 30px;
 
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 
-  border: 1px solid #e7ebf0;
+  border: 1px solid var(--theme-border, #e7ebf0);
   border-radius: 18px;
 
   box-shadow:
@@ -44,7 +44,7 @@
 .expedicion-page .dashboard-bienvenida h1 {
   margin: 9px 0 8px;
 
-  color: #101828;
+  color: var(--theme-text, #101828);
 
   font-size: 30px;
   font-weight: 750;
@@ -58,7 +58,7 @@
 
   margin: 0;
 
-  color: #667085;
+  color: var(--theme-muted, #667085);
 
   font-size: 14px;
   line-height: 1.65;
@@ -149,9 +149,9 @@
 .expedicion-page section {
   padding: 26px 28px;
 
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 
-  border: 1px solid #e7ebf0;
+  border: 1px solid var(--theme-border, #e7ebf0);
   border-radius: 18px;
 
   box-shadow:
@@ -180,7 +180,7 @@
 
   margin-bottom: 5px;
 
-  color: #3976d8;
+  color: var(--theme-accent, #3976d8);
 
   font-size: 11px;
   font-weight: 800;
@@ -194,7 +194,7 @@
 .expedicion-page .section-heading h2 {
   margin: 0;
 
-  color: #101828;
+  color: var(--theme-text, #101828);
 
   font-size: 21px;
   font-weight: 720;
@@ -202,7 +202,7 @@
 
 
 .expedicion-page .section-heading small {
-  color: #98a2b3;
+  color: var(--theme-muted, #98a2b3);
 
   font-size: 12px;
 }
@@ -235,9 +235,9 @@
 
   padding: 17px 18px;
 
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 
-  border: 1px solid #e8ecf2;
+  border: 1px solid var(--theme-border, #e8ecf2);
   border-radius: 14px;
 
   transition:
@@ -250,7 +250,7 @@
 .expedicion-page .kpi-card:hover {
   transform: translateY(-2px);
 
-  border-color: #d6dfeb;
+  border-color: var(--theme-border, #d6dfeb);
 
   box-shadow:
     0 8px 22px
@@ -273,26 +273,26 @@
 
 
 .expedicion-page .kpi-icon.blue {
-  background: #edf4ff;
-  color: #3976d8;
+  background: var(--theme-accent-bg, #edf4ff);
+  color: var(--theme-accent, #3976d8);
 }
 
 
 .expedicion-page .kpi-icon.green {
-  background: #edf9f3;
-  color: #1c9b63;
+  background: var(--theme-success-bg, #edf9f3);
+  color: var(--theme-success, #1c9b63);
 }
 
 
 .expedicion-page .kpi-icon.amber {
-  background: #fff6e8;
-  color: #d6871f;
+  background: var(--theme-warning-bg, #fff6e8);
+  color: var(--theme-warning, #d6871f);
 }
 
 
 .expedicion-page .kpi-icon.navy {
-  background: #eef2f8;
-  color: #334c70;
+  background: var(--theme-surface-muted, #eef2f8);
+  color: var(--theme-accent, #334c70);
 }
 
 
@@ -305,7 +305,7 @@
 
 
 .expedicion-page .kpi-card span {
-  color: #667085;
+  color: var(--theme-muted, #667085);
 
   font-size: 12px;
   font-weight: 600;
@@ -315,7 +315,7 @@
 .expedicion-page .kpi-card strong {
   margin: 2px 0;
 
-  color: #101828;
+  color: var(--theme-text, #101828);
 
   font-size: 24px;
   font-weight: 760;
@@ -323,7 +323,7 @@
 
 
 .expedicion-page .kpi-card small {
-  color: #98a2b3;
+  color: var(--theme-muted, #98a2b3);
 
   font-size: 11px;
 }
@@ -354,9 +354,9 @@
 
   padding: 22px;
 
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 
-  border: 1px solid #e6ebf1;
+  border: 1px solid var(--theme-border, #e6ebf1);
   border-radius: 16px;
 
   transition:
@@ -386,7 +386,7 @@
 
 
 .expedicion-page .module-card-top > span {
-  color: #98a2b3;
+  color: var(--theme-muted, #98a2b3);
 
   font-size: 10px;
   font-weight: 800;
@@ -407,15 +407,15 @@
 
   border-radius: 13px;
 
-  background: #edf4ff;
-  color: #3976d8;
+  background: var(--theme-accent-bg, #edf4ff);
+  color: var(--theme-accent, #3976d8);
 }
 
 
 .expedicion-page .modulo-card h3 {
   margin: 0 0 8px;
 
-  color: #101828;
+  color: var(--theme-text, #101828);
 
   font-size: 18px;
 }
@@ -426,7 +426,7 @@
 
   margin: 0 0 17px;
 
-  color: #667085;
+  color: var(--theme-muted, #667085);
 
   font-size: 13px;
   line-height: 1.55;
@@ -444,7 +444,7 @@
 
 
 .expedicion-page .modulo-link {
-  color: #3976d8;
+  color: var(--theme-accent, #3976d8);
 
   font-size: 12px;
   font-weight: 650;
@@ -471,12 +471,12 @@
 
   padding: 9px 14px;
 
-  background: #f1f6ff;
+  background: var(--theme-surface-muted, #f1f6ff);
 
-  border: 1px solid #dce8fa;
+  border: 1px solid var(--theme-border, #dce8fa);
   border-radius: 9px;
 
-  color: #2967c7;
+  color: var(--theme-accent, #2967c7);
 
   font-family: inherit;
   font-size: 12px;
@@ -493,7 +493,7 @@
 
 
 .expedicion-page .module-enter:hover {
-  background: #e6f0ff;
+  background: var(--theme-accent-bg, #e6f0ff);
 
   transform: translateY(-1px);
 }
@@ -522,7 +522,7 @@
 
 
 .expedicion-page .form-group label {
-  color: #344054;
+  color: var(--theme-text, #344054);
 
   font-size: 12px;
   font-weight: 700;
@@ -538,12 +538,12 @@
 
   padding: 10px 12px;
 
-  background: #ffffff;
+  background: var(--theme-input, #ffffff);
 
-  border: 1px solid #d6dce5;
+  border: 1px solid var(--theme-border, #d6dce5);
   border-radius: 9px;
 
-  color: #101828;
+  color: var(--theme-text, #101828);
 
   font-family: inherit;
   font-size: 13px;
@@ -572,7 +572,7 @@
 .expedicion-page .form-group input:focus,
 .expedicion-page .form-group select:focus,
 .expedicion-page .form-group textarea:focus {
-  border-color: #4a84df;
+  border-color: var(--theme-accent, #4a84df);
 
   box-shadow:
     0 0 0 3px
@@ -582,7 +582,7 @@
 
 .expedicion-page .form-group input::placeholder,
 .expedicion-page .form-group textarea::placeholder {
-  color: #a3acba;
+  color: var(--theme-muted, #a3acba);
 }
 
 
@@ -601,9 +601,9 @@
 
   padding: 0 18px;
 
-  background: #2867cb;
+  background: var(--theme-primary, #2867cb);
 
-  border: 1px solid #2867cb;
+  border: 1px solid var(--theme-accent, #2867cb);
   border-radius: 9px;
 
   color: #ffffff;
@@ -625,7 +625,7 @@
 
 
 .expedicion-page .btn-primary:hover {
-  background: #2059b7;
+  background: var(--theme-primary, #2059b7);
 
   transform: translateY(-1px);
 }
@@ -670,12 +670,12 @@
 .expedicion-page thead th {
   padding: 12px 14px;
 
-  background: #f8fafc;
+  background: var(--theme-surface-muted, #f8fafc);
 
-  border-top: 1px solid #e5eaf0;
-  border-bottom: 1px solid #e5eaf0;
+  border-top: 1px solid var(--theme-border, #e5eaf0);
+  border-bottom: 1px solid var(--theme-border, #e5eaf0);
 
-  color: #667085;
+  color: var(--theme-muted, #667085);
 
   font-size: 10px;
   font-weight: 800;
@@ -689,14 +689,14 @@
 
 
 .expedicion-page thead th:first-child {
-  border-left: 1px solid #e5eaf0;
+  border-left: 1px solid var(--theme-border, #e5eaf0);
 
   border-top-left-radius: 10px;
 }
 
 
 .expedicion-page thead th:last-child {
-  border-right: 1px solid #e5eaf0;
+  border-right: 1px solid var(--theme-border, #e5eaf0);
 
   border-top-right-radius: 10px;
 }
@@ -705,9 +705,9 @@
 .expedicion-page tbody td {
   padding: 14px;
 
-  border-bottom: 1px solid #edf0f4;
+  border-bottom: 1px solid var(--theme-border, #edf0f4);
 
-  color: #475467;
+  color: var(--theme-text, #475467);
 
   vertical-align: middle;
 }
@@ -720,12 +720,12 @@
 
 
 .expedicion-page tbody tr:hover {
-  background: #f8fbff;
+  background: var(--theme-surface, #f8fbff);
 }
 
 
 .expedicion-page tbody td strong {
-  color: #101828;
+  color: var(--theme-text, #101828);
 }
 
 
@@ -734,7 +734,7 @@
    ========================================================== */
 
 .expedicion-page table a {
-  color: #2867cb;
+  color: var(--theme-accent, #2867cb);
 
   font-weight: 700;
 
@@ -763,9 +763,9 @@
 
   padding: 16px;
 
-  background: #f8fafc;
+  background: var(--theme-surface-muted, #f8fafc);
 
-  border: 1px solid #e5e9ef;
+  border: 1px solid var(--theme-border, #e5e9ef);
   border-radius: 12px;
 }
 
@@ -782,9 +782,9 @@
 
   padding: 16px;
 
-  background: #f8fafc;
+  background: var(--theme-surface-muted, #f8fafc);
 
-  border: 1px solid #e5e9ef;
+  border: 1px solid var(--theme-border, #e5e9ef);
   border-radius: 12px;
 }
 
@@ -798,12 +798,12 @@
 
   padding: 0 14px;
 
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 
-  border: 1px solid #d6dce5;
+  border: 1px solid var(--theme-border, #d6dce5);
   border-radius: 9px;
 
-  color: #667085;
+  color: var(--theme-muted, #667085);
 
   font-size: 12px;
   font-weight: 650;
@@ -813,11 +813,11 @@
 
 
 .expedicion-page .expedicion-remove-button:hover {
-  border-color: #e19b9b;
+  border-color: var(--theme-danger-border, #e19b9b);
 
-  background: #fff7f7;
+  background: var(--theme-danger-bg, #fff7f7);
 
-  color: #b44242;
+  color: var(--theme-danger, #b44242);
 }
 
 
@@ -835,7 +835,7 @@
 .expedicion-page .expedicion-empty {
   padding: 45px 20px;
 
-  color: #667085;
+  color: var(--theme-muted, #667085);
 
   text-align: center;
 }
@@ -844,7 +844,7 @@
 .expedicion-page .expedicion-empty h3 {
   margin: 10px 0 6px;
 
-  color: #344054;
+  color: var(--theme-text, #344054);
 }
 
 
@@ -990,7 +990,7 @@
   padding: 4px 0;
   border: 0;
   background: transparent;
-  color: #2867cb;
+  color: var(--theme-accent, #2867cb);
   font-size: 11px;
   font-weight: 700;
 }
@@ -1002,9 +1002,9 @@
   gap: 12px;
   margin-top: 18px;
   padding: 16px;
-  border: 1px solid #cfe0f7;
+  border: 1px solid var(--theme-border, #cfe0f7);
   border-radius: 12px;
-  background: #f7fbff;
+  background: var(--theme-surface-muted, #f7fbff);
 }
 
 .expedicion-info {
@@ -1013,10 +1013,10 @@
   gap: 10px;
   margin-top: 16px;
   padding: 12px 14px;
-  border: 1px solid #cfe0f7;
+  border: 1px solid var(--theme-border, #cfe0f7);
   border-radius: 10px;
-  background: #f1f7ff;
-  color: #3d5f89;
+  background: var(--theme-surface-muted, #f1f7ff);
+  color: var(--theme-accent, #3d5f89);
 }
 
 .expedicion-info > div {
@@ -1034,14 +1034,14 @@
   gap: 9px;
   margin-bottom: 16px;
   padding: 0 12px;
-  border: 1px solid #d6dce5;
+  border: 1px solid var(--theme-border, #d6dce5);
   border-radius: 10px;
-  background: #fff;
-  color: #7c8ca2;
+  background: var(--theme-surface, #fff);
+  color: var(--theme-muted, #7c8ca2);
 }
 
 .expedicion-product-search:focus-within {
-  border-color: #5591e8;
+  border-color: var(--theme-accent, #5591e8);
   box-shadow: 0 0 0 3px rgba(40, 103, 203, 0.1);
 }
 
@@ -1052,7 +1052,7 @@
   border: 0;
   outline: 0;
   background: transparent;
-  color: #26354c;
+  color: var(--theme-text, #26354c);
 }
 
 .expedicion-product-search span {
@@ -1062,7 +1062,7 @@
 }
 
 .expedicion-field-help {
-  color: #687a91;
+  color: var(--theme-muted, #687a91);
   font-size: 10px;
 }
 
@@ -1075,7 +1075,7 @@
 
 .expedicion-table-actions .module-enter {
   padding: 7px 10px;
-  border: 1px solid #bcd3f2;
+  border: 1px solid var(--theme-border, #bcd3f2);
   border-radius: 8px;
 }
 

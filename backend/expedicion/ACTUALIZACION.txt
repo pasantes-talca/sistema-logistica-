@@ -1,0 +1,79 @@
+EXPEDICIÓN TALCA — ACTUALIZACIÓN E INTEGRACIÓN
+
+Esta entrega amplía únicamente Expedición. Conserva las rutas React existentes
+y agrega Pendientes, Empleados, Conteos y relevo, Auditoría y Configuración.
+Utiliza las sesiones y permisos del sistema (grupo EXPEDICION o superusuario).
+Las contraseñas de Firebase no se copian ni se almacenan en texto plano.
+
+ACTUALIZAR EL SERVIDOR
+
+1. Realizar el respaldo habitual de PostgreSQL antes de la actualización.
+2. Copiar los cambios del frontend y backend, incluidas TODAS las migraciones
+   de backend/expedicion/migrations/0002 a 0009.
+3. Desde la carpeta backend, con su entorno virtual activo:
+
+   python manage.py migrate
+   python manage.py check
+
+4. Desde frontend:
+
+   npm.cmd run build
+
+5. Reiniciar los procesos habituales de Django y frontend. Verificar que
+   VITE_API_URL apunta al backend del servidor antes de compilar. Abrir la
+   dirección del FRONTEND; la raíz del backend Django no sirve la interfaz.
+
+No se aplicaron estas migraciones sobre el PostgreSQL operativo durante el
+desarrollo. Las verificaciones se realizaron en SQLite en memoria.
+
+DATOS Y EQUIVALENCIAS
+
+Las operaciones nuevas guardan UNIDADES: packs * unidades_por_pack + sueltas.
+Las cantidades históricas se mantienen tal como estaban; no se interpreta ni
+convierte automáticamente un decimal antiguo de Trillay. Revisar ese historial
+antes de mezclarlo con cargas nuevas. La corrección deja auditoría y movimientos
+compensatorios. Una anulación revierte el saldo neto y conserva la trazabilidad.
+
+El catálogo conocido de referencia se incorpora sin cambiar nombres existentes
+en los maestros compartidos. El código local 417 se conserva cuando existe;
+de otro modo se agrega 4171. Ambos requieren revisión si ya coexistían.
+
+Los pendientes manuales de la pantalla Stock son ADICIONALES a los derivados
+de órdenes operativas. No hay impacto físico al guardar una orden administrativa.
+El stock sin codificar se alimenta desde producción; se valida la disponibilidad
+antes de una salida. Los derrames quedan registrados sin modificar el físico.
+
+RESPALDOS E IMPORTACIÓN
+
+Configuración permite descargar un informe JSON. Un superusuario también puede
+descargar un respaldo restaurable o revisar/importar un JSON exportado desde el
+sitio original de Talca Expedición (Firebase). La confirmación exige RESTAURAR.
+El servidor verifica la revisión y crea una copia previa dentro de PostgreSQL.
+Se conservan los contadores CE y AE. No se consulta ni altera Firebase en vivo.
+
+Las órdenes de versiones antiguas sin requestLines se rechazan explícitamente
+para evitar inventar la cantidad solicitada. Los archivos de más de 2 MB deben
+restaurarse de forma asistida. Los autores que no existan como usuarios Django
+se conservan en las notas/auditoría importada cuando están disponibles.
+
+PRUEBAS REPRODUCIBLES
+
+Desde backend:
+  .venv\Scripts\python.exe manage.py test expedicion --settings=config.test_settings --noinput
+  .venv\Scripts\python.exe -m expedicion.smoke_server
+
+El servidor de prueba crea SOLO una base en memoria en 127.0.0.1:8765.
+Usa el usuario ficticio smoke / Smoke-local-123!; nunca es un usuario productivo.
+
+En otra terminal, desde frontend:
+  $env:VITE_API_URL='http://127.0.0.1:8765/api'
+  npm.cmd run dev -- --host 127.0.0.1 --port 5175 --strictPort
+
+Con Playwright disponible:
+  node scripts/expedicion-smoke.cjs
+
+PLAYWRIGHT_MODULE y PLAYWRIGHT_BROWSER permiten usar instalaciones temporales.
+El script solo accede a los puertos de prueba locales. Verifica login, teclado,
+órdenes, entregas, correcciones, empleados, materiales, conteos, respaldos,
+rutas, responsive e impresión. Las capturas/PDF van a frontend/test-artifacts,
+que está excluido de Git. No se agregó ninguna dependencia de producción.

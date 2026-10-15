@@ -348,9 +348,10 @@ def actualizar_reparto(
         puntos_venta or ""
     ).strip()
 
-    reparto.recargas = (
-        calculo["recargas"]
-    )
+    # Los valores autorizados en Drive no se reemplazan al editar otros datos.
+    # Para repartos manuales nuevos se mantiene intacta la fórmula habitual.
+    if not reparto.recargas_autorizadas:
+        reparto.recargas = calculo["recargas"]
 
     reparto.observaciones = str(
         observaciones or ""

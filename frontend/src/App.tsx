@@ -107,32 +107,9 @@ import EstadisticasControlDiarioPage
 
 // =============================================
 // EXPEDICIÓN
+// Rutas históricas y nuevas secciones comparten el mismo módulo operativo.
+import ExpedicionOperativaPage from "./pages/ExpedicionOperativaPage";
 // =============================================
-
-import InicioExpedicionPage
-  from "./pages/InicioExpedicionPage";
-
-import StockExpedicionPage
-  from "./pages/StockExpedicionPage";
-
-import OrdenesExpedicionPage
-  from "./pages/OrdenesExpedicionPage";
-
-import MovimientosExpedicionPage
-  from "./pages/MovimientosExpedicionPage";
-
-import FleterosExpedicionPage
-  from "./pages/FleterosExpedicionPage";
-
-import MaterialesExpedicionPage
-  from "./pages/MaterialesExpedicionPage";
-
-import NuevaOrdenExpedicionPage
-  from "./pages/NuevaOrdenExpedicionPage";
-
-import DetalleOrdenExpedicionPage
-  from "./pages/DetalleOrdenExpedicionPage";
-
 
 function App() {
 
@@ -452,66 +429,73 @@ function App() {
                   {/* EXPEDICIÓN */}
                   {/* ============================= */}
 
+                  <Route path="/expedicion/pendientes" element={<ExpedicionOperativaPage />} />
+                  <Route path="/expedicion/empleados" element={<ExpedicionOperativaPage />} />
+                  <Route path="/expedicion/conteos" element={<ExpedicionOperativaPage />} />
+                  <Route path="/expedicion/auditoria" element={<ExpedicionOperativaPage />} />
+                  <Route path="/expedicion/configuracion" element={<ExpedicionOperativaPage />} />
+                  <Route path="/expedicion" element={<ExpedicionOperativaPage />} />
+
                   <Route
                     path="/expedicion/inicio"
                     element={
-                      <InicioExpedicionPage />
+                      <ExpedicionOperativaPage />
                     }
                   />
 
                   <Route
                     path="/expedicion/stock"
                     element={
-                      <StockExpedicionPage />
+                      <ExpedicionOperativaPage />
                     }
                   />
 
                   <Route
                     path="/expedicion/ordenes"
                     element={
-                      <OrdenesExpedicionPage />
+                      <ExpedicionOperativaPage />
                     }
                   />
 
                   <Route
                     path="/expedicion/movimientos"
                     element={
-                      <MovimientosExpedicionPage />
+                      <ExpedicionOperativaPage />
                     }
                   />
 
                   <Route
                     path="/expedicion/fleteros"
                     element={
-                      <FleterosExpedicionPage />
+                      <ExpedicionOperativaPage />
                     }
                   />
 
                   <Route
                     path="/expedicion/materiales"
                     element={
-                      <MaterialesExpedicionPage />
+                      <ExpedicionOperativaPage />
                     }
                   />
 
                   <Route
                     path="/expedicion/ordenes/nueva"
                     element={
-                      <NuevaOrdenExpedicionPage />
+                      <ExpedicionOperativaPage />
                     }
                   />
 
                   <Route
                     path="/expedicion/ordenes/:id"
                     element={
-                      <DetalleOrdenExpedicionPage />
+                      <ExpedicionOperativaPage />
                     }
                   />
 
                   <Route
                     path="/expedicion/ordenes/:id/editar"
                     element={
-                      <NuevaOrdenExpedicionPage />
+                      <ExpedicionOperativaPage />
                     }
                   />
 

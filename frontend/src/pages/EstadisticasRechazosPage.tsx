@@ -1,88 +1,41 @@
+import ScrollableChart from "../components/charts/ScrollableChart";
+import ChartCategoryTick from "../components/charts/ChartCategoryTick";
 import { useState } from "react";
 
-import {
-  useQuery,
-} from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Bar, BarChart, CartesianGrid, Tooltip, XAxis, YAxis } from "recharts";
 
 import {
   obtenerAsignaciones,
   obtenerEstadisticasRechazos,
 } from "../api/logistica";
 
+function fechaLocal(fecha: Date) {
+  const year = fecha.getFullYear();
 
-function fechaLocal(
-  fecha: Date
-) {
+  const month = String(fecha.getMonth() + 1).padStart(2, "0");
 
-  const year =
-    fecha.getFullYear();
-
-  const month =
-    String(
-      fecha.getMonth() + 1
-    ).padStart(
-      2,
-      "0"
-    );
-
-  const day =
-    String(
-      fecha.getDate()
-    ).padStart(
-      2,
-      "0"
-    );
+  const day = String(fecha.getDate()).padStart(2, "0");
 
   return `${year}-${month}-${day}`;
 }
 
-
 function primerDiaMes() {
+  const hoy = new Date();
 
-  const hoy =
-    new Date();
-
-  return fechaLocal(
-    new Date(
-      hoy.getFullYear(),
-      hoy.getMonth(),
-      1
-    )
-  );
+  return fechaLocal(new Date(hoy.getFullYear(), hoy.getMonth(), 1));
 }
-
 
 function hoy() {
-
-  return fechaLocal(
-    new Date()
-  );
+  return fechaLocal(new Date());
 }
 
-
-function formatearFecha(
-  fecha: string
-) {
-
-  const [
-    year,
-    month,
-    day,
-  ] = fecha.split("-");
+function formatearFecha(fecha: string) {
+  const [year, month, day] = fecha.split("-");
 
   return `${day}/${month}/${year}`;
 }
-
 
 interface FiltrosAplicados {
   desde: string;
@@ -91,560 +44,280 @@ interface FiltrosAplicados {
   consulta: number;
 }
 
-
 export default function EstadisticasRechazosPage() {
+  const [desde, setDesde] = useState(primerDiaMes());
 
-  const [
-    desde,
-    setDesde,
-  ] = useState(
-    primerDiaMes()
-  );
+  const [hasta, setHasta] = useState(hoy());
 
-  const [
-    hasta,
-    setHasta,
-  ] = useState(
-    hoy()
-  );
+  const [asignacionId, setAsignacionId] = useState("");
 
-  const [
-    asignacionId,
-    setAsignacionId,
-  ] = useState("");
+  const [filtros, setFiltros] = useState<FiltrosAplicados | null>(null);
 
-  const [
-    filtros,
-    setFiltros,
-  ] = useState<FiltrosAplicados | null>(
-    null
-  );
-
-
-  const {
-    data: asignaciones = [],
-  } = useQuery({
-    queryKey: [
-      "asignaciones"
-    ],
-    queryFn:
-      obtenerAsignaciones,
+  const { data: asignaciones = [] } = useQuery({
+    queryKey: ["asignaciones"],
+    queryFn: obtenerAsignaciones,
   });
-
 
   const {
     data: estadisticas,
     isLoading,
     isError,
   } = useQuery({
-
-    queryKey: [
-      "estadisticas-rechazos",
-      filtros,
-    ],
+    queryKey: ["estadisticas-rechazos", filtros],
 
     queryFn: () =>
       obtenerEstadisticasRechazos(
         filtros!.desde,
         filtros!.hasta,
-        filtros!.asignacionId
+        filtros!.asignacionId,
       ),
 
-    enabled:
-      filtros !== null,
+    enabled: filtros !== null,
   });
 
-
-  function generarEstadisticas(
-    event: React.FormEvent
-  ) {
-
+  function generarEstadisticas(event: React.FormEvent) {
     event.preventDefault();
 
-
     if (!desde || !hasta) {
-
-      alert(
-        "Seleccioná ambas fechas."
-      );
+      alert("Seleccioná ambas fechas.");
 
       return;
     }
-
 
     if (desde > hasta) {
-
-      alert(
-        "La fecha desde no puede ser posterior a la fecha hasta."
-      );
+      alert("La fecha desde no puede ser posterior a la fecha hasta.");
 
       return;
     }
 
-
     setFiltros({
-
       desde,
 
       hasta,
 
-      asignacionId:
-        asignacionId
-          ? Number(
-              asignacionId
-            )
-          : null,
+      asignacionId: asignacionId ? Number(asignacionId) : null,
 
-      consulta:
-        Date.now(),
+      consulta: Date.now(),
     });
   }
 
-
   return (
     <div className="pagina">
-
       <div className="contenedor-grande">
-
         <div className="encabezado-pagina">
-
           <div>
+            <h1>Estadísticas de rechazos</h1>
 
-            <h1>
-              Estadísticas de rechazos
-            </h1>
-
-            <p className="subtitulo">
-              Análisis de entregas no realizadas
-            </p>
-
+            <p className="subtitulo">Análisis de entregas no realizadas</p>
           </div>
-
         </div>
 
+        <>
+          <form className="filtros-reporte" onSubmit={generarEstadisticas}>
+            <div className="campo">
+              <label>Desde</label>
 
-        <form
-          className="filtros-reporte"
-          onSubmit={
-            generarEstadisticas
-          }
-        >
+              <input
+                type="date"
+                value={desde}
+                onChange={(event) => setDesde(event.target.value)}
+              />
+            </div>
 
-          <div className="campo">
+            <div className="campo">
+              <label>Hasta</label>
 
-            <label>
-              Desde
-            </label>
+              <input
+                type="date"
+                value={hasta}
+                onChange={(event) => setHasta(event.target.value)}
+              />
+            </div>
 
-            <input
-              type="date"
-              value={desde}
-              onChange={(event) =>
-                setDesde(
-                  event.target.value
-                )
-              }
-            />
+            <div className="campo">
+              <label>Asignación</label>
 
-          </div>
+              <select
+                value={asignacionId}
+                onChange={(event) => setAsignacionId(event.target.value)}
+              >
+                <option value="">Todas</option>
 
-
-          <div className="campo">
-
-            <label>
-              Hasta
-            </label>
-
-            <input
-              type="date"
-              value={hasta}
-              onChange={(event) =>
-                setHasta(
-                  event.target.value
-                )
-              }
-            />
-
-          </div>
-
-
-          <div className="campo">
-
-            <label>
-              Asignación
-            </label>
-
-            <select
-              value={
-                asignacionId
-              }
-              onChange={(event) =>
-                setAsignacionId(
-                  event.target.value
-                )
-              }
-            >
-
-              <option value="">
-                Todas
-              </option>
-
-
-              {asignaciones.map(
-                (asignacion) => (
-
-                  <option
-                    key={
-                      asignacion.id
-                    }
-                    value={
-                      asignacion.id
-                    }
-                  >
-                    {
-                      asignacion.codigo
-                    }
+                {asignaciones.map((asignacion) => (
+                  <option key={asignacion.id} value={asignacion.id}>
+                    {asignacion.codigo}
                   </option>
+                ))}
+              </select>
+            </div>
 
-                )
-              )}
+            <button type="submit" className="boton-guardar boton-generar">
+              Generar estadísticas
+            </button>
+          </form>
 
-            </select>
+          {isLoading && (
+            <div className="estado-vacio">Generando estadísticas...</div>
+          )}
 
-          </div>
+          {isError && (
+            <div className="estado-vacio">
+              No se pudieron generar las estadísticas.
+            </div>
+          )}
 
-
-          <button
-            type="submit"
-            className="boton-guardar boton-generar"
-          >
-            Generar estadísticas
-          </button>
-
-        </form>
-
-
-        {isLoading && (
-
-          <div className="estado-vacio">
-            Generando estadísticas...
-          </div>
-
-        )}
-
-
-        {isError && (
-
-          <div className="estado-vacio">
-            No se pudieron generar
-            las estadísticas.
-          </div>
-
-        )}
-
-
-        {
-          estadisticas &&
-          !isLoading &&
-          !isError && (
-
+          {estadisticas && !isLoading && !isError && (
             <>
-
               <div className="resumen-reporte">
-
                 <div>
-
-                  <span>
-                    Período
-                  </span>
+                  <span>Período</span>
 
                   <strong>
-                    {
-                      formatearFecha(
-                        estadisticas.desde
-                      )
-                    }
+                    {formatearFecha(estadisticas.desde)}
 
                     {" → "}
 
-                    {
-                      formatearFecha(
-                        estadisticas.hasta
-                      )
-                    }
+                    {formatearFecha(estadisticas.hasta)}
                   </strong>
-
                 </div>
-
 
                 <div>
+                  <span>Total de rechazos</span>
 
-                  <span>
-                    Total de rechazos
-                  </span>
-
-                  <strong>
-                    {
-                      estadisticas
-                        .total_rechazos
-                    }
-                  </strong>
-
+                  <strong>{estadisticas.total_rechazos}</strong>
                 </div>
-
 
                 <div>
+                  <span>Motivos diferentes</span>
 
-                  <span>
-                    Motivos diferentes
-                  </span>
-
-                  <strong>
-                    {
-                      estadisticas
-                        .por_motivo
-                        .length
-                    }
-                  </strong>
-
+                  <strong>{estadisticas.por_motivo.length}</strong>
                 </div>
-
               </div>
 
+              {estadisticas.total_rechazos === 0 ? (
+                <div className="estado-vacio">
+                  No hay rechazos registrados para el período seleccionado.
+                </div>
+              ) : (
+                <>
+                  <h2>Rechazos por motivo</h2>
 
-              {
-                estadisticas
-                  .total_rechazos === 0
-                ? (
+                  <div className="grafico-rechazos">
+                    <ScrollableChart
+                      label="Rechazos por motivo"
+                      itemCount={estadisticas.por_motivo.length}
+                      itemWidth={156}
+                      height={420}
+                    >
+                      <BarChart
+                        data={estadisticas.por_motivo}
+                        margin={{
+                          top: 20,
+                          right: 30,
+                          left: 10,
+                          bottom: 12,
+                        }}
+                      >
+                        <CartesianGrid
+                          strokeDasharray="3 3"
+                          stroke="#e4eaf2"
+                          vertical={false}
+                        />
 
-                  <div className="estado-vacio">
+                        <XAxis
+                          dataKey="motivo"
+                          interval={0}
+                          height={82}
+                          tick={<ChartCategoryTick />}
+                          axisLine={{ stroke: "#d9e1eb" }}
+                          tickLine={false}
+                        />
 
-                    No hay rechazos
-                    registrados para
-                    el período seleccionado.
+                        <YAxis
+                          allowDecimals={false}
+                          tick={{ fill: "#657289", fontSize: 11 }}
+                          axisLine={false}
+                          tickLine={false}
+                        />
 
+                        <Tooltip
+                          cursor={{ fill: "#f2f7fd" }}
+                          contentStyle={{
+                            border: "1px solid #dfe6ef",
+                            borderRadius: 10,
+                            boxShadow: "0 8px 24px rgba(18,38,63,.08)",
+                            fontSize: 12,
+                          }}
+                        />
+
+                        <Bar
+                          maxBarSize={48}
+                          dataKey="cantidad"
+                          name="Cantidad"
+                          fill="#2780f3"
+                          radius={[5, 5, 0, 0]}
+                        />
+                      </BarChart>
+                    </ScrollableChart>
                   </div>
 
-                )
-                : (
+                  <div className="tabla-wrapper">
+                    <table className="tabla-repartos">
+                      <thead>
+                        <tr>
+                          <th>Motivo</th>
 
-                  <>
+                          <th>Cantidad</th>
 
-                    <h2>
-                      Rechazos por motivo
-                    </h2>
+                          <th>Porcentaje</th>
+                        </tr>
+                      </thead>
 
+                      <tbody>
+                        {estadisticas.por_motivo.map((item) => (
+                          <tr key={item.motivo_id}>
+                            <td>{item.motivo}</td>
 
-                    <div className="grafico-rechazos">
+                            <td>{item.cantidad}</td>
 
-                      <ResponsiveContainer
-                        width="100%"
-                        height={350}
-                      >
-
-                        <BarChart
-                          data={
-                            estadisticas
-                              .por_motivo
-                          }
-                          margin={{
-                            top: 20,
-                            right: 30,
-                            left: 10,
-                            bottom: 80,
-                          }}
-                        >
-
-                          <CartesianGrid
-                            strokeDasharray="3 3"
-                            stroke="#e4eaf2"
-                            vertical={false}
-                          />
-
-                          <XAxis
-                            dataKey="motivo"
-                            angle={-35}
-                            textAnchor="end"
-                            interval={0}
-                            height={100}
-                            tick={{ fill: "#657289", fontSize: 11 }}
-                            axisLine={{ stroke: "#d9e1eb" }}
-                            tickLine={false}
-                          />
-
-                          <YAxis
-                            allowDecimals={
-                              false
-                            }
-                            tick={{ fill: "#657289", fontSize: 11 }}
-                            axisLine={false}
-                            tickLine={false}
-                          />
-
-                          <Tooltip cursor={{ fill: "#f2f7fd" }} contentStyle={{ border: "1px solid #dfe6ef", borderRadius: 10, boxShadow: "0 8px 24px rgba(18,38,63,.08)", fontSize: 12 }} />
-
-                          <Bar
-                            dataKey="cantidad"
-                            name="Cantidad"
-                            fill="#2780f3"
-                            radius={[5, 5, 0, 0]}
-                          />
-
-                        </BarChart>
-
-                      </ResponsiveContainer>
-
-                    </div>
-
-
-                    <div className="tabla-wrapper">
-
-                      <table className="tabla-repartos">
-
-                        <thead>
-
-                          <tr>
-                            <th>
-                              Motivo
-                            </th>
-
-                            <th>
-                              Cantidad
-                            </th>
-
-                            <th>
-                              Porcentaje
-                            </th>
+                            <td>{item.porcentaje.toFixed(2)}%</td>
                           </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
 
-                        </thead>
+                  <h2 className="titulo-seccion-estadisticas">
+                    Rechazos por asignación
+                  </h2>
 
+                  <div className="tabla-wrapper">
+                    <table className="tabla-repartos">
+                      <thead>
+                        <tr>
+                          <th>Asignación</th>
 
-                        <tbody>
+                          <th>Cantidad</th>
+                        </tr>
+                      </thead>
 
-                          {
-                            estadisticas
-                              .por_motivo
-                              .map(
-                                (item) => (
+                      <tbody>
+                        {estadisticas.por_asignacion.map((item) => (
+                          <tr key={item.asignacion_id ?? item.asignacion}>
+                            <td>{item.asignacion}</td>
 
-                                  <tr
-                                    key={
-                                      item.motivo_id
-                                    }
-                                  >
-
-                                    <td>
-                                      {
-                                        item.motivo
-                                      }
-                                    </td>
-
-                                    <td>
-                                      {
-                                        item.cantidad
-                                      }
-                                    </td>
-
-                                    <td>
-                                      {
-                                        item
-                                          .porcentaje
-                                          .toFixed(2)
-                                      }
-                                      %
-                                    </td>
-
-                                  </tr>
-
-                                )
-                              )
-                          }
-
-                        </tbody>
-
-                      </table>
-
-                    </div>
-
-
-                    <h2 className="titulo-seccion-estadisticas">
-                      Rechazos por asignación
-                    </h2>
-
-
-                    <div className="tabla-wrapper">
-
-                      <table className="tabla-repartos">
-
-                        <thead>
-
-                          <tr>
-
-                            <th>
-                              Asignación
-                            </th>
-
-                            <th>
-                              Cantidad
-                            </th>
-
+                            <td>{item.cantidad}</td>
                           </tr>
-
-                        </thead>
-
-
-                        <tbody>
-
-                          {
-                            estadisticas
-                              .por_asignacion
-                              .map(
-                                (item) => (
-
-                                  <tr
-                                    key={
-                                      item.asignacion_id
-                                      ?? item.asignacion
-                                    }
-                                  >
-
-                                    <td>
-                                      {
-                                        item.asignacion
-                                      }
-                                    </td>
-
-                                    <td>
-                                      {
-                                        item.cantidad
-                                      }
-                                    </td>
-
-                                  </tr>
-
-                                )
-                              )
-                          }
-
-                        </tbody>
-
-                      </table>
-
-                    </div>
-
-                  </>
-
-                )
-              }
-
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              )}
             </>
-
-          )
-        }
-
+          )}
+        </>
       </div>
-
     </div>
   );
 }

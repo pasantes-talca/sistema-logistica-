@@ -5,9 +5,12 @@ from .views import (
     RepartoDetailAPIView,
     ReporteRecargasAPIView,
 )
+from .historicos_views import ImportacionesHistoricasAPIView, HistoricoRepartosAPIView
 
 
 urlpatterns = [
+    path("historicos/", ImportacionesHistoricasAPIView.as_view(), name="repartos-historicos"),
+    path("historicos/<int:pk>/<str:contenido>/", HistoricoRepartosAPIView.as_view(), name="repartos-historicos-contenido"),
     path(
         "",
         RepartoListCreateAPIView.as_view(),

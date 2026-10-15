@@ -1,0 +1,183 @@
+.hc-historico .hr-indicadores {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.hc-listado table {
+  min-width: 820px;
+}
+.hc-listado th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.hc-listado td:first-child {
+  white-space: nowrap;
+}
+.hc-recibo {
+  padding: 24px;
+  border: 1px solid var(--theme-border, #dce5ef);
+  border-radius: 12px;
+  margin: 18px 0;
+  background: var(--theme-surface, #fff);
+}
+.hc-recibo-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid var(--theme-border, #e1e8f1);
+  padding-bottom: 18px;
+}
+.hc-recibo h2 {
+  font-size: 24px;
+  margin: 8px 0 0;
+}
+.hc-eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--theme-accent, #2567b3);
+}
+.hc-solo-lectura {
+  color: var(--theme-text, #487167);
+  background: var(--theme-success-bg, #edf7f2);
+  padding: 7px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+}
+.hc-datos {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 20px;
+  padding: 14px 0;
+}
+.hc-datos p {
+  margin: 0;
+}
+.hc-datos span,
+.hc-materiales span {
+  display: block;
+  font-size: 12px;
+  color: var(--theme-muted, #65768c);
+  margin: 6px 0;
+}
+.hc-datos strong {
+  font-size: 18px;
+}
+.hc-nota {
+  font-size: 12px;
+  color: var(--theme-muted, #64758c);
+  line-height: 1.6;
+}
+.hc-historico .hc-productos {
+  max-height: none;
+}
+.hc-productos table {
+  min-width: 660px;
+}
+.hc-cantidad {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.hc-materiales {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.hc-materiales > div {
+  border: 1px solid var(--theme-border, #e0e7ef);
+  border-radius: 8px;
+  padding: 12px;
+}
+.hc-materiales strong {
+  font-size: 20px;
+}
+.hc-original summary {
+  cursor: pointer;
+  color: var(--theme-accent, #1b5cad);
+  font-size: 13px;
+  padding: 12px 0;
+}
+.hc-hoja-original table {
+  min-width: 1250px;
+}
+.hc-historico .hc-hoja-original td {
+  min-width: 80px;
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+.hc-historico .hc-hoja-original td:first-child {
+  min-width: 270px;
+  white-space: normal;
+}
+.hc-historico .hc-hoja-original td:last-child {
+  min-width: 210px;
+}
+@media (max-width: 800px) {
+  .hc-historico .hr-indicadores,
+  .hc-materiales {
+    grid-template-columns: 1fr;
+  }
+  .hc-recibo {
+    padding: 14px;
+  }
+  .hc-recibo-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .hc-datos {
+    grid-template-columns: 1fr;
+  }
+}
+@media print {
+  body:has(.hc-print) :not(.hc-print):not(.hc-print *):not(:has(.hc-print)) {
+    display: none !important;
+  }
+  body:has(.hc-print) .pagina,
+  body:has(.hc-print) .contenedor-grande,
+  body:has(.hc-print) .app-main,
+  body:has(.hc-print) .app-content {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    max-width: none;
+    border: 0;
+    box-shadow: none;
+  }
+  body:has(.hc-print) * {
+    visibility: hidden;
+  }
+  body:has(.hc-print) .hc-print,
+  body:has(.hc-print) .hc-print * {
+    visibility: visible;
+  }
+  body:has(.hc-print) .hc-print {
+    position: static;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 12px;
+    border: 0;
+    background: #fff;
+    box-sizing: border-box;
+  }
+  body:has(.hc-print) .hc-print .tabla-wrapper {
+    overflow: visible;
+    max-height: none;
+  }
+  body:has(.hc-print) .hc-print table {
+    min-width: 0;
+    width: 100%;
+    table-layout: auto;
+  }
+  body:has(.hc-print) .hc-print td,
+  body:has(.hc-print) .hc-print th {
+    padding: 5px;
+    font-size: 9px;
+    min-width: 0 !important;
+    white-space: normal !important;
+  }
+  body:has(.hc-print) .hc-print tr {
+    break-inside: avoid;
+  }
+}

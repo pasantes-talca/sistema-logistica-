@@ -20,8 +20,8 @@
 ========================================== */
 
 .viaticos-header {
-  background: #ffffff;
-  border: 1px solid #dfe7f3;
+  background: var(--theme-surface, #ffffff);
+  border: 1px solid var(--theme-border, #dfe7f3);
   border-radius: 18px;
 
   padding: 24px 28px;
@@ -37,7 +37,7 @@
   font-size: 28px;
   font-weight: 800;
 
-  color: #0f2d67;
+  color: var(--theme-text, #0f2d67);
 }
 
 .viaticos-header p {
@@ -46,7 +46,7 @@
   font-size: 15px;
   line-height: 1.5;
 
-  color: #6b7a99;
+  color: var(--theme-muted, #6b7a99);
 }
 
 
@@ -55,9 +55,9 @@
 ========================================== */
 
 .viaticos-card {
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 
-  border: 1px solid #dfe7f3;
+  border: 1px solid var(--theme-border, #dfe7f3);
   border-radius: 18px;
 
   padding: 22px;
@@ -98,9 +98,9 @@
 }
 
 .viaticos-summary-card {
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 
-  border: 1px solid #dfe7f3;
+  border: 1px solid var(--theme-border, #dfe7f3);
   border-radius: 16px;
 
   padding: 20px 22px;
@@ -115,7 +115,7 @@
 
   margin-bottom: 8px;
 
-  color: #7181a0;
+  color: var(--theme-muted, #7181a0);
 
   font-size: 13px;
   font-weight: 600;
@@ -124,7 +124,7 @@
 .viaticos-summary-card strong {
   display: block;
 
-  color: #0f2d67;
+  color: var(--theme-text, #0f2d67);
 
   font-size: 24px;
   font-weight: 800;
@@ -135,7 +135,7 @@
 
   margin-top: 7px;
 
-  color: #7181a0;
+  color: var(--theme-muted, #7181a0);
 
   font-size: 13px;
 }
@@ -159,7 +159,7 @@
 }
 
 .viaticos-table thead tr {
-  background: #f4f7fb;
+  background: var(--theme-surface-muted, #f4f7fb);
 }
 
 .viaticos-table th {
@@ -170,13 +170,13 @@
   font-size: 12px;
   font-weight: 700;
 
-  color: #46597a;
+  color: var(--theme-text, #46597a);
 
   text-transform: uppercase;
   letter-spacing: 0.03em;
 
   border-bottom:
-    1px solid #dfe7f3;
+    1px solid var(--theme-border, #dfe7f3);
 }
 
 .viaticos-table td {
@@ -184,10 +184,10 @@
 
   font-size: 14px;
 
-  color: #23314d;
+  color: var(--theme-text, #23314d);
 
   border-bottom:
-    1px solid #edf2f8;
+    1px solid var(--theme-border, #edf2f8);
 
   vertical-align: middle;
 }
@@ -197,7 +197,7 @@
 }
 
 .viaticos-table tbody tr:hover {
-  background: #fafcff;
+  background: var(--theme-surface, #fafcff);
 }
 
 
@@ -206,7 +206,7 @@
 ========================================== */
 
 .viaticos-money {
-  color: #0f2d67;
+  color: var(--theme-text, #0f2d67);
   font-weight: 800;
 }
 
@@ -228,13 +228,13 @@
 }
 
 .viaticos-badge-local {
-  background: #e9f8ef;
-  color: #198754;
+  background: var(--theme-success-bg, #e9f8ef);
+  color: var(--theme-success, #198754);
 }
 
 .viaticos-badge-larga {
-  background: #fff2dd;
-  color: #a96000;
+  background: var(--theme-warning-bg, #fff2dd);
+  color: var(--theme-warning, #a96000);
 }
 
 
@@ -247,7 +247,7 @@
 
   text-align: center;
 
-  color: #7181a0;
+  color: var(--theme-muted, #7181a0);
 }
 
 
@@ -274,10 +274,10 @@
 
   padding: 20px;
 
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 
   border:
-    1px solid #dfe7f3;
+    1px solid var(--theme-border, #dfe7f3);
 
   border-radius: 16px;
 
@@ -299,7 +299,7 @@
     translateY(-2px);
 
   border-color:
-    #c9d8ef;
+    var(--theme-border, #c9d8ef);
 
   box-shadow:
     0 12px 28px
@@ -319,9 +319,9 @@
 
   border-radius: 12px;
 
-  background: #edf4ff;
+  background: var(--theme-accent-bg, #edf4ff);
 
-  color: #1746c6;
+  color: var(--theme-accent, #1746c6);
 
   font-size: 20px;
   font-weight: 800;
@@ -333,7 +333,7 @@
   font-size: 17px;
   font-weight: 800;
 
-  color: #0f2d67;
+  color: var(--theme-text, #0f2d67);
 }
 
 .viaticos-home-card p {
@@ -342,13 +342,13 @@
   font-size: 13px;
   line-height: 1.5;
 
-  color: #7181a0;
+  color: var(--theme-muted, #7181a0);
 }
 
 .viaticos-home-arrow {
   margin-left: auto;
 
-  color: #1746c6;
+  color: var(--theme-accent, #1746c6);
 
   font-size: 20px;
   font-weight: 800;
@@ -412,9 +412,9 @@
 
   padding: 30px 32px;
 
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 
-  border: 1px solid #dbe4f0;
+  border: 1px solid var(--theme-border, #dbe4f0);
   border-radius: 16px;
 
   box-shadow:
@@ -446,8 +446,8 @@
 
   border-radius: 12px;
 
-  background: #eaf3ff;
-  color: #1473e6;
+  background: var(--theme-accent-bg, #eaf3ff);
+  color: var(--theme-accent, #1473e6);
 }
 
 
@@ -468,7 +468,7 @@
 
   letter-spacing: 0.08em;
 
-  color: #0866ff;
+  color: var(--theme-accent, #0866ff);
 }
 
 
@@ -480,7 +480,7 @@
 
   font-weight: 800;
 
-  color: #071b40;
+  color: var(--theme-text, #071b40);
 }
 
 
@@ -489,7 +489,7 @@
 
   font-size: 14px;
 
-  color: #70809d;
+  color: var(--theme-muted, #70809d);
 }
 
 
@@ -503,7 +503,7 @@
 
   margin: 22px 0 20px;
 
-  background: #e5ebf3;
+  background: var(--theme-surface-muted, #e5ebf3);
 }
 
 
@@ -529,9 +529,9 @@
   display: flex;
   flex-direction: column;
 
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 
-  border: 1px solid #d9e3ef;
+  border: 1px solid var(--theme-border, #d9e3ef);
   border-radius: 12px;
 
   text-decoration: none;
@@ -548,7 +548,7 @@
 .viaticos-inicio-card:hover {
   transform: translateY(-2px);
 
-  border-color: #b9cde8;
+  border-color: var(--theme-border, #b9cde8);
 
   box-shadow:
     0 8px 22px
@@ -568,9 +568,9 @@
 
   border-radius: 10px;
 
-  background: #eaf3ff;
+  background: var(--theme-accent-bg, #eaf3ff);
 
-  color: #1473e6;
+  color: var(--theme-accent, #1473e6);
 }
 
 
@@ -581,7 +581,7 @@
 
   font-weight: 800;
 
-  color: #071b40;
+  color: var(--theme-text, #071b40);
 }
 
 
@@ -593,7 +593,7 @@
   font-size: 12px;
   line-height: 1.5;
 
-  color: #71809c;
+  color: var(--theme-muted, #71809c);
 }
 
 
@@ -610,7 +610,7 @@
 
   font-weight: 800;
 
-  color: #0866ff;
+  color: var(--theme-accent, #0866ff);
 }
 
 
@@ -652,7 +652,7 @@
 
   margin-top: 14px;
 
-  color: #0f6fe8;
+  color: var(--theme-accent, #0f6fe8);
 
   font-size: 12px;
   font-weight: 700;
@@ -666,7 +666,7 @@
 
 .viaticos-inicio-card:hover
 .viaticos-inicio-card-link {
-  color: #075ec8;
+  color: var(--theme-accent, #075ec8);
   gap: 7px;
 }
 

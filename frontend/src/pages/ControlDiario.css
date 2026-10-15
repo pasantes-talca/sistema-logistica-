@@ -15,7 +15,7 @@
   display: block;
   margin-bottom: 4px;
 
-  color: #1671e8;
+  color: var(--theme-accent, #1671e8);
 
   font-size: 10px;
   font-weight: 800;
@@ -26,7 +26,7 @@
 .control-diario-header h1 {
   margin: 0;
 
-  color: #162a46;
+  color: var(--theme-text, #162a46);
 
   font-size: 24px;
   line-height: 1.2;
@@ -38,7 +38,7 @@
 
   margin: 6px 0 0;
 
-  color: #718096;
+  color: var(--theme-muted, #718096);
 
   font-size: 13px;
   line-height: 1.5;
@@ -53,9 +53,9 @@
   margin-bottom: 18px;
   padding: 18px 20px;
 
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 
-  border: 1px solid #dfe6ef;
+  border: 1px solid var(--theme-border, #dfe6ef);
   border-radius: 13px;
 
   box-shadow:
@@ -83,7 +83,7 @@
 
 
 .control-diario-field label {
-  color: #53647c;
+  color: var(--theme-muted, #53647c);
 
   font-size: 11px;
   font-weight: 700;
@@ -95,12 +95,12 @@
 
   padding: 0 11px;
 
-  border: 1px solid #ccd7e4;
+  border: 1px solid var(--theme-border, #ccd7e4);
   border-radius: 8px;
 
-  background: #ffffff;
+  background: var(--theme-input, #ffffff);
 
-  color: #273950;
+  color: var(--theme-text, #273950);
 
   font-family: inherit;
   font-size: 13px;
@@ -110,7 +110,7 @@
 
 
 .control-diario-field input:focus {
-  border-color: #3182e8;
+  border-color: var(--theme-accent, #3182e8);
 
   box-shadow:
     0 0 0 3px
@@ -125,9 +125,9 @@
 .control-diario-section {
   margin-bottom: 18px;
 
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 
-  border: 1px solid #dde5ee;
+  border: 1px solid var(--theme-border, #dde5ee);
   border-radius: 13px;
 
   overflow: hidden;
@@ -142,14 +142,14 @@
   padding: 15px 20px;
 
   border-bottom:
-    1px solid #e7edf4;
+    1px solid var(--theme-border, #e7edf4);
 }
 
 
 .control-diario-section-header h2 {
   margin: 0;
 
-  color: #1d3451;
+  color: var(--theme-text, #1d3451);
 
   font-size: 16px;
 }
@@ -158,7 +158,7 @@
 .control-diario-section-header p {
   margin: 4px 0 0;
 
-  color: #8190a4;
+  color: var(--theme-muted, #8190a4);
 
   font-size: 11px;
 }
@@ -189,13 +189,13 @@
 
   padding: 10px 7px;
 
-  background: #f7f9fc;
+  background: var(--theme-surface-muted, #f7f9fc);
 
   border-right:
-    1px solid #e7edf3;
+    1px solid var(--theme-border, #e7edf3);
 
   border-bottom:
-    1px solid #dfe6ef;
+    1px solid var(--theme-border, #dfe6ef);
 
   text-align: center;
 }
@@ -216,7 +216,7 @@
 
 
 .control-diario-product-header strong {
-  color: #30435d;
+  color: var(--theme-accent, #30435d);
 
   font-size: 10px;
   font-weight: 800;
@@ -224,7 +224,7 @@
 
 
 .control-diario-product-header span {
-  color: #1671e8;
+  color: var(--theme-accent, #1671e8);
 
   font-size: 10px;
   font-weight: 700;
@@ -236,20 +236,20 @@
 .control-diario-table td {
   padding: 6px;
 
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 
   border-right:
-    1px solid #edf1f5;
+    1px solid var(--theme-border, #edf1f5);
 
   border-bottom:
-    1px solid #edf1f5;
+    1px solid var(--theme-border, #edf1f5);
 
   text-align: center;
 }
 
 
 .control-diario-table tbody tr:hover td {
-  background: #fafcff;
+  background: var(--theme-surface, #fafcff);
 }
 
 
@@ -259,12 +259,12 @@
 
   padding: 0 5px;
 
-  border: 1px solid #cad5e1;
+  border: 1px solid var(--theme-border, #cad5e1);
   border-radius: 6px;
 
-  background: #ffffff;
+  background: var(--theme-input, #ffffff);
 
-  color: #263a53;
+  color: var(--theme-text, #263a53);
 
   font-family: inherit;
   font-size: 11px;
@@ -277,7 +277,7 @@
 
 
 .control-diario-table td input:focus {
-  border-color: #2f80ed;
+  border-color: var(--theme-accent, #2f80ed);
 
   box-shadow:
     0 0 0 3px
@@ -295,7 +295,7 @@
   z-index: 4;
 
   background:
-    #f7f9fc !important;
+    var(--theme-surface-muted, #f7f9fc) !important;
 
   box-shadow:
     1px 0 0
@@ -306,14 +306,14 @@
 tbody
 .control-diario-sticky {
   background:
-    #ffffff !important;
+    var(--theme-surface, #ffffff) !important;
 }
 
 
 .control-diario-row-name {
   padding-left: 14px !important;
 
-  color: #40536d;
+  color: var(--theme-text, #40536d);
 
   font-size: 11px;
   font-weight: 700;
@@ -331,14 +331,14 @@ tbody
 .control-diario-table tfoot td {
   padding: 9px 7px;
 
-  background: #f3f7fc;
+  background: var(--theme-surface-muted, #f3f7fc);
 
   border-top:
-    1px solid #d9e3ef;
+    1px solid var(--theme-border, #d9e3ef);
 
   border-bottom: none;
 
-  color: #235080;
+  color: var(--theme-accent, #235080);
 
   font-size: 11px;
   font-weight: 800;
@@ -348,7 +348,7 @@ tbody
 .control-diario-table tfoot
 .control-diario-sticky {
   background:
-    #f3f7fc !important;
+    var(--theme-surface-muted, #f3f7fc) !important;
 }
 
 
@@ -360,7 +360,7 @@ tbody
 
 
 .control-diario-total-value {
-  color: #116ad8 !important;
+  color: var(--theme-accent, #116ad8) !important;
 }
 
 
@@ -381,9 +381,9 @@ tbody
 
   padding: 18px 20px;
 
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 
-  border: 1px solid #dde5ee;
+  border: 1px solid var(--theme-border, #dde5ee);
   border-radius: 13px;
 
   box-shadow:
@@ -408,7 +408,7 @@ tbody
 
 
 .control-diario-resumen span {
-  color: #78879b;
+  color: var(--theme-muted, #78879b);
 
   font-size: 10px;
   font-weight: 700;
@@ -416,7 +416,7 @@ tbody
 
 
 .control-diario-resumen strong {
-  color: #18304e;
+  color: var(--theme-text, #18304e);
 
   font-size: 19px;
 }
@@ -430,7 +430,7 @@ tbody
   border: none;
   border-radius: 8px;
 
-  background: #126fe5;
+  background: var(--theme-primary, #126fe5);
 
   color: #ffffff;
 
@@ -447,7 +447,7 @@ tbody
 
 
 .control-diario-save-button:hover {
-  background: #0d63cf;
+  background: var(--theme-primary, #0d63cf);
 }
 
 
@@ -464,12 +464,12 @@ tbody
 .control-diario-state {
   padding: 35px;
 
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 
-  border: 1px solid #dfe6ef;
+  border: 1px solid var(--theme-border, #dfe6ef);
   border-radius: 13px;
 
-  color: #718096;
+  color: var(--theme-muted, #718096);
 
   font-size: 13px;
 
@@ -528,9 +528,9 @@ tbody
 .control-diario-summary-card {
   padding: 16px 18px;
 
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 
-  border: 1px solid #dde5ee;
+  border: 1px solid var(--theme-border, #dde5ee);
   border-radius: 12px;
 
   box-shadow:
@@ -544,14 +544,14 @@ tbody
 
 
 .control-diario-summary-card span {
-  color: #7d8ca1;
+  color: var(--theme-muted, #7d8ca1);
   font-size: 10px;
   font-weight: 700;
 }
 
 
 .control-diario-summary-card strong {
-  color: #19314f;
+  color: var(--theme-text, #19314f);
   font-size: 23px;
 }
 
@@ -559,9 +559,9 @@ tbody
 .control-diario-history-card {
   margin-bottom: 18px;
 
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 
-  border: 1px solid #dde5ee;
+  border: 1px solid var(--theme-border, #dde5ee);
   border-radius: 13px;
 
   overflow: hidden;
@@ -587,11 +587,11 @@ tbody
 .control-diario-history-table th {
   padding: 11px 14px;
 
-  background: #f7f9fc;
+  background: var(--theme-surface-muted, #f7f9fc);
 
-  border-bottom: 1px solid #dfe6ef;
+  border-bottom: 1px solid var(--theme-border, #dfe6ef);
 
-  color: #5e6f86;
+  color: var(--theme-muted, #5e6f86);
 
   font-size: 10px;
   font-weight: 800;
@@ -603,21 +603,21 @@ tbody
 .control-diario-history-table td {
   padding: 12px 14px;
 
-  border-bottom: 1px solid #edf1f5;
+  border-bottom: 1px solid var(--theme-border, #edf1f5);
 
-  color: #53647b;
+  color: var(--theme-muted, #53647b);
 
   font-size: 11px;
 }
 
 
 .control-diario-history-table tbody tr:hover {
-  background: #fafcff;
+  background: var(--theme-surface, #fafcff);
 }
 
 
 .control-diario-history-date {
-  color: #263c59;
+  color: var(--theme-text, #263c59);
 }
 
 
@@ -631,9 +631,9 @@ tbody
 
   border-radius: 999px;
 
-  background: #edf5ff;
+  background: var(--theme-accent-bg, #edf5ff);
 
-  color: #126fe5;
+  color: var(--theme-accent, #126fe5);
 
   font-size: 10px;
   font-weight: 800;
@@ -641,7 +641,7 @@ tbody
 
 
 .control-diario-detail-link {
-  color: #126fe5;
+  color: var(--theme-accent, #126fe5);
 
   font-size: 11px;
   font-weight: 800;
@@ -674,9 +674,9 @@ tbody
 .control-diario-detail-summary > div {
   padding: 16px 18px;
 
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 
-  border: 1px solid #dde5ee;
+  border: 1px solid var(--theme-border, #dde5ee);
   border-radius: 12px;
 
   box-shadow:
@@ -690,7 +690,7 @@ tbody
 
 
 .control-diario-detail-summary span {
-  color: #7d8ca1;
+  color: var(--theme-muted, #7d8ca1);
 
   font-size: 10px;
   font-weight: 700;
@@ -698,7 +698,7 @@ tbody
 
 
 .control-diario-detail-summary strong {
-  color: #19314f;
+  color: var(--theme-text, #19314f);
 
   font-size: 16px;
 }
@@ -709,9 +709,9 @@ tbody
 
   padding: 16px 18px;
 
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 
-  border: 1px solid #dde5ee;
+  border: 1px solid var(--theme-border, #dde5ee);
   border-radius: 12px;
 }
 
@@ -721,7 +721,7 @@ tbody
 
   margin-bottom: 5px;
 
-  color: #7d8ca1;
+  color: var(--theme-muted, #7d8ca1);
 
   font-size: 10px;
   font-weight: 800;
@@ -731,7 +731,7 @@ tbody
 .control-diario-detail-observation p {
   margin: 0;
 
-  color: #425773;
+  color: var(--theme-text, #425773);
 
   font-size: 12px;
   line-height: 1.5;
@@ -739,7 +739,7 @@ tbody
 
 
 .control-diario-detail-quantity {
-  color: #145fbf;
+  color: var(--theme-accent, #145fbf);
 }
 
 
@@ -766,9 +766,9 @@ tbody
   margin-bottom: 18px;
   padding: 16px 18px;
 
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 
-  border: 1px solid #dde5ee;
+  border: 1px solid var(--theme-border, #dde5ee);
   border-radius: 12px;
 
   box-shadow:
@@ -785,7 +785,7 @@ tbody
 
 
 .control-diario-stats-filter label {
-  color: #69798f;
+  color: var(--theme-muted, #69798f);
 
   font-size: 10px;
   font-weight: 800;
@@ -798,12 +798,12 @@ tbody
 
   padding: 0 10px;
 
-  border: 1px solid #ccd7e4;
+  border: 1px solid var(--theme-border, #ccd7e4);
   border-radius: 7px;
 
-  background: #ffffff;
+  background: var(--theme-input, #ffffff);
 
-  color: #31445f;
+  color: var(--theme-accent, #31445f);
 
   font-family: inherit;
   font-size: 11px;
@@ -813,7 +813,7 @@ tbody
 
 
 .control-diario-stats-filter input:focus {
-  border-color: #1671e8;
+  border-color: var(--theme-accent, #1671e8);
 
   box-shadow:
     0 0 0 3px
@@ -826,12 +826,12 @@ tbody
 
   padding: 0 13px;
 
-  border: 1px solid #d8e2ee;
+  border: 1px solid var(--theme-border, #d8e2ee);
   border-radius: 7px;
 
-  background: #f7f9fc;
+  background: var(--theme-surface-muted, #f7f9fc);
 
-  color: #496078;
+  color: var(--theme-text, #496078);
 
   font-family: inherit;
   font-size: 10px;
@@ -842,7 +842,7 @@ tbody
 
 
 .control-diario-stats-filter button:hover {
-  background: #edf3fa;
+  background: var(--theme-surface-muted, #edf3fa);
 }
 
 
@@ -869,9 +869,9 @@ tbody
 
   padding: 16px 18px;
 
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 
-  border: 1px solid #dde5ee;
+  border: 1px solid var(--theme-border, #dde5ee);
   border-radius: 12px;
 
   box-shadow:
@@ -886,7 +886,7 @@ tbody
 
 
 .control-diario-stats-kpi span {
-  color: #7c8ba0;
+  color: var(--theme-muted, #7c8ba0);
 
   font-size: 10px;
   font-weight: 700;
@@ -894,7 +894,7 @@ tbody
 
 
 .control-diario-stats-kpi strong {
-  color: #18304e;
+  color: var(--theme-text, #18304e);
 
   font-size: 24px;
   line-height: 1.2;
@@ -909,7 +909,7 @@ tbody
 .control-diario-stats-kpi small {
   margin-top: auto;
 
-  color: #96a2b3;
+  color: var(--theme-muted, #96a2b3);
 
   font-size: 9px;
 }
@@ -936,9 +936,9 @@ tbody
 .control-diario-stats-card {
   margin-bottom: 18px;
 
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 
-  border: 1px solid #dde5ee;
+  border: 1px solid var(--theme-border, #dde5ee);
   border-radius: 13px;
 
   overflow: hidden;
@@ -964,14 +964,14 @@ tbody
   padding: 15px 18px;
 
   border-bottom:
-    1px solid #e8edf4;
+    1px solid var(--theme-border, #e8edf4);
 }
 
 
 .control-diario-stats-card-header h2 {
   margin: 0;
 
-  color: #203753;
+  color: var(--theme-text, #203753);
 
   font-size: 14px;
 }
@@ -980,7 +980,7 @@ tbody
 .control-diario-stats-card-header p {
   margin: 4px 0 0;
 
-  color: #8190a3;
+  color: var(--theme-muted, #8190a3);
 
   font-size: 10px;
 }
@@ -1002,7 +1002,7 @@ tbody
   justify-content: center;
   align-items: center;
 
-  color: #8998aa;
+  color: var(--theme-muted, #8998aa);
 
   font-size: 11px;
 }
@@ -1076,9 +1076,9 @@ tbody
   padding: 16px 18px;
   margin-bottom: 18px;
 
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 
-  border: 1px solid #dde5ee;
+  border: 1px solid var(--theme-border, #dde5ee);
   border-radius: 12px;
 }
 
@@ -1094,7 +1094,7 @@ tbody
   font-size: 10px;
   font-weight: 700;
 
-  color: #6d7c90;
+  color: var(--theme-muted, #6d7c90);
 }
 
 
@@ -1105,7 +1105,7 @@ tbody
   padding: 0 10px;
 
   border:
-    1px solid #ccd7e4;
+    1px solid var(--theme-border, #ccd7e4);
 
   border-radius: 7px;
 
@@ -1119,11 +1119,11 @@ tbody
   padding: 0 14px;
 
   border:
-    1px solid #d8e2ee;
+    1px solid var(--theme-border, #d8e2ee);
 
   border-radius: 7px;
 
-  background: #f6f8fb;
+  background: var(--theme-surface-muted, #f6f8fb);
 
   cursor: pointer;
 }
@@ -1155,17 +1155,17 @@ tbody
 
   padding: 16px 18px;
 
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 
   border:
-    1px solid #dde5ee;
+    1px solid var(--theme-border, #dde5ee);
 
   border-radius: 12px;
 }
 
 
 .control-diario-stats-kpi span {
-  color: #7c8ba0;
+  color: var(--theme-muted, #7c8ba0);
 
   font-size: 10px;
   font-weight: 700;
@@ -1175,7 +1175,7 @@ tbody
 .control-diario-stats-kpi strong {
   margin-top: 4px;
 
-  color: #18304e;
+  color: var(--theme-text, #18304e);
 
   font-size: 24px;
 }
@@ -1189,7 +1189,7 @@ tbody
 .control-diario-stats-kpi small {
   margin-top: auto;
 
-  color: #96a2b3;
+  color: var(--theme-muted, #96a2b3);
 
   font-size: 9px;
 }
@@ -1214,10 +1214,10 @@ tbody
 
 
 .control-diario-stats-card {
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 
   border:
-    1px solid #dde5ee;
+    1px solid var(--theme-border, #dde5ee);
 
   border-radius: 12px;
 
@@ -1237,7 +1237,7 @@ tbody
   padding: 15px 18px;
 
   border-bottom:
-    1px solid #e8edf4;
+    1px solid var(--theme-border, #e8edf4);
 }
 
 
@@ -1246,7 +1246,7 @@ tbody
 
   font-size: 14px;
 
-  color: #203753;
+  color: var(--theme-text, #203753);
 }
 
 
@@ -1255,7 +1255,7 @@ tbody
 
   font-size: 10px;
 
-  color: #8190a3;
+  color: var(--theme-muted, #8190a3);
 }
 
 

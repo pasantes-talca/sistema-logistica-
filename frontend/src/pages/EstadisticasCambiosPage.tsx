@@ -1,87 +1,43 @@
+import ScrollableChart from "../components/charts/ScrollableChart";
+import ChartCategoryTick from "../components/charts/ChartCategoryTick";
 import { useState } from "react";
+import { obtenerHistoricosCambios } from "../api/cambiosHistoricos";
+import { ResumenCambiosGuardado } from "../components/cambios/CambiosHistoricos";
 
-import {
-  useQuery,
-} from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Bar, BarChart, CartesianGrid, Tooltip, XAxis, YAxis } from "recharts";
 
 import {
   obtenerConcesionarios,
   obtenerEstadisticasCambios,
 } from "../api/logistica";
 
+function fechaLocal(fecha: Date) {
+  const year = fecha.getFullYear();
 
-function fechaLocal(
-  fecha: Date
-) {
+  const month = String(fecha.getMonth() + 1).padStart(2, "0");
 
-  const year =
-    fecha.getFullYear();
-
-  const month =
-    String(
-      fecha.getMonth() + 1
-    ).padStart(
-      2,
-      "0"
-    );
-
-  const day =
-    String(
-      fecha.getDate()
-    ).padStart(
-      2,
-      "0"
-    );
+  const day = String(fecha.getDate()).padStart(2, "0");
 
   return `${year}-${month}-${day}`;
 }
 
-
 function primerDiaMes() {
+  const hoy = new Date();
 
-  const hoy =
-    new Date();
-
-  return fechaLocal(
-    new Date(
-      hoy.getFullYear(),
-      hoy.getMonth(),
-      1
-    )
-  );
+  return fechaLocal(new Date(hoy.getFullYear(), hoy.getMonth(), 1));
 }
-
 
 function hoy() {
-  return fechaLocal(
-    new Date()
-  );
+  return fechaLocal(new Date());
 }
 
-
-function formatearFecha(
-  fecha: string
-) {
-
-  const [
-    year,
-    month,
-    day,
-  ] = fecha.split("-");
+function formatearFecha(fecha: string) {
+  const [year, month, day] = fecha.split("-");
 
   return `${day}/${month}/${year}`;
 }
-
 
 interface FiltrosAplicados {
   desde: string;
@@ -90,612 +46,357 @@ interface FiltrosAplicados {
   consulta: number;
 }
 
-
 export default function EstadisticasCambiosPage() {
-
-  const [
-    desde,
-    setDesde,
-  ] = useState(
-    primerDiaMes()
-  );
-
-  const [
-    hasta,
-    setHasta,
-  ] = useState(
-    hoy()
-  );
-
-  const [
-    concesionarioId,
-    setConcesionarioId,
-  ] = useState("");
-
-  const [
-    filtros,
-    setFiltros,
-  ] = useState<FiltrosAplicados | null>(
-    null
-  );
-
-
-  const {
-    data: concesionarios = [],
-  } = useQuery({
-    queryKey: [
-      "concesionarios"
-    ],
-    queryFn:
-      obtenerConcesionarios,
+  const [modo, setModo] = useState<"operativo" | "resumen">("operativo");
+  const historicos = useQuery({
+    queryKey: ["cambios-importaciones"],
+    queryFn: obtenerHistoricosCambios,
+    retry: false,
   });
+  return (
+    <>
+      <div className="pagina">
+        <div className="contenedor-grande">
+          <div className="encabezado-pagina">
+            <div>
+              <h1>
+                {modo === "resumen"
+                  ? "Resumen guardado de cambios"
+                  : "Estadísticas de cambios"}
+              </h1>
+              <p className="subtitulo">
+                {modo === "resumen"
+                  ? "Resumen original generado en la planilla"
+                  : "Análisis de productos cambiados"}
+              </p>
+            </div>
+          </div>
+          <nav
+            className="hr-source"
+            aria-label="Origen de las estadísticas de cambios"
+          >
+            <button
+              type="button"
+              aria-pressed={modo === "operativo"}
+              onClick={() => setModo("operativo")}
+            >
+              Generar estadísticas
+            </button>
+            <button
+              type="button"
+              aria-pressed={modo === "resumen"}
+              onClick={() => setModo("resumen")}
+            >
+              Resumen guardado de Drive
+            </button>
+          </nav>
+          {modo === "resumen" && (
+            <>
+              {historicos.isPending && <p role="status">Cargando resumen…</p>}
+              {historicos.isError && (
+                <p role="alert" className="hr-error">
+                  {historicos.error.message}
+                </p>
+              )}
+              {historicos.data && (
+                <ResumenCambiosGuardado lotes={historicos.data} />
+              )}
+            </>
+          )}
+          {modo === "operativo" && <EstadisticasOperativas />}
+        </div>
+      </div>
+    </>
+  );
+}
 
+function EstadisticasOperativas() {
+  const [desde, setDesde] = useState(primerDiaMes());
+
+  const [hasta, setHasta] = useState(hoy());
+
+  const [concesionarioId, setConcesionarioId] = useState("");
+
+  const [filtros, setFiltros] = useState<FiltrosAplicados | null>(null);
+
+  const { data: concesionarios = [] } = useQuery({
+    queryKey: ["concesionarios"],
+    queryFn: obtenerConcesionarios,
+  });
 
   const {
     data: estadisticas,
     isLoading,
     isError,
   } = useQuery({
-
-    queryKey: [
-      "estadisticas-cambios",
-      filtros,
-    ],
+    queryKey: ["estadisticas-cambios", filtros],
 
     queryFn: () =>
       obtenerEstadisticasCambios(
         filtros!.desde,
         filtros!.hasta,
-        filtros!.concesionarioId
+        filtros!.concesionarioId,
       ),
 
-    enabled:
-      filtros !== null,
+    enabled: filtros !== null,
   });
 
-
-  function generar(
-    event: React.FormEvent
-  ) {
-
+  function generar(event: React.FormEvent) {
     event.preventDefault();
 
-
     if (!desde || !hasta) {
-
-      alert(
-        "Seleccioná ambas fechas."
-      );
+      alert("Seleccioná ambas fechas.");
 
       return;
     }
-
 
     if (desde > hasta) {
-
-      alert(
-        "La fecha desde no puede ser posterior a la fecha hasta."
-      );
+      alert("La fecha desde no puede ser posterior a la fecha hasta.");
 
       return;
     }
-
 
     setFiltros({
       desde,
       hasta,
 
-      concesionarioId:
-        concesionarioId
-          ? Number(
-              concesionarioId
-            )
-          : null,
+      concesionarioId: concesionarioId ? Number(concesionarioId) : null,
 
-      consulta:
-        Date.now(),
+      consulta: Date.now(),
     });
   }
 
-
   const datosGrafico =
-    estadisticas?.modo ===
-    "concesionario"
-
-      ? estadisticas
-          .por_producto
-          .map(
-            (item) => ({
-              nombre:
-                `${item.codigo} ${item.producto}`,
-              cantidad:
-                item.cantidad,
-            })
-          )
-
-      : estadisticas
-          ?.por_producto_concesionario
-          .map(
-            (item) => ({
-              nombre:
-                `${item.codigo} - ${item.concesionario}`,
-              cantidad:
-                item.cantidad,
-            })
-          )
-        || [];
-
+    estadisticas?.modo === "concesionario"
+      ? estadisticas.por_producto.map((item) => ({
+          nombre: `${item.codigo} ${item.producto}`,
+          cantidad: item.cantidad,
+        }))
+      : estadisticas?.por_producto_concesionario.map((item) => ({
+          nombre: `${item.codigo} - ${item.concesionario}`,
+          cantidad: item.cantidad,
+        })) || [];
 
   return (
-    <div className="pagina">
+    <>
+      <form className="filtros-reporte" onSubmit={generar}>
+        <div className="campo">
+          <label>Desde</label>
 
-      <div className="contenedor-grande">
-
-        <div className="encabezado-pagina">
-
-          <div>
-
-            <h1>
-              Estadísticas de cambios
-            </h1>
-
-            <p className="subtitulo">
-              Análisis de productos cambiados
-            </p>
-
-          </div>
-
+          <input
+            type="date"
+            value={desde}
+            onChange={(event) => setDesde(event.target.value)}
+          />
         </div>
 
+        <div className="campo">
+          <label>Hasta</label>
 
-        <form
-          className="filtros-reporte"
-          onSubmit={generar}
-        >
+          <input
+            type="date"
+            value={hasta}
+            onChange={(event) => setHasta(event.target.value)}
+          />
+        </div>
 
-          <div className="campo">
+        <div className="campo">
+          <label>Concesionario</label>
 
-            <label>
-              Desde
-            </label>
-
-            <input
-              type="date"
-              value={desde}
-              onChange={(event) =>
-                setDesde(
-                  event.target.value
-                )
-              }
-            />
-
-          </div>
-
-
-          <div className="campo">
-
-            <label>
-              Hasta
-            </label>
-
-            <input
-              type="date"
-              value={hasta}
-              onChange={(event) =>
-                setHasta(
-                  event.target.value
-                )
-              }
-            />
-
-          </div>
-
-
-          <div className="campo">
-
-            <label>
-              Concesionario
-            </label>
-
-            <select
-              value={
-                concesionarioId
-              }
-              onChange={(event) =>
-                setConcesionarioId(
-                  event.target.value
-                )
-              }
-            >
-
-              <option value="">
-                Todos
-              </option>
-
-
-              {concesionarios.map(
-                (concesionario) => (
-
-                  <option
-                    key={
-                      concesionario.id
-                    }
-                    value={
-                      concesionario.id
-                    }
-                  >
-                    {
-                      concesionario.nombre
-                    }
-                  </option>
-
-                )
-              )}
-
-            </select>
-
-          </div>
-
-
-          <button
-            type="submit"
-            className="boton-guardar boton-generar"
+          <select
+            value={concesionarioId}
+            onChange={(event) => setConcesionarioId(event.target.value)}
           >
-            Generar estadísticas
-          </button>
+            <option value="">Todos</option>
 
-        </form>
+            {concesionarios.map((concesionario) => (
+              <option key={concesionario.id} value={concesionario.id}>
+                {concesionario.nombre}
+              </option>
+            ))}
+          </select>
+        </div>
 
+        <button type="submit" className="boton-guardar boton-generar">
+          Generar estadísticas
+        </button>
+      </form>
 
-        {isLoading && (
+      {isLoading && (
+        <div className="estado-vacio">Generando estadísticas...</div>
+      )}
 
-          <div className="estado-vacio">
-            Generando estadísticas...
+      {isError && (
+        <div className="estado-vacio">
+          No se pudieron generar las estadísticas.
+        </div>
+      )}
+
+      {estadisticas && !isLoading && !isError && (
+        <>
+          <div className="resumen-reporte">
+            <div>
+              <span>Período</span>
+
+              <strong>
+                {formatearFecha(estadisticas.desde)}
+
+                {" → "}
+
+                {formatearFecha(estadisticas.hasta)}
+              </strong>
+            </div>
+
+            <div>
+              <span>Recibos</span>
+
+              <strong>{estadisticas.cantidad_recibos}</strong>
+            </div>
+
+            <div>
+              <span>Cantidad total</span>
+
+              <strong>{estadisticas.total_cantidad}</strong>
+            </div>
           </div>
 
-        )}
-
-
-        {isError && (
-
-          <div className="estado-vacio">
-            No se pudieron generar
-            las estadísticas.
-          </div>
-
-        )}
-
-
-        {
-          estadisticas &&
-          !isLoading &&
-          !isError && (
-
+          {estadisticas.total_cantidad === 0 ? (
+            <div className="estado-vacio">
+              No hay datos para el período seleccionado.
+            </div>
+          ) : (
             <>
+              <h2>Cantidades por producto</h2>
 
-              <div className="resumen-reporte">
+              <div className="grafico-rechazos">
+                <ScrollableChart
+                  label="Cantidades por producto"
+                  itemCount={datosGrafico.length}
+                  itemWidth={144}
+                  height={420}
+                >
+                  <BarChart
+                    data={datosGrafico}
+                    margin={{
+                      top: 20,
+                      right: 30,
+                      left: 10,
+                      bottom: 12,
+                    }}
+                  >
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="#e4eaf2"
+                      vertical={false}
+                    />
 
-                <div>
+                    <XAxis
+                      dataKey="nombre"
+                      interval={0}
+                      height={82}
+                      tick={<ChartCategoryTick />}
+                      axisLine={{ stroke: "#d9e1eb" }}
+                      tickLine={false}
+                    />
 
-                  <span>
-                    Período
-                  </span>
+                    <YAxis
+                      allowDecimals={false}
+                      tick={{ fill: "#657289", fontSize: 11 }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
 
-                  <strong>
-                    {
-                      formatearFecha(
-                        estadisticas.desde
-                      )
-                    }
+                    <Tooltip
+                      cursor={{ fill: "#f2f7fd" }}
+                      contentStyle={{
+                        border: "1px solid #dfe6ef",
+                        borderRadius: 10,
+                        boxShadow: "0 8px 24px rgba(18,38,63,.08)",
+                        fontSize: 12,
+                      }}
+                    />
 
-                    {" → "}
-
-                    {
-                      formatearFecha(
-                        estadisticas.hasta
-                      )
-                    }
-                  </strong>
-
-                </div>
-
-
-                <div>
-
-                  <span>
-                    Recibos
-                  </span>
-
-                  <strong>
-                    {
-                      estadisticas
-                        .cantidad_recibos
-                    }
-                  </strong>
-
-                </div>
-
-
-                <div>
-
-                  <span>
-                    Cantidad total
-                  </span>
-
-                  <strong>
-                    {
-                      estadisticas
-                        .total_cantidad
-                    }
-                  </strong>
-
-                </div>
-
+                    <Bar
+                      maxBarSize={48}
+                      dataKey="cantidad"
+                      name="Cantidad"
+                      fill="#2780f3"
+                      radius={[5, 5, 0, 0]}
+                    />
+                  </BarChart>
+                </ScrollableChart>
               </div>
 
+              {estadisticas.modo === "concesionario" ? (
+                <div className="tabla-wrapper">
+                  <table className="tabla-repartos">
+                    <thead>
+                      <tr>
+                        <th>Código</th>
+                        <th>Producto</th>
+                        <th>Familia</th>
+                        <th>Cantidad</th>
+                        <th>Porcentaje</th>
+                      </tr>
+                    </thead>
 
-              {
-                estadisticas.total_cantidad === 0
-                ? (
+                    <tbody>
+                      {estadisticas.por_producto.map((item) => (
+                        <tr key={item.producto_id}>
+                          <td>{item.codigo}</td>
 
-                  <div className="estado-vacio">
-                    No hay datos para
-                    el período seleccionado.
-                  </div>
+                          <td>{item.producto}</td>
 
-                )
-                : (
+                          <td>{item.familia}</td>
 
-                  <>
+                          <td>{item.cantidad}</td>
 
-                    <h2>
-                      Cantidades por producto
-                    </h2>
+                          <td>{item.porcentaje.toFixed(2)}%</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="tabla-wrapper">
+                  <table className="tabla-repartos">
+                    <thead>
+                      <tr>
+                        <th>Código</th>
+                        <th>Producto</th>
+                        <th>Familia</th>
+                        <th>Concesionario</th>
+                        <th>Cantidad</th>
+                        <th>Porcentaje</th>
+                      </tr>
+                    </thead>
 
-
-                    <div className="grafico-rechazos">
-
-                      <ResponsiveContainer
-                        width="100%"
-                        height={350}
-                      >
-
-                        <BarChart
-                          data={
-                            datosGrafico
-                          }
-                          margin={{
-                            top: 20,
-                            right: 30,
-                            left: 10,
-                            bottom: 100,
-                          }}
+                    <tbody>
+                      {estadisticas.por_producto_concesionario.map((item) => (
+                        <tr
+                          key={`${item.producto_id}-${item.concesionario_id}`}
                         >
+                          <td>{item.codigo}</td>
 
-                          <CartesianGrid
-                            strokeDasharray="3 3"
-                            stroke="#e4eaf2"
-                            vertical={false}
-                          />
+                          <td>{item.producto}</td>
 
-                          <XAxis
-                            dataKey="nombre"
-                            angle={-35}
-                            textAnchor="end"
-                            interval={0}
-                            height={120}
-                            tick={{ fill: "#657289", fontSize: 11 }}
-                            axisLine={{ stroke: "#d9e1eb" }}
-                            tickLine={false}
-                          />
+                          <td>{item.familia}</td>
 
-                          <YAxis
-                            allowDecimals={false}
-                            tick={{ fill: "#657289", fontSize: 11 }}
-                            axisLine={false}
-                            tickLine={false}
-                          />
+                          <td>{item.concesionario}</td>
 
-                          <Tooltip cursor={{ fill: "#f2f7fd" }} contentStyle={{ border: "1px solid #dfe6ef", borderRadius: 10, boxShadow: "0 8px 24px rgba(18,38,63,.08)", fontSize: 12 }} />
+                          <td>{item.cantidad}</td>
 
-                          <Bar
-                            dataKey="cantidad"
-                            name="Cantidad"
-                            fill="#2780f3"
-                            radius={[5, 5, 0, 0]}
-                          />
-
-                        </BarChart>
-
-                      </ResponsiveContainer>
-
-                    </div>
-
-
-                    {
-                      estadisticas.modo ===
-                      "concesionario"
-                      ? (
-
-                        <div className="tabla-wrapper">
-
-                          <table className="tabla-repartos">
-
-                            <thead>
-                              <tr>
-                                <th>Código</th>
-                                <th>Producto</th>
-                                <th>Familia</th>
-                                <th>Cantidad</th>
-                                <th>Porcentaje</th>
-                              </tr>
-                            </thead>
-
-
-                            <tbody>
-
-                              {
-                                estadisticas
-                                  .por_producto
-                                  .map(
-                                    (item) => (
-
-                                      <tr
-                                        key={
-                                          item
-                                            .producto_id
-                                        }
-                                      >
-
-                                        <td>
-                                          {
-                                            item.codigo
-                                          }
-                                        </td>
-
-                                        <td>
-                                          {
-                                            item.producto
-                                          }
-                                        </td>
-
-                                        <td>
-                                          {
-                                            item.familia
-                                          }
-                                        </td>
-
-                                        <td>
-                                          {
-                                            item.cantidad
-                                          }
-                                        </td>
-
-                                        <td>
-                                          {
-                                            item
-                                              .porcentaje
-                                              .toFixed(
-                                                2
-                                              )
-                                          }
-                                          %
-                                        </td>
-
-                                      </tr>
-
-                                    )
-                                  )
-                              }
-
-                            </tbody>
-
-                          </table>
-
-                        </div>
-
-                      )
-                      : (
-
-                        <div className="tabla-wrapper">
-
-                          <table className="tabla-repartos">
-
-                            <thead>
-                              <tr>
-                                <th>Código</th>
-                                <th>Producto</th>
-                                <th>Familia</th>
-                                <th>Concesionario</th>
-                                <th>Cantidad</th>
-                                <th>Porcentaje</th>
-                              </tr>
-                            </thead>
-
-
-                            <tbody>
-
-                              {
-                                estadisticas
-                                  .por_producto_concesionario
-                                  .map(
-                                    (item) => (
-
-                                      <tr
-                                        key={
-                                          `${item.producto_id}-${item.concesionario_id}`
-                                        }
-                                      >
-
-                                        <td>
-                                          {
-                                            item.codigo
-                                          }
-                                        </td>
-
-                                        <td>
-                                          {
-                                            item.producto
-                                          }
-                                        </td>
-
-                                        <td>
-                                          {
-                                            item.familia
-                                          }
-                                        </td>
-
-                                        <td>
-                                          {
-                                            item
-                                              .concesionario
-                                          }
-                                        </td>
-
-                                        <td>
-                                          {
-                                            item.cantidad
-                                          }
-                                        </td>
-
-                                        <td>
-                                          {
-                                            item
-                                              .porcentaje
-                                              .toFixed(
-                                                2
-                                              )
-                                          }
-                                          %
-                                        </td>
-
-                                      </tr>
-
-                                    )
-                                  )
-                              }
-
-                            </tbody>
-
-                          </table>
-
-                        </div>
-
-                      )
-                    }
-
-                  </>
-
-                )
-              }
-
+                          <td>{item.porcentaje.toFixed(2)}%</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </>
-
-          )
-        }
-
-      </div>
-
-    </div>
+          )}
+        </>
+      )}
+    </>
   );
 }

@@ -71,6 +71,8 @@ export type EntregaOrdenCarga = {
 
 
 export type OrdenCarga = {
+  anulada?: boolean;
+  circuito?: string;
   id: number;
   numero: string;
   fecha: string;
@@ -95,6 +97,8 @@ export type OrdenCarga = {
 
 
 export type MovimientoStock = {
+  sin_impacto?: boolean;
+  fecha_operativa?: string | null;
   id: number;
 
   producto: number;

@@ -1,4 +1,5 @@
 from django.urls import path
+from .historicos_views import ImportacionesHistoricasAPIView, HistoricoRechazosAPIView
 
 from .views import (
     RechazoListCreateAPIView,
@@ -8,6 +9,8 @@ from .views import (
 
 
 urlpatterns = [
+    path('historicos/', ImportacionesHistoricasAPIView.as_view(), name='rechazos-historicos'),
+    path('historicos/<int:pk>/<str:contenido>/', HistoricoRechazosAPIView.as_view(), name='rechazos-historicos-contenido'),
 
     path(
         "",

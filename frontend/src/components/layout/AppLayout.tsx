@@ -1,4 +1,6 @@
 import { useState } from "react";
+import ThemeToggle from "../ui/ThemeToggle";
+import TurnoExpedicionSelector from "../expedicion/TurnoExpedicionSelector";
 
 import {
   NavLink,
@@ -210,11 +212,13 @@ const modules: SidebarModule[] = [
     permiso: "EXPEDICION",
 
     links: [
+      { label: "Resumen del turno", to: "/expedicion/inicio", icon: "chart" },
       {
         label: "Órdenes de carga",
         to: "/expedicion/ordenes",
         icon: "truck",
       },
+      { label: "Pendientes y cambios", to: "/expedicion/pendientes", icon: "history" },
       {
         label: "Stock",
         to: "/expedicion/stock",
@@ -226,15 +230,15 @@ const modules: SidebarModule[] = [
         icon: "history",
       },
       {
-        label: "Fleteros",
-        to: "/expedicion/fleteros",
-        icon: "truck",
-      },
-      {
-        label: "Pallets y chapadur",
+        label: "Materiales",
         to: "/expedicion/materiales",
         icon: "boxes",
       },
+      { label: "Empleados", to: "/expedicion/empleados", icon: "boxes" },
+      { label: "Conteos y relevo", to: "/expedicion/conteos", icon: "history" },
+      { label: "Auditoría", to: "/expedicion/auditoria", icon: "history" },
+      { label: "Configuración", to: "/expedicion/configuracion", icon: "boxes" },
+      { label: "Fleteros", to: "/expedicion/fleteros", icon: "truck" },
     ],
   },
 
@@ -266,6 +270,13 @@ const pageNames: Record<
 
   expedicion:
     "Expedición",
+
+  pendientes: "Pendientes y cambios",
+  empleados: "Empleados",
+  conteos: "Conteos y relevo",
+  auditoria: "Auditoría",
+  configuracion: "Configuración",
+  nueva: "Nuevo registro",
 
   stock:
     "Stock",
@@ -415,6 +426,8 @@ export default function AppLayout({
   const location =
     useLocation();
 
+
+  const esExpedicion = location.pathname === "/expedicion" || location.pathname.startsWith("/expedicion/");
 
   const navigate =
     useNavigate();
@@ -928,7 +941,7 @@ export default function AppLayout({
 
       <div className="app-main">
 
-        <header className="app-header">
+        <header className={`app-header${esExpedicion ? " app-header-expedicion" : ""}`}>
 
           <button
             className="menu-toggle"
@@ -952,6 +965,10 @@ export default function AppLayout({
 
 
           <div className="header-user">
+
+            <ThemeToggle />
+
+            {esExpedicion && <TurnoExpedicionSelector />}
 
             <div className="user-avatar">
 

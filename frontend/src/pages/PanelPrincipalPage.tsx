@@ -1,10 +1,8 @@
-import {
-  Link,
-} from "react-router-dom";
+import ScrollableChart from "../components/charts/ScrollableChart";
+import ChartCategoryTick from "../components/charts/ChartCategoryTick";
+import { Link } from "react-router-dom";
 
-import {
-  useQuery,
-} from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 import {
   Bar,
@@ -36,37 +34,21 @@ import {
   obtenerStockExpedicion,
 } from "../api/expedicion";
 
-import Icon, {
-  type IconName,
-} from "../components/ui/Icon";
+import Icon, { type IconName } from "../components/ui/Icon";
 
 import "./PanelPrincipalPage.css";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000/api";
 
-const API_URL =
-  import.meta.env.VITE_API_URL
-  ||
-  "http://127.0.0.1:8000/api";
-
-
-type ComparisonTrend =
-  | "positive"
-  | "negative"
-  | "neutral";
-
+type ComparisonTrend = "positive" | "negative" | "neutral";
 
 type KpiComparison = {
   text: string;
 
-  trend:
-    ComparisonTrend;
+  trend: ComparisonTrend;
 
-  direction:
-    | "up"
-    | "down"
-    | "equal";
+  direction: "up" | "down" | "equal";
 };
-
 
 type KpiItem = {
   label: string;
@@ -75,10 +57,8 @@ type KpiItem = {
   icon: IconName;
   tone: string;
 
-  comparison?:
-    KpiComparison;
+  comparison?: KpiComparison;
 };
-
 
 type ModuleItem = {
   title: string;
@@ -87,11 +67,9 @@ type ModuleItem = {
   permiso: string;
   home: string;
 
-  ultimaCarga?:
-    string | null;
+  ultimaCarga?: string | null;
 
-  ultimaCargaTexto?:
-    string;
+  ultimaCargaTexto?: string;
 
   links: {
     label: string;
@@ -99,10 +77,7 @@ type ModuleItem = {
   }[];
 };
 
-
-type RegistroGenerico =
-  Record<string, unknown>;
-
+type RegistroGenerico = Record<string, unknown>;
 
 const COLORES_PIE = [
   "#2f75d6",
@@ -113,58 +88,34 @@ const COLORES_PIE = [
   "#64748b",
 ];
 
-
 // =========================================================
 // CONSULTAS AUXILIARES
 // =========================================================
 
 async function obtenerListaDashboard(
-  ruta: string
+  ruta: string,
 ): Promise<RegistroGenerico[]> {
-
-  const response =
-    await fetch(
-      `${API_URL}${ruta}`,
-      {
-        credentials:
-          "include",
-      }
-    );
-
+  const response = await fetch(`${API_URL}${ruta}`, {
+    credentials: "include",
+  });
 
   if (!response.ok) {
-
-    throw new Error(
-      "No se pudo cargar información del dashboard."
-    );
+    throw new Error("No se pudo cargar información del dashboard.");
   }
-
 
   return response.json();
 }
-
 
 // =========================================================
 // FECHAS
 // =========================================================
 
-function obtenerFechaRegistro(
-  item: unknown
-): string | null {
-
-  if (
-    !item
-    ||
-    typeof item !== "object"
-  ) {
-
+function obtenerFechaRegistro(item: unknown): string | null {
+  if (!item || typeof item !== "object") {
     return null;
   }
 
-
-  const registro =
-    item as RegistroGenerico;
-
+  const registro = item as RegistroGenerico;
 
   const camposFecha = [
     "creado_en",
@@ -178,292 +129,117 @@ function obtenerFechaRegistro(
     "updated",
   ];
 
+  for (const campo of camposFecha) {
+    const valor = registro[campo];
 
-  for (
-    const campo
-    of camposFecha
-  ) {
-
-    const valor =
-      registro[campo];
-
-
-    if (
-      typeof valor === "string"
-      &&
-      valor.trim()
-    ) {
-
+    if (typeof valor === "string" && valor.trim()) {
       return valor;
     }
-
   }
-
 
   return null;
 }
 
+function convertirFecha(valor: string): Date | null {
+  const esFechaSimple = /^\d{4}-\d{2}-\d{2}$/.test(valor);
 
-function convertirFecha(
-  valor: string
-): Date | null {
+  if (esFechaSimple) {
+    const [anio, mes, dia] = valor.split("-").map(Number);
 
-  const esFechaSimple =
-    /^\d{4}-\d{2}-\d{2}$/
-      .test(
-        valor
-      );
-
-
-  if (
-    esFechaSimple
-  ) {
-
-    const [
-      anio,
-      mes,
-      dia,
-    ] =
-      valor
-        .split("-")
-        .map(
-          Number
-        );
-
-
-    return new Date(
-      anio,
-      mes - 1,
-      dia,
-      12,
-      0,
-      0
-    );
+    return new Date(anio, mes - 1, dia, 12, 0, 0);
   }
 
+  const fecha = new Date(valor);
 
-  const fecha =
-    new Date(
-      valor
-    );
-
-
-  if (
-    Number.isNaN(
-      fecha.getTime()
-    )
-  ) {
-
+  if (Number.isNaN(fecha.getTime())) {
     return null;
   }
-
 
   return fecha;
 }
 
+function obtenerUltimaFecha(registros: unknown[]): string | null {
+  let ultimaFecha: Date | null = null;
 
-function obtenerUltimaFecha(
-  registros: unknown[]
-): string | null {
-
-  let ultimaFecha:
-    Date | null = null;
-
-
-  for (
-    const registro
-    of registros
-  ) {
-
-    const valor =
-      obtenerFechaRegistro(
-        registro
-      );
-
+  for (const registro of registros) {
+    const valor = obtenerFechaRegistro(registro);
 
     if (!valor) {
       continue;
     }
 
-
-    const fecha =
-      convertirFecha(
-        valor
-      );
-
+    const fecha = convertirFecha(valor);
 
     if (!fecha) {
       continue;
     }
 
-
-    if (
-      !ultimaFecha
-      ||
-      fecha >
-      ultimaFecha
-    ) {
-
-      ultimaFecha =
-        fecha;
+    if (!ultimaFecha || fecha > ultimaFecha) {
+      ultimaFecha = fecha;
     }
-
   }
 
-
-  return ultimaFecha
-    ? ultimaFecha.toISOString()
-    : null;
+  return ultimaFecha ? ultimaFecha.toISOString() : null;
 }
 
-
-function formatearUltimaCarga(
-  valor:
-    string
-    |
-    null
-    |
-    undefined
-) {
-
+function formatearUltimaCarga(valor: string | null | undefined) {
   if (!valor) {
-
     return "Sin cargas registradas";
   }
 
+  const fecha = new Date(valor);
 
-  const fecha =
-    new Date(
-      valor
-    );
-
-
-  if (
-    Number.isNaN(
-      fecha.getTime()
-    )
-  ) {
-
+  if (Number.isNaN(fecha.getTime())) {
     return "Sin fecha disponible";
   }
 
+  const tieneHoraReal = fecha.getHours() !== 12 || fecha.getMinutes() !== 0;
 
-  const tieneHoraReal =
-    fecha.getHours() !== 12
-    ||
-    fecha.getMinutes() !== 0;
+  if (tieneHoraReal) {
+    return fecha.toLocaleString("es-AR", {
+      day: "2-digit",
 
+      month: "2-digit",
 
-  if (
-    tieneHoraReal
-  ) {
+      year: "numeric",
 
-    return fecha.toLocaleString(
-      "es-AR",
-      {
-        day:
-          "2-digit",
+      hour: "2-digit",
 
-        month:
-          "2-digit",
-
-        year:
-          "numeric",
-
-        hour:
-          "2-digit",
-
-        minute:
-          "2-digit",
-      }
-    );
+      minute: "2-digit",
+    });
   }
 
-
-  return fecha.toLocaleDateString(
-    "es-AR"
-  );
+  return fecha.toLocaleDateString("es-AR");
 }
-
 
 // =========================================================
 // COMPARACIÓN DE PERÍODOS
 // =========================================================
 
-function inicioDelDia(
-  fecha: Date
-) {
+function inicioDelDia(fecha: Date) {
+  const copia = new Date(fecha);
 
-  const copia =
-    new Date(
-      fecha
-    );
-
-
-  copia.setHours(
-    0,
-    0,
-    0,
-    0
-  );
-
+  copia.setHours(0, 0, 0, 0);
 
   return copia;
 }
 
-
 function obtenerRangosComparacion() {
+  const hoy = inicioDelDia(new Date());
 
-  const hoy =
-    inicioDelDia(
-      new Date()
-    );
+  const finActual = new Date(hoy);
 
+  finActual.setDate(finActual.getDate() + 1);
 
-  const finActual =
-    new Date(
-      hoy
-    );
+  const inicioActual = new Date(hoy);
 
+  inicioActual.setDate(inicioActual.getDate() - 6);
 
-  finActual.setDate(
-    finActual.getDate()
-    +
-    1
-  );
+  const finAnterior = new Date(inicioActual);
 
+  const inicioAnterior = new Date(inicioActual);
 
-  const inicioActual =
-    new Date(
-      hoy
-    );
-
-
-  inicioActual.setDate(
-    inicioActual.getDate()
-    -
-    6
-  );
-
-
-  const finAnterior =
-    new Date(
-      inicioActual
-    );
-
-
-  const inicioAnterior =
-    new Date(
-      inicioActual
-    );
-
-
-  inicioAnterior.setDate(
-    inicioAnterior.getDate()
-    -
-    7
-  );
-
+  inicioAnterior.setDate(inicioAnterior.getDate() - 7);
 
   return {
     inicioActual,
@@ -473,289 +249,137 @@ function obtenerRangosComparacion() {
   };
 }
 
+function registrosEnRango(registros: unknown[], desde: Date, hasta: Date) {
+  return registros.filter((registro) => {
+    const valor = obtenerFechaRegistro(registro);
 
-function registrosEnRango(
-  registros: unknown[],
-  desde: Date,
-  hasta: Date
-) {
-
-  return registros.filter(
-    registro => {
-
-      const valor =
-        obtenerFechaRegistro(
-          registro
-        );
-
-
-      if (!valor) {
-        return false;
-      }
-
-
-      const fecha =
-        convertirFecha(
-          valor
-        );
-
-
-      if (!fecha) {
-        return false;
-      }
-
-
-      return (
-        fecha >= desde
-        &&
-        fecha < hasta
-      );
+    if (!valor) {
+      return false;
     }
-  );
-}
 
+    const fecha = convertirFecha(valor);
+
+    if (!fecha) {
+      return false;
+    }
+
+    return fecha >= desde && fecha < hasta;
+  });
+}
 
 function crearComparacionCantidad(
   actual: number,
   anterior: number,
-  mejorCuandoSube:
-    boolean = true
+  mejorCuandoSube: boolean = true,
 ): KpiComparison {
-
-  if (
-    actual === anterior
-  ) {
-
+  if (actual === anterior) {
     return {
-      text:
-        "Sin cambios vs. 7 días anteriores",
+      text: "Sin cambios vs. 7 días anteriores",
 
-      trend:
-        "neutral",
+      trend: "neutral",
 
-      direction:
-        "equal",
+      direction: "equal",
     };
   }
 
+  const subio = actual > anterior;
 
-  const subio =
-    actual > anterior;
+  let trend: ComparisonTrend;
 
-
-  let trend:
-    ComparisonTrend;
-
-
-  if (
-    mejorCuandoSube
-  ) {
-
-    trend =
-      subio
-        ? "positive"
-        : "negative";
-
+  if (mejorCuandoSube) {
+    trend = subio ? "positive" : "negative";
   } else {
-
-    trend =
-      subio
-        ? "negative"
-        : "positive";
+    trend = subio ? "negative" : "positive";
   }
 
-
-  if (
-    anterior === 0
-  ) {
-
+  if (anterior === 0) {
     return {
-      text:
-        `${subio ? "+" : ""}${actual - anterior} vs. 7 días anteriores`,
+      text: `${subio ? "+" : ""}${actual - anterior} vs. 7 días anteriores`,
 
       trend,
 
-      direction:
-        subio
-          ? "up"
-          : "down",
+      direction: subio ? "up" : "down",
     };
   }
 
+  const variacion = ((actual - anterior) / anterior) * 100;
 
-  const variacion =
-    (
-      (
-        actual
-        -
-        anterior
-      )
-      /
-      anterior
-    )
-    *
-    100;
-
-
-  const porcentaje =
-    Math.abs(
-      variacion
-    ).toLocaleString(
-      "es-AR",
-      {
-        maximumFractionDigits:
-          1,
-      }
-    );
-
+  const porcentaje = Math.abs(variacion).toLocaleString("es-AR", {
+    maximumFractionDigits: 1,
+  });
 
   return {
-    text:
-      `${porcentaje}% vs. 7 días anteriores`,
+    text: `${porcentaje}% vs. 7 días anteriores`,
 
     trend,
 
-    direction:
-      subio
-        ? "up"
-        : "down",
+    direction: subio ? "up" : "down",
   };
 }
-
 
 function crearComparacionPorcentaje(
   actual: number,
   anterior: number,
-  mejorCuandoSube:
-    boolean = true
+  mejorCuandoSube: boolean = true,
 ): KpiComparison {
+  const diferencia = actual - anterior;
 
-  const diferencia =
-    actual
-    -
-    anterior;
-
-
-  if (
-    diferencia === 0
-  ) {
-
+  if (diferencia === 0) {
     return {
-      text:
-        "Sin cambios vs. 7 días anteriores",
+      text: "Sin cambios vs. 7 días anteriores",
 
-      trend:
-        "neutral",
+      trend: "neutral",
 
-      direction:
-        "equal",
+      direction: "equal",
     };
   }
 
+  const subio = diferencia > 0;
 
-  const subio =
-    diferencia > 0;
+  let trend: ComparisonTrend;
 
-
-  let trend:
-    ComparisonTrend;
-
-
-  if (
-    mejorCuandoSube
-  ) {
-
-    trend =
-      subio
-        ? "positive"
-        : "negative";
-
+  if (mejorCuandoSube) {
+    trend = subio ? "positive" : "negative";
   } else {
-
-    trend =
-      subio
-        ? "negative"
-        : "positive";
+    trend = subio ? "negative" : "positive";
   }
 
-
   return {
-    text:
-      `${Math.abs(
-        diferencia
-      ).toLocaleString(
-        "es-AR",
-        {
-          maximumFractionDigits:
-            1,
-        }
-      )} pp vs. 7 días anteriores`,
+    text: `${Math.abs(diferencia).toLocaleString("es-AR", {
+      maximumFractionDigits: 1,
+    })} pp vs. 7 días anteriores`,
 
     trend,
 
-    direction:
-      subio
-        ? "up"
-        : "down",
+    direction: subio ? "up" : "down",
   };
 }
-
 
 // =========================================================
 // ESTADOS DE EXPEDICIÓN
 // =========================================================
 
-function nombreEstadoOrden(
-  estado: string
-) {
+function nombreEstadoOrden(estado: string) {
+  const nombres: Record<string, string> = {
+    RECIBIDA: "Recibidas",
 
-  const nombres:
-    Record<string, string> = {
+    CARGA_INICIADA: "Carga iniciada",
 
-      RECIBIDA:
-        "Recibidas",
+    PARCIAL: "Parciales",
 
-      CARGA_INICIADA:
-        "Carga iniciada",
+    COMPLETA: "Completas",
 
-      PARCIAL:
-        "Parciales",
+    COMPLETA_CON_CAMBIO: "Completas con cambio",
 
-      COMPLETA:
-        "Completas",
+    PENDIENTE_CONTROL: "Pendientes control",
+  };
 
-      COMPLETA_CON_CAMBIO:
-        "Completas con cambio",
-
-      PENDIENTE_CONTROL:
-        "Pendientes control",
-
-    };
-
-
-  return (
-    nombres[estado]
-    ??
-    estado
-  );
+  return nombres[estado] ?? estado;
 }
 
-
-function estaCompleta(
-  orden: {
-    estado: string;
-  }
-) {
-
-  return (
-    orden.estado ===
-      "COMPLETA"
-    ||
-    orden.estado ===
-      "COMPLETA_CON_CAMBIO"
-  );
+function estaCompleta(orden: { estado: string }) {
+  return orden.estado === "COMPLETA" || orden.estado === "COMPLETA_CON_CAMBIO";
 }
-
 
 // =========================================================
 // COMPONENTE ÚLTIMA CARGA
@@ -765,2942 +389,1617 @@ function UltimaCarga({
   fecha,
   texto,
 }: {
-  fecha?:
-    string | null;
+  fecha?: string | null;
 
-  texto?:
-    string;
+  texto?: string;
 }) {
-
   return (
-
     <div className="dashboard-module-last-update">
-
       <div className="dashboard-module-last-icon">
-
-        <Icon
-          name="history"
-          size={14}
-        />
-
+        <Icon name="history" size={14} />
       </div>
-
 
       <div>
+        <span>Última carga</span>
 
-        <span>
-          Última carga
-        </span>
-
-        <strong>
-
-          {
-            texto
-            ??
-            formatearUltimaCarga(
-              fecha
-            )
-          }
-
-        </strong>
-
+        <strong>{texto ?? formatearUltimaCarga(fecha)}</strong>
       </div>
-
     </div>
-
   );
 }
-
 
 // =========================================================
 // COMPONENTE KPI
 // =========================================================
 
-function KpiCard({
-  kpi,
-}: {
-  kpi: KpiItem;
-}) {
-
+function KpiCard({ kpi }: { kpi: KpiItem }) {
   return (
-
     <div className="dashboard-kpi-card">
-
-      <div
-        className={
-          `dashboard-kpi-icon ${kpi.tone}`
-        }
-      >
-
-        <Icon
-          name={
-            kpi.icon
-          }
-        />
-
+      <div className={`dashboard-kpi-icon ${kpi.tone}`}>
+        <Icon name={kpi.icon} />
       </div>
-
 
       <div>
+        <span>{kpi.label}</span>
 
-        <span>
-          {
-            kpi.label
-          }
-        </span>
+        <strong>{kpi.value}</strong>
 
+        <small>{kpi.description}</small>
 
-        <strong>
-          {
-            kpi.value
-          }
-        </strong>
+        {kpi.comparison && (
+          <div className={`dashboard-kpi-comparison ${kpi.comparison.trend}`}>
+            <span className="dashboard-kpi-arrow">
+              {kpi.comparison.direction === "up"
+                ? "↑"
+                : kpi.comparison.direction === "down"
+                  ? "↓"
+                  : "—"}
+            </span>
 
-
-        <small>
-          {
-            kpi.description
-          }
-        </small>
-
-
-        {
-          kpi.comparison
-          &&
-          (
-
-            <div
-              className={
-                `dashboard-kpi-comparison ${kpi.comparison.trend}`
-              }
-            >
-
-              <span className="dashboard-kpi-arrow">
-
-                {
-                  kpi.comparison.direction ===
-                    "up"
-                    ? "↑"
-                    : kpi.comparison.direction ===
-                        "down"
-                      ? "↓"
-                      : "—"
-                }
-
-              </span>
-
-
-              <span>
-                {
-                  kpi.comparison.text
-                }
-              </span>
-
-            </div>
-
-          )
-        }
-
+            <span>{kpi.comparison.text}</span>
+          </div>
+        )}
       </div>
-
     </div>
-
   );
 }
-
 
 // =========================================================
 // PANEL
 // =========================================================
 
 export default function PanelPrincipalPage() {
-
   // =======================================================
   // USUARIO
   // =======================================================
 
-  const {
-    data: usuario,
-    isLoading:
-      cargandoUsuario,
-  } = useQuery({
+  const { data: usuario, isLoading: cargandoUsuario } = useQuery({
+    queryKey: ["usuario-actual"],
 
-    queryKey: [
-      "usuario-actual",
-    ],
+    queryFn: obtenerUsuarioActual,
 
-    queryFn:
-      obtenerUsuarioActual,
-
-    retry:
-      false,
-
+    retry: false,
   });
 
+  const nombre = usuario?.nombre_completo || usuario?.username || "Usuario";
 
-  const nombre =
-    usuario?.nombre_completo
-    ||
-    usuario?.username
-    ||
-    "Usuario";
+  const esSuperusuario = usuario?.es_superusuario ?? false;
 
+  const grupos = usuario?.grupos ?? [];
 
-  const esSuperusuario =
-    usuario?.es_superusuario
-    ??
-    false;
-
-
-  const grupos =
-    usuario?.grupos
-    ??
-    [];
-
-
-  function tienePermiso(
-    permiso: string
-  ) {
-
-    if (
-      esSuperusuario
-    ) {
-
+  function tienePermiso(permiso: string) {
+    if (esSuperusuario) {
       return true;
     }
 
-
-    return grupos.includes(
-      permiso
-    );
+    return grupos.includes(permiso);
   }
-
 
   // =======================================================
   // PERMISOS
   // =======================================================
 
-  const puedeRepartos =
-    tienePermiso(
-      "REPARTOS"
-    );
+  const puedeRepartos = tienePermiso("REPARTOS");
 
+  const puedeRechazos = tienePermiso("RECHAZOS");
 
-  const puedeRechazos =
-    tienePermiso(
-      "RECHAZOS"
-    );
+  const puedeCambios = tienePermiso("CAMBIOS");
 
+  const puedeViaticos = tienePermiso("VIATICOS");
 
-  const puedeCambios =
-    tienePermiso(
-      "CAMBIOS"
-    );
+  const puedeKilometrajes = tienePermiso("KILOMETRAJES");
 
+  const puedeControlDiario = tienePermiso("CONTROL_DIARIO");
 
-  const puedeViaticos =
-    tienePermiso(
-      "VIATICOS"
-    );
+  const puedeExpedicion = tienePermiso("EXPEDICION");
 
-
-  const puedeKilometrajes =
-    tienePermiso(
-      "KILOMETRAJES"
-    );
-
-
-  const puedeControlDiario =
-    tienePermiso(
-      "CONTROL_DIARIO"
-    );
-
-
-  const puedeExpedicion =
-    tienePermiso(
-      "EXPEDICION"
-    );
-
-
-  const puedeStockPallets =
-    esSuperusuario
-    ||
-    grupos.includes(
-      "CAMBIOS"
-    );
-
+  const puedeStockPallets = esSuperusuario || grupos.includes("CAMBIOS");
 
   const puedeVerLogistica =
-    puedeRepartos
-    ||
-    puedeRechazos
-    ||
-    puedeCambios
-    ||
-    puedeViaticos
-    ||
-    puedeKilometrajes
-    ||
-    puedeControlDiario
-    ||
+    puedeRepartos ||
+    puedeRechazos ||
+    puedeCambios ||
+    puedeViaticos ||
+    puedeKilometrajes ||
+    puedeControlDiario ||
     puedeStockPallets;
-
 
   // =======================================================
   // LOGÍSTICA
   // =======================================================
 
-  const {
-    data: repartos = [],
-    isLoading:
-      cargandoRepartos,
-  } = useQuery({
+  const { data: repartos = [], isLoading: cargandoRepartos } = useQuery({
+    queryKey: ["repartos"],
 
-    queryKey: [
-      "repartos",
-    ],
+    queryFn: obtenerRepartos,
 
-    queryFn:
-      obtenerRepartos,
-
-    enabled:
-      puedeRepartos,
-
+    enabled: puedeRepartos,
   });
 
+  const { data: rechazos = [], isLoading: cargandoRechazos } = useQuery({
+    queryKey: ["rechazos"],
 
-  const {
-    data: rechazos = [],
-    isLoading:
-      cargandoRechazos,
-  } = useQuery({
+    queryFn: obtenerRechazos,
 
-    queryKey: [
-      "rechazos",
-    ],
-
-    queryFn:
-      obtenerRechazos,
-
-    enabled:
-      puedeRechazos,
-
+    enabled: puedeRechazos,
   });
 
+  const { data: recibos = [], isLoading: cargandoRecibos } = useQuery({
+    queryKey: ["recibos-cambio"],
 
-  const {
-    data: recibos = [],
-    isLoading:
-      cargandoRecibos,
-  } = useQuery({
+    queryFn: obtenerRecibosCambio,
 
-    queryKey: [
-      "recibos-cambio",
-    ],
-
-    queryFn:
-      obtenerRecibosCambio,
-
-    enabled:
-      puedeCambios,
-
+    enabled: puedeCambios,
   });
 
+  const { data: viaticos = [], isLoading: cargandoViaticos } = useQuery({
+    queryKey: ["viaticos"],
 
-  const {
-    data: viaticos = [],
-    isLoading:
-      cargandoViaticos,
-  } = useQuery({
+    queryFn: obtenerViaticos,
 
-    queryKey: [
-      "viaticos",
-    ],
-
-    queryFn:
-      obtenerViaticos,
-
-    enabled:
-      puedeViaticos,
-
+    enabled: puedeViaticos,
   });
 
+  const { data: kilometrajes = [] } = useQuery({
+    queryKey: ["dashboard-kilometrajes"],
 
-  const {
-    data:
-      kilometrajes = [],
-  } = useQuery({
+    queryFn: () => obtenerListaDashboard("/kilometrajes/"),
 
-    queryKey: [
-      "dashboard-kilometrajes",
-    ],
+    enabled: puedeKilometrajes,
 
-    queryFn:
-      () =>
-        obtenerListaDashboard(
-          "/kilometrajes/"
-        ),
-
-    enabled:
-      puedeKilometrajes,
-
-    retry:
-      false,
-
+    retry: false,
   });
 
+  const { data: controlesDiarios = [] } = useQuery({
+    queryKey: ["controles-diarios"],
 
-  const {
-    data:
-      controlesDiarios = [],
-  } = useQuery({
+    queryFn: () => obtenerListaDashboard("/control-diario/"),
 
-    queryKey: [
-      "controles-diarios",
-    ],
+    enabled: puedeControlDiario,
 
-    queryFn:
-      () =>
-        obtenerListaDashboard(
-          "/control-diario/"
-        ),
-
-    enabled:
-      puedeControlDiario,
-
-    retry:
-      false,
-
+    retry: false,
   });
-
 
   // =======================================================
   // EXPEDICIÓN
   // =======================================================
 
-  const {
-    data: ordenes = [],
-    isLoading:
-      cargandoOrdenes,
-  } = useQuery({
+  const { data: ordenes = [], isLoading: cargandoOrdenes } = useQuery({
+    queryKey: ["expedicion-ordenes"],
 
-    queryKey: [
-      "expedicion-ordenes",
-    ],
+    queryFn: obtenerOrdenesCarga,
 
-    queryFn:
-      obtenerOrdenesCarga,
+    select: (registros) => registros.filter((orden) => !orden.anulada),
 
-    enabled:
-      puedeExpedicion,
-
+    enabled: puedeExpedicion,
   });
 
+  const { data: stock = [], isLoading: cargandoStock } = useQuery({
+    queryKey: ["expedicion-stock"],
 
-  const {
-    data: stock = [],
-    isLoading:
-      cargandoStock,
-  } = useQuery({
+    queryFn: obtenerStockExpedicion,
 
-    queryKey: [
-      "expedicion-stock",
-    ],
-
-    queryFn:
-      obtenerStockExpedicion,
-
-    enabled:
-      puedeExpedicion,
-
+    enabled: puedeExpedicion,
   });
 
+  const { data: movimientosStock = [] } = useQuery({
+    queryKey: ["expedicion-movimientos-stock"],
 
-  const {
-    data:
-      movimientosStock = [],
-  } = useQuery({
+    queryFn: obtenerMovimientosStock,
 
-    queryKey: [
-      "expedicion-movimientos-stock",
-    ],
-
-    queryFn:
-      obtenerMovimientosStock,
-
-    enabled:
-      puedeExpedicion,
-
+    enabled: puedeExpedicion,
   });
 
+  const { data: fleteros = [], isLoading: cargandoFleteros } = useQuery({
+    queryKey: ["expedicion-fleteros"],
 
-  const {
-    data: fleteros = [],
-    isLoading:
-      cargandoFleteros,
-  } = useQuery({
+    queryFn: obtenerFleteros,
 
-    queryKey: [
-      "expedicion-fleteros",
-    ],
-
-    queryFn:
-      obtenerFleteros,
-
-    enabled:
-      puedeExpedicion,
-
+    enabled: puedeExpedicion,
   });
 
+  const { data: materiales = [] } = useQuery({
+    queryKey: ["expedicion-materiales"],
 
-  const {
-    data:
-      materiales = [],
-  } = useQuery({
+    queryFn: obtenerMovimientosMaterial,
 
-    queryKey: [
-      "expedicion-materiales",
-    ],
-
-    queryFn:
-      obtenerMovimientosMaterial,
-
-    enabled:
-      puedeExpedicion,
-
+    enabled: puedeExpedicion,
   });
-
 
   // =======================================================
   // ÚLTIMAS CARGAS
   // =======================================================
 
-  const ultimaCargaRepartos =
-    obtenerUltimaFecha(
-      repartos
-    );
+  const ultimaCargaRepartos = obtenerUltimaFecha(repartos);
 
+  const ultimaCargaRechazos = obtenerUltimaFecha(rechazos);
 
-  const ultimaCargaRechazos =
-    obtenerUltimaFecha(
-      rechazos
-    );
+  const ultimaCargaCambios = obtenerUltimaFecha(recibos);
 
+  const ultimaCargaViaticos = obtenerUltimaFecha(viaticos);
 
-  const ultimaCargaCambios =
-    obtenerUltimaFecha(
-      recibos
-    );
+  const ultimaCargaKilometrajes = obtenerUltimaFecha(kilometrajes);
 
+  const ultimaCargaControlDiario = obtenerUltimaFecha(controlesDiarios);
 
-  const ultimaCargaViaticos =
-    obtenerUltimaFecha(
-      viaticos
-    );
+  const ultimaCargaOrdenes = obtenerUltimaFecha(ordenes);
 
+  const ultimaCargaStock = obtenerUltimaFecha(movimientosStock);
 
-  const ultimaCargaKilometrajes =
-    obtenerUltimaFecha(
-      kilometrajes
-    );
+  const ultimaCargaMovimientos = obtenerUltimaFecha(movimientosStock);
 
+  const ultimaCargaFleteros = obtenerUltimaFecha(fleteros);
 
-  const ultimaCargaControlDiario =
-    obtenerUltimaFecha(
-      controlesDiarios
-    );
-
-
-  const ultimaCargaOrdenes =
-    obtenerUltimaFecha(
-      ordenes
-    );
-
-
-  const ultimaCargaStock =
-    obtenerUltimaFecha(
-      movimientosStock
-    );
-
-
-  const ultimaCargaMovimientos =
-    obtenerUltimaFecha(
-      movimientosStock
-    );
-
-
-  const ultimaCargaFleteros =
-    obtenerUltimaFecha(
-      fleteros
-    );
-
-
-  const ultimaCargaMateriales =
-    obtenerUltimaFecha(
-      materiales
-    );
-
+  const ultimaCargaMateriales = obtenerUltimaFecha(materiales);
 
   // =======================================================
   // RANGOS COMPARATIVOS
   // =======================================================
 
-  const {
-    inicioActual,
-    finActual,
-    inicioAnterior,
-    finAnterior,
-  } =
+  const { inicioActual, finActual, inicioAnterior, finAnterior } =
     obtenerRangosComparacion();
-
 
   // =======================================================
   // LOGÍSTICA - COMPARACIONES
   // =======================================================
 
-  const repartosActuales =
-    registrosEnRango(
-      repartos,
-      inicioActual,
-      finActual
-    );
+  const repartosActuales = registrosEnRango(repartos, inicioActual, finActual);
 
+  const repartosAnteriores = registrosEnRango(
+    repartos,
+    inicioAnterior,
+    finAnterior,
+  );
 
-  const repartosAnteriores =
-    registrosEnRango(
-      repartos,
-      inicioAnterior,
-      finAnterior
-    );
+  const rechazosActuales = registrosEnRango(rechazos, inicioActual, finActual);
 
+  const rechazosAnteriores = registrosEnRango(
+    rechazos,
+    inicioAnterior,
+    finAnterior,
+  );
 
-  const rechazosActuales =
-    registrosEnRango(
-      rechazos,
-      inicioActual,
-      finActual
-    );
+  const cambiosActuales = registrosEnRango(recibos, inicioActual, finActual);
 
+  const cambiosAnteriores = registrosEnRango(
+    recibos,
+    inicioAnterior,
+    finAnterior,
+  );
 
-  const rechazosAnteriores =
-    registrosEnRango(
-      rechazos,
-      inicioAnterior,
-      finAnterior
-    );
+  const viaticosActuales = registrosEnRango(viaticos, inicioActual, finActual);
 
-
-  const cambiosActuales =
-    registrosEnRango(
-      recibos,
-      inicioActual,
-      finActual
-    );
-
-
-  const cambiosAnteriores =
-    registrosEnRango(
-      recibos,
-      inicioAnterior,
-      finAnterior
-    );
-
-
-  const viaticosActuales =
-    registrosEnRango(
-      viaticos,
-      inicioActual,
-      finActual
-    );
-
-
-  const viaticosAnteriores =
-    registrosEnRango(
-      viaticos,
-      inicioAnterior,
-      finAnterior
-    );
-
+  const viaticosAnteriores = registrosEnRango(
+    viaticos,
+    inicioAnterior,
+    finAnterior,
+  );
 
   // =======================================================
   // EXPEDICIÓN - COMPARACIONES
   // =======================================================
 
-  const ordenesActuales =
-    registrosEnRango(
-      ordenes,
-      inicioActual,
-      finActual
-    );
+  const ordenesActuales = registrosEnRango(ordenes, inicioActual, finActual);
 
+  const ordenesAnteriores = registrosEnRango(
+    ordenes,
+    inicioAnterior,
+    finAnterior,
+  );
 
-  const ordenesAnteriores =
-    registrosEnRango(
-      ordenes,
-      inicioAnterior,
-      finAnterior
-    );
+  const ordenesCompletadasActuales = ordenesActuales.filter((orden) =>
+    estaCompleta(
+      orden as {
+        estado: string;
+      },
+    ),
+  );
 
-
-  const ordenesCompletadasActuales =
-    ordenesActuales.filter(
-      orden =>
-        estaCompleta(
-          orden as {
-            estado: string;
-          }
-        )
-    );
-
-
-  const ordenesCompletadasAnteriores =
-    ordenesAnteriores.filter(
-      orden =>
-        estaCompleta(
-          orden as {
-            estado: string;
-          }
-        )
-    );
-
+  const ordenesCompletadasAnteriores = ordenesAnteriores.filter((orden) =>
+    estaCompleta(
+      orden as {
+        estado: string;
+      },
+    ),
+  );
 
   const porcentajeCompletadasActual =
     ordenesActuales.length === 0
       ? 0
-      : (
-          ordenesCompletadasActuales.length
-          /
-          ordenesActuales.length
-        )
-        *
-        100;
-
+      : (ordenesCompletadasActuales.length / ordenesActuales.length) * 100;
 
   const porcentajeCompletadasAnterior =
     ordenesAnteriores.length === 0
       ? 0
-      : (
-          ordenesCompletadasAnteriores.length
-          /
-          ordenesAnteriores.length
-        )
-        *
-        100;
+      : (ordenesCompletadasAnteriores.length / ordenesAnteriores.length) * 100;
 
+  const ordenesPendientesActuales = ordenesActuales.filter(
+    (orden) =>
+      !estaCompleta(
+        orden as {
+          estado: string;
+        },
+      ),
+  );
 
-  const ordenesPendientesActuales =
-    ordenesActuales.filter(
-      orden =>
-        !estaCompleta(
-          orden as {
-            estado: string;
-          }
-        )
-    );
-
-
-  const ordenesPendientesAnteriores =
-    ordenesAnteriores.filter(
-      orden =>
-        !estaCompleta(
-          orden as {
-            estado: string;
-          }
-        )
-    );
-
+  const ordenesPendientesAnteriores = ordenesAnteriores.filter(
+    (orden) =>
+      !estaCompleta(
+        orden as {
+          estado: string;
+        },
+      ),
+  );
 
   // =======================================================
   // CÁLCULOS EXPEDICIÓN
   // =======================================================
 
-  const productosSinStock =
-    stock.filter(
-      item =>
-        Number(
-          item.cantidad_unidades
-        ) <= 0
-    );
+  const productosSinStock = stock.filter(
+    (item) => Number(item.cantidad_unidades) <= 0,
+  );
 
-
-  const fleterosActivos =
-    fleteros.filter(
-      fletero =>
-        fletero.activo
-    );
-
+  const fleterosActivos = fleteros.filter((fletero) => fletero.activo);
 
   // =======================================================
   // GRÁFICO LOGÍSTICA
   // =======================================================
 
   const actividadLogistica = [
-
     {
-      nombre:
-        "Repartos",
+      nombre: "Repartos",
 
-      cantidad:
-        puedeRepartos
-          ? repartosActuales.length
-          : 0,
+      cantidad: puedeRepartos ? repartosActuales.length : 0,
     },
 
     {
-      nombre:
-        "Rechazos",
+      nombre: "Rechazos",
 
-      cantidad:
-        puedeRechazos
-          ? rechazosActuales.length
-          : 0,
+      cantidad: puedeRechazos ? rechazosActuales.length : 0,
     },
 
     {
-      nombre:
-        "Cambios",
+      nombre: "Cambios",
 
-      cantidad:
-        puedeCambios
-          ? cambiosActuales.length
-          : 0,
+      cantidad: puedeCambios ? cambiosActuales.length : 0,
     },
 
     {
-      nombre:
-        "Viáticos",
+      nombre: "Viáticos",
 
-      cantidad:
-        puedeViaticos
-          ? viaticosActuales.length
-          : 0,
+      cantidad: puedeViaticos ? viaticosActuales.length : 0,
     },
-
-  ].filter(
-    item =>
-      item.cantidad > 0
-  );
-
+  ].filter((item) => item.cantidad > 0);
 
   // =======================================================
   // ÓRDENES POR ESTADO
   // =======================================================
 
-  const mapaEstados:
-    Record<string, number> = {};
+  const mapaEstados: Record<string, number> = {};
 
+  for (const orden of ordenesActuales) {
+    const estado = (
+      orden as {
+        estado: string;
+      }
+    ).estado;
 
-  for (
-    const orden
-    of ordenesActuales
-  ) {
-
-    const estado =
-      (
-        orden as {
-          estado: string;
-        }
-      ).estado;
-
-
-    mapaEstados[
-      estado
-    ] =
-      (
-        mapaEstados[
-          estado
-        ]
-        ??
-        0
-      )
-      +
-      1;
-
+    mapaEstados[estado] = (mapaEstados[estado] ?? 0) + 1;
   }
 
+  const ordenesPorEstado = Object.entries(mapaEstados).map(
+    ([estado, cantidad]) => ({
+      nombre: nombreEstadoOrden(estado),
 
-  const ordenesPorEstado =
-    Object.entries(
-      mapaEstados
-    ).map(
-      (
-        [
-          estado,
-          cantidad,
-        ]
-      ) => ({
-
-        nombre:
-          nombreEstadoOrden(
-            estado
-          ),
-
-        cantidad,
-
-      })
-    );
-
+      cantidad,
+    }),
+  );
 
   // =======================================================
   // STOCK POR PRODUCTO
   // =======================================================
 
-  const stockPorProducto =
-    stock
-      .map(
-        item => ({
+  const stockPorProducto = stock
+    .map((item) => ({
+      producto: `${item.codigo} - ${item.producto}`,
 
-          producto:
-            `${item.codigo} - ${item.producto}`,
+      cantidad: Number(item.cantidad_unidades),
+    }))
+    .sort((a, b) => b.cantidad - a.cantidad)
+    .slice(0, 10);
 
-          cantidad:
-            Number(
-              item.cantidad_unidades
-            ),
-
-        })
-      )
-      .sort(
-        (
-          a,
-          b
-        ) =>
-          b.cantidad
-          -
-          a.cantidad
-      )
-      .slice(
-        0,
-        10
-      );
-
-  const stockMaximo =
-    Math.max(
-      ...stockPorProducto.map(
-        item => item.cantidad
-      ),
-      1
-    );
-
+  const stockMaximo = Math.max(
+    ...stockPorProducto.map((item) => item.cantidad),
+    1,
+  );
 
   // =======================================================
   // ENTRADAS / SALIDAS
   // =======================================================
 
-  const movimientosActuales =
-    registrosEnRango(
-      movimientosStock,
-      inicioActual,
-      finActual
+  const movimientosActuales = registrosEnRango(
+    movimientosStock
+      .filter((m) => !m.sin_impacto)
+      .map((m) => ({ ...m, creado_en: m.fecha_operativa || m.creado_en })),
+    inicioActual,
+    finActual,
+  );
+
+  const totalEntradas = movimientosActuales
+    .filter(
+      (movimiento) =>
+        (
+          movimiento as {
+            direccion: string;
+          }
+        ).direccion === "ENTRADA",
+    )
+    .reduce<number>(
+      (total, movimiento) =>
+        total +
+        Number(
+          (
+            movimiento as {
+              cantidad: number | string;
+            }
+          ).cantidad,
+        ),
+      0,
     );
 
-
-  const totalEntradas =
-    movimientosActuales
-      .filter(
-        movimiento =>
+  const totalSalidas = movimientosActuales
+    .filter(
+      (movimiento) =>
+        (
+          movimiento as {
+            direccion: string;
+          }
+        ).direccion === "SALIDA",
+    )
+    .reduce<number>(
+      (total, movimiento) =>
+        total +
+        Number(
           (
             movimiento as {
-              direccion: string;
+              cantidad: number | string;
             }
-          ).direccion
-          ===
-          "ENTRADA"
-      )
-      .reduce<number>(
-        (
-          total,
-          movimiento
-        ) =>
-          total
-          +
-          Number(
-            (
-              movimiento as {
-                cantidad:
-                  number | string;
-              }
-            ).cantidad
-          ),
-        0
-      );
-
-
-  const totalSalidas =
-    movimientosActuales
-      .filter(
-        movimiento =>
-          (
-            movimiento as {
-              direccion: string;
-            }
-          ).direccion
-          ===
-          "SALIDA"
-      )
-      .reduce<number>(
-        (
-          total,
-          movimiento
-        ) =>
-          total
-          +
-          Number(
-            (
-              movimiento as {
-                cantidad:
-                  number | string;
-              }
-            ).cantidad
-          ),
-        0
-      );
-
+          ).cantidad,
+        ),
+      0,
+    );
 
   const entradasSalidas = [
-
     {
-      nombre:
-        "Entradas",
+      nombre: "Entradas",
 
-      cantidad:
-        totalEntradas,
+      cantidad: totalEntradas,
     },
 
     {
-      nombre:
-        "Salidas",
+      nombre: "Salidas",
 
-      cantidad:
-        totalSalidas,
+      cantidad: totalSalidas,
     },
-
   ];
-
 
   // =======================================================
   // PALLETS Y CHAPADUR
   // =======================================================
 
-  const materialesActuales =
-    registrosEnRango(
-      materiales,
-      inicioActual,
-      finActual
-    );
+  const materialesActuales = registrosEnRango(
+    materiales,
+    inicioActual,
+    finActual,
+  );
 
+  const totalPalletsSalida = materialesActuales.reduce<number>(
+    (total, item) =>
+      total +
+      Number(
+        (
+          item as {
+            pallets_salida: number | string;
+          }
+        ).pallets_salida ?? 0,
+      ),
+    0,
+  );
 
-  const totalPalletsSalida =
-    materialesActuales.reduce<number>(
-      (
-        total,
-        item
-      ) =>
-        total
-        +
-        Number(
-          (
-            item as {
-              pallets_salida:
-                number | string;
-            }
-          ).pallets_salida
-          ??
-          0
-        ),
-      0
-    );
+  const totalPalletsEntrada = materialesActuales.reduce<number>(
+    (total, item) =>
+      total +
+      Number(
+        (
+          item as {
+            pallets_entrada: number | string;
+          }
+        ).pallets_entrada ?? 0,
+      ),
+    0,
+  );
 
+  const totalChapadurSalida = materialesActuales.reduce<number>(
+    (total, item) =>
+      total +
+      Number(
+        (
+          item as {
+            chapadur_salida: number | string;
+          }
+        ).chapadur_salida ?? 0,
+      ),
+    0,
+  );
 
-  const totalPalletsEntrada =
-    materialesActuales.reduce<number>(
-      (
-        total,
-        item
-      ) =>
-        total
-        +
-        Number(
-          (
-            item as {
-              pallets_entrada:
-                number | string;
-            }
-          ).pallets_entrada
-          ??
-          0
-        ),
-      0
-    );
-
-
-  const totalChapadurSalida =
-    materialesActuales.reduce<number>(
-      (
-        total,
-        item
-      ) =>
-        total
-        +
-        Number(
-          (
-            item as {
-              chapadur_salida:
-                number | string;
-            }
-          ).chapadur_salida
-          ??
-          0
-        ),
-      0
-    );
-
-
-  const totalChapadurEntrada =
-    materialesActuales.reduce<number>(
-      (
-        total,
-        item
-      ) =>
-        total
-        +
-        Number(
-          (
-            item as {
-              chapadur_entrada:
-                number | string;
-            }
-          ).chapadur_entrada
-          ??
-          0
-        ),
-      0
-    );
-
+  const totalChapadurEntrada = materialesActuales.reduce<number>(
+    (total, item) =>
+      total +
+      Number(
+        (
+          item as {
+            chapadur_entrada: number | string;
+          }
+        ).chapadur_entrada ?? 0,
+      ),
+    0,
+  );
 
   const materialesGrafico = [
-
     {
-      material:
-        "Pallets",
+      material: "Pallets",
 
-      salidas:
-        totalPalletsSalida,
+      salidas: totalPalletsSalida,
 
-      entradas:
-        totalPalletsEntrada,
+      entradas: totalPalletsEntrada,
     },
 
     {
-      material:
-        "Chapadur",
+      material: "Chapadur",
 
-      salidas:
-        totalChapadurSalida,
+      salidas: totalChapadurSalida,
 
-      entradas:
-        totalChapadurEntrada,
+      entradas: totalChapadurEntrada,
     },
-
   ];
-
 
   // =======================================================
   // KPIS LOGÍSTICA
   // =======================================================
 
-  const kpisLogistica:
-    KpiItem[] = [];
+  const kpisLogistica: KpiItem[] = [];
 
-
-  if (
-    puedeRepartos
-  ) {
-
+  if (puedeRepartos) {
     kpisLogistica.push({
+      label: "Repartos",
 
-      label:
-        "Repartos",
+      value: cargandoRepartos ? "—" : repartosActuales.length,
 
-      value:
-        cargandoRepartos
-          ? "—"
-          : repartosActuales.length,
+      description: "Últimos 7 días",
 
-      description:
-        "Últimos 7 días",
+      icon: "truck",
 
-      icon:
-        "truck",
+      tone: "blue",
 
-      tone:
-        "blue",
-
-      comparison:
-        cargandoRepartos
-          ? undefined
-          : crearComparacionCantidad(
-              repartosActuales.length,
-              repartosAnteriores.length,
-              true
-            ),
-
+      comparison: cargandoRepartos
+        ? undefined
+        : crearComparacionCantidad(
+            repartosActuales.length,
+            repartosAnteriores.length,
+            true,
+          ),
     });
   }
 
-
-  if (
-    puedeRechazos
-  ) {
-
+  if (puedeRepartos) {
     kpisLogistica.push({
-
-      label:
-        "Rechazos",
-
-      value:
-        cargandoRechazos
-          ? "—"
-          : rechazosActuales.length,
-
-      description:
-        "Últimos 7 días",
-
-      icon:
-        "alert",
-
-      tone:
-        "amber",
-
-      comparison:
-        cargandoRechazos
-          ? undefined
-          : crearComparacionCantidad(
-              rechazosActuales.length,
-              rechazosAnteriores.length,
-              false
-            ),
-
+      label: "Repartos registrados",
+      value: cargandoRepartos ? "—" : repartos.length,
+      description: "Todas las fechas",
+      icon: "truck",
+      tone: "blue",
     });
   }
 
-
-  if (
-    puedeCambios
-  ) {
-
+  if (puedeRechazos) {
     kpisLogistica.push({
+      label: "Rechazos",
 
-      label:
-        "Cambios",
+      value: cargandoRechazos ? "—" : rechazosActuales.length,
 
-      value:
-        cargandoRecibos
-          ? "—"
-          : cambiosActuales.length,
+      description: "Últimos 7 días",
 
-      description:
-        "Últimos 7 días",
+      icon: "alert",
 
-      icon:
-        "boxes",
+      tone: "amber",
 
-      tone:
-        "green",
-
-      comparison:
-        cargandoRecibos
-          ? undefined
-          : crearComparacionCantidad(
-              cambiosActuales.length,
-              cambiosAnteriores.length,
-              true
-            ),
-
+      comparison: cargandoRechazos
+        ? undefined
+        : crearComparacionCantidad(
+            rechazosActuales.length,
+            rechazosAnteriores.length,
+            false,
+          ),
     });
   }
 
-
-  if (
-    puedeViaticos
-  ) {
-
+  if (puedeRechazos) {
     kpisLogistica.push({
-
-      label:
-        "Viáticos",
-
-      value:
-        cargandoViaticos
-          ? "—"
-          : viaticosActuales.length,
-
-      description:
-        "Últimos 7 días",
-
-      icon:
-        "activity",
-
-      tone:
-        "navy",
-
-      comparison:
-        cargandoViaticos
-          ? undefined
-          : crearComparacionCantidad(
-              viaticosActuales.length,
-              viaticosAnteriores.length,
-              true
-            ),
-
+      label: "Rechazos registrados",
+      value: cargandoRechazos ? "—" : rechazos.length,
+      description: "Todas las fechas",
+      icon: "alert",
+      tone: "amber",
     });
   }
 
+  if (puedeCambios) {
+    kpisLogistica.push({
+      label: "Cambios",
+
+      value: cargandoRecibos ? "—" : cambiosActuales.length,
+
+      description: "Últimos 7 días",
+
+      icon: "boxes",
+
+      tone: "green",
+
+      comparison: cargandoRecibos
+        ? undefined
+        : crearComparacionCantidad(
+            cambiosActuales.length,
+            cambiosAnteriores.length,
+            true,
+          ),
+    });
+  }
+
+  if (puedeCambios) {
+    kpisLogistica.push({
+      label: "Recibos registrados",
+      value: cargandoRecibos ? "—" : recibos.length,
+      description: "Todas las fechas",
+      icon: "boxes",
+      tone: "green",
+    });
+  }
+
+  if (puedeViaticos) {
+    kpisLogistica.push({
+      label: "Viáticos",
+
+      value: cargandoViaticos ? "—" : viaticosActuales.length,
+
+      description: "Últimos 7 días",
+
+      icon: "activity",
+
+      tone: "navy",
+
+      comparison: cargandoViaticos
+        ? undefined
+        : crearComparacionCantidad(
+            viaticosActuales.length,
+            viaticosAnteriores.length,
+            true,
+          ),
+    });
+  }
 
   // =======================================================
   // KPIS EXPEDICIÓN
   // =======================================================
 
-  const kpisExpedicion:
-    KpiItem[] = [
+  const kpisExpedicion: KpiItem[] = [
+    {
+      label: "Órdenes",
 
-      {
-        label:
-          "Órdenes",
+      value: cargandoOrdenes ? "—" : ordenesActuales.length,
 
-        value:
-          cargandoOrdenes
-            ? "—"
-            : ordenesActuales.length,
+      description: "Últimos 7 días",
 
-        description:
-          "Últimos 7 días",
+      icon: "truck",
 
-        icon:
-          "truck",
+      tone: "blue",
 
-        tone:
-          "blue",
+      comparison: cargandoOrdenes
+        ? undefined
+        : crearComparacionCantidad(
+            ordenesActuales.length,
+            ordenesAnteriores.length,
+            true,
+          ),
+    },
 
-        comparison:
-          cargandoOrdenes
-            ? undefined
-            : crearComparacionCantidad(
-                ordenesActuales.length,
-                ordenesAnteriores.length,
-                true
-              ),
-      },
+    {
+      label: "Órdenes completadas",
 
+      value: cargandoOrdenes
+        ? "—"
+        : `${porcentajeCompletadasActual.toLocaleString("es-AR", {
+            maximumFractionDigits: 1,
+          })}%`,
 
-      {
-        label:
-          "Órdenes completadas",
+      description: "Tasa de finalización",
 
-        value:
-          cargandoOrdenes
-            ? "—"
-            : `${porcentajeCompletadasActual.toLocaleString(
-                "es-AR",
-                {
-                  maximumFractionDigits:
-                    1,
-                }
-              )}%`,
+      icon: "activity",
 
-        description:
-          "Tasa de finalización",
+      tone: "green",
 
-        icon:
-          "activity",
+      comparison: cargandoOrdenes
+        ? undefined
+        : crearComparacionPorcentaje(
+            porcentajeCompletadasActual,
+            porcentajeCompletadasAnterior,
+            true,
+          ),
+    },
 
-        tone:
-          "green",
+    {
+      label: "Pendientes",
 
-        comparison:
-          cargandoOrdenes
-            ? undefined
-            : crearComparacionPorcentaje(
-                porcentajeCompletadasActual,
-                porcentajeCompletadasAnterior,
-                true
-              ),
-      },
+      value: cargandoOrdenes ? "—" : ordenesPendientesActuales.length,
 
+      description: "Últimos 7 días",
 
-      {
-        label:
-          "Pendientes",
+      icon: "history",
 
-        value:
-          cargandoOrdenes
-            ? "—"
-            : ordenesPendientesActuales.length,
+      tone: "amber",
 
-        description:
-          "Últimos 7 días",
+      comparison: cargandoOrdenes
+        ? undefined
+        : crearComparacionCantidad(
+            ordenesPendientesActuales.length,
+            ordenesPendientesAnteriores.length,
+            false,
+          ),
+    },
 
-        icon:
-          "history",
+    {
+      label: "Productos",
 
-        tone:
-          "amber",
+      value: cargandoStock ? "—" : stock.length,
 
-        comparison:
-          cargandoOrdenes
-            ? undefined
-            : crearComparacionCantidad(
-                ordenesPendientesActuales.length,
-                ordenesPendientesAnteriores.length,
-                false
-              ),
-      },
+      description: "Con control de stock",
 
+      icon: "boxes",
 
-      {
-        label:
-          "Productos",
+      tone: "green",
+    },
 
-        value:
-          cargandoStock
-            ? "—"
-            : stock.length,
+    {
+      label: "Sin stock",
 
-        description:
-          "Con control de stock",
+      value: cargandoStock ? "—" : productosSinStock.length,
 
-        icon:
-          "boxes",
+      description: "Requieren atención",
 
-        tone:
-          "green",
-      },
+      icon: "alert",
 
+      tone: "red",
+    },
 
-      {
-        label:
-          "Sin stock",
+    {
+      label: "Fleteros",
 
-        value:
-          cargandoStock
-            ? "—"
-            : productosSinStock.length,
+      value: cargandoFleteros ? "—" : fleterosActivos.length,
 
-        description:
-          "Requieren atención",
+      description: "Activos",
 
-        icon:
-          "alert",
+      icon: "truck",
 
-        tone:
-          "red",
-      },
-
-
-      {
-        label:
-          "Fleteros",
-
-        value:
-          cargandoFleteros
-            ? "—"
-            : fleterosActivos.length,
-
-        description:
-          "Activos",
-
-        icon:
-          "truck",
-
-        tone:
-          "navy",
-      },
-
-    ];
-
+      tone: "navy",
+    },
+  ];
 
   // =======================================================
   // MÓDULOS LOGÍSTICA
   // =======================================================
 
-  const modulosLogistica:
-    ModuleItem[] = [
+  const modulosLogistica: ModuleItem[] = [
+    {
+      title: "Repartos y recargas",
 
-      {
-        title:
-          "Repartos y recargas",
+      description:
+        "Planificá salidas, asigná personal " + "y consultá las recargas.",
 
-        description:
-          (
-            "Planificá salidas, asigná personal "
-            +
-            "y consultá las recargas."
-          ),
+      icon: "truck",
 
-        icon:
-          "truck",
+      permiso: "REPARTOS",
 
-        permiso:
-          "REPARTOS",
+      home: "/repartos/inicio",
 
-        home:
-          "/repartos/inicio",
+      ultimaCarga: ultimaCargaRepartos,
 
-        ultimaCarga:
-          ultimaCargaRepartos,
+      links: [
+        {
+          label: "Nuevo reparto",
 
-        links: [
-          {
-            label:
-              "Nuevo reparto",
+          to: "/repartos/nuevo",
+        },
+        {
+          label: "Historial",
 
-            to:
-              "/repartos/nuevo",
-          },
-          {
-            label:
-              "Historial",
+          to: "/repartos",
+        },
+      ],
+    },
 
-            to:
-              "/repartos",
-          },
-        ],
-      },
+    {
+      title: "Rechazos",
 
+      description:
+        "Registrá entregas no concretadas " + "y analizá sus motivos.",
 
-      {
-        title:
-          "Rechazos",
+      icon: "alert",
 
-        description:
-          (
-            "Registrá entregas no concretadas "
-            +
-            "y analizá sus motivos."
-          ),
+      permiso: "RECHAZOS",
 
-        icon:
-          "alert",
+      home: "/rechazos/inicio",
 
-        permiso:
-          "RECHAZOS",
+      ultimaCarga: ultimaCargaRechazos,
 
-        home:
-          "/rechazos/inicio",
+      links: [
+        {
+          label: "Nuevo rechazo",
 
-        ultimaCarga:
-          ultimaCargaRechazos,
+          to: "/rechazos/nuevo",
+        },
+        {
+          label: "Estadísticas",
 
-        links: [
-          {
-            label:
-              "Nuevo rechazo",
+          to: "/rechazos/estadisticas",
+        },
+      ],
+    },
 
-            to:
-              "/rechazos/nuevo",
-          },
-          {
-            label:
-              "Estadísticas",
+    {
+      title: "Recibos de cambios",
 
-            to:
-              "/rechazos/estadisticas",
-          },
-        ],
-      },
+      description: "Controlá devoluciones, productos " + "y movimientos.",
 
+      icon: "boxes",
 
-      {
-        title:
-          "Recibos de cambios",
+      permiso: "CAMBIOS",
 
-        description:
-          (
-            "Controlá devoluciones, productos "
-            +
-            "y movimientos."
-          ),
+      home: "/cambios/inicio",
 
-        icon:
-          "boxes",
+      ultimaCarga: ultimaCargaCambios,
 
-        permiso:
-          "CAMBIOS",
+      links: [
+        {
+          label: "Nuevo recibo",
 
-        home:
-          "/cambios/inicio",
+          to: "/cambios/nuevo",
+        },
+        {
+          label: "Historial",
 
-        ultimaCarga:
-          ultimaCargaCambios,
+          to: "/cambios",
+        },
+      ],
+    },
 
-        links: [
-          {
-            label:
-              "Nuevo recibo",
+    {
+      title: "Viáticos",
 
-            to:
-              "/cambios/nuevo",
-          },
-          {
-            label:
-              "Historial",
+      description:
+        "Registrá y consultá viáticos " + "locales y de larga distancia.",
 
-            to:
-              "/cambios",
-          },
-        ],
-      },
+      icon: "activity",
 
+      permiso: "VIATICOS",
 
-      {
-        title:
-          "Viáticos",
+      home: "/viaticos/inicio",
 
-        description:
-          (
-            "Registrá y consultá viáticos "
-            +
-            "locales y de larga distancia."
-          ),
+      ultimaCarga: ultimaCargaViaticos,
 
-        icon:
-          "activity",
+      links: [
+        {
+          label: "Nuevo registro",
 
-        permiso:
-          "VIATICOS",
+          to: "/viaticos/nuevo",
+        },
+        {
+          label: "Resumen",
 
-        home:
-          "/viaticos/inicio",
+          to: "/viaticos/resumen",
+        },
+      ],
+    },
 
-        ultimaCarga:
-          ultimaCargaViaticos,
+    {
+      title: "Kilometrajes",
 
-        links: [
-          {
-            label:
-              "Nuevo registro",
+      description:
+        "Control de kilómetros recorridos " + "por chofer y destino.",
 
-            to:
-              "/viaticos/nuevo",
-          },
-          {
-            label:
-              "Resumen",
+      icon: "truck",
 
-            to:
-              "/viaticos/resumen",
-          },
-        ],
-      },
+      permiso: "KILOMETRAJES",
 
+      home: "/kilometrajes/inicio",
 
-      {
-        title:
-          "Kilometrajes",
+      ultimaCarga: ultimaCargaKilometrajes,
 
-        description:
-          (
-            "Control de kilómetros recorridos "
-            +
-            "por chofer y destino."
-          ),
+      links: [
+        {
+          label: "Nuevo control",
 
-        icon:
-          "truck",
+          to: "/kilometrajes/nuevo",
+        },
+        {
+          label: "Historial",
 
-        permiso:
-          "KILOMETRAJES",
+          to: "/kilometrajes",
+        },
+      ],
+    },
 
-        home:
-          "/kilometrajes/inicio",
+    {
+      title: "Control diario",
 
-        ultimaCarga:
-          ultimaCargaKilometrajes,
+      description:
+        "Disponibilidad, asignaciones, " + "depósitos y distribución.",
 
-        links: [
-          {
-            label:
-              "Nuevo control",
+      icon: "boxes",
 
-            to:
-              "/kilometrajes/nuevo",
-          },
-          {
-            label:
-              "Historial",
+      permiso: "CONTROL_DIARIO",
 
-            to:
-              "/kilometrajes",
-          },
-        ],
-      },
+      home: "/control-diario/inicio",
 
+      ultimaCarga: ultimaCargaControlDiario,
 
-      {
-        title:
-          "Control diario",
+      links: [
+        {
+          label: "Nueva carga",
 
-        description:
-          (
-            "Disponibilidad, asignaciones, "
-            +
-            "depósitos y distribución."
-          ),
+          to: "/control-diario/nuevo",
+        },
+        {
+          label: "Historial",
 
-        icon:
-          "boxes",
+          to: "/control-diario",
+        },
+      ],
+    },
+  ];
 
-        permiso:
-          "CONTROL_DIARIO",
-
-        home:
-          "/control-diario/inicio",
-
-        ultimaCarga:
-          ultimaCargaControlDiario,
-
-        links: [
-          {
-            label:
-              "Nueva carga",
-
-            to:
-              "/control-diario/nuevo",
-          },
-          {
-            label:
-              "Historial",
-
-            to:
-              "/control-diario",
-          },
-        ],
-      },
-
-    ];
-
-
-  const modulosLogisticaVisibles =
-    modulosLogistica.filter(
-      modulo =>
-        tienePermiso(
-          modulo.permiso
-        )
-    );
-
+  const modulosLogisticaVisibles = modulosLogistica.filter((modulo) =>
+    tienePermiso(modulo.permiso),
+  );
 
   // =======================================================
   // MÓDULOS EXPEDICIÓN
   // =======================================================
 
-  const modulosExpedicion:
-    ModuleItem[] = [
+  const modulosExpedicion: ModuleItem[] = [
+    {
+      title: "Órdenes de carga",
 
-      {
-        title:
-          "Órdenes de carga",
+      description: "Gestión de órdenes, productos " + "solicitados y entregas.",
 
-        description:
-          (
-            "Gestión de órdenes, productos "
-            +
-            "solicitados y entregas."
-          ),
+      icon: "truck",
 
-        icon:
-          "truck",
+      permiso: "EXPEDICION",
 
-        permiso:
-          "EXPEDICION",
+      home: "/expedicion/ordenes",
 
-        home:
-          "/expedicion/ordenes",
+      ultimaCarga: ultimaCargaOrdenes,
 
-        ultimaCarga:
-          ultimaCargaOrdenes,
+      links: [
+        {
+          label: "Nueva orden",
 
-        links: [
-          {
-            label:
-              "Nueva orden",
+          to: "/expedicion/ordenes/nueva",
+        },
+        {
+          label: "Ver órdenes",
 
-            to:
-              "/expedicion/ordenes/nueva",
-          },
-          {
-            label:
-              "Ver órdenes",
+          to: "/expedicion/ordenes",
+        },
+      ],
+    },
 
-            to:
-              "/expedicion/ordenes",
-          },
-        ],
-      },
+    {
+      title: "Stock",
 
+      description:
+        "Existencias, ingresos, salidas " + "y ajustes de productos.",
 
-      {
-        title:
-          "Stock",
+      icon: "boxes",
 
-        description:
-          (
-            "Existencias, ingresos, salidas "
-            +
-            "y ajustes de productos."
-          ),
+      permiso: "EXPEDICION",
 
-        icon:
-          "boxes",
+      home: "/expedicion/stock",
 
-        permiso:
-          "EXPEDICION",
+      ultimaCarga: ultimaCargaStock,
 
-        home:
-          "/expedicion/stock",
+      links: [
+        {
+          label: "Ver stock",
 
-        ultimaCarga:
-          ultimaCargaStock,
+          to: "/expedicion/stock",
+        },
+      ],
+    },
 
-        links: [
-          {
-            label:
-              "Ver stock",
+    {
+      title: "Movimientos",
 
-            to:
-              "/expedicion/stock",
-          },
-        ],
-      },
+      description: "Historial completo de " + "movimientos de mercadería.",
 
+      icon: "history",
 
-      {
-        title:
-          "Movimientos",
+      permiso: "EXPEDICION",
 
-        description:
-          (
-            "Historial completo de "
-            +
-            "movimientos de mercadería."
-          ),
+      home: "/expedicion/movimientos",
 
-        icon:
-          "history",
+      ultimaCarga: ultimaCargaMovimientos,
 
-        permiso:
-          "EXPEDICION",
+      links: [
+        {
+          label: "Ver movimientos",
 
-        home:
-          "/expedicion/movimientos",
+          to: "/expedicion/movimientos",
+        },
+      ],
+    },
 
-        ultimaCarga:
-          ultimaCargaMovimientos,
+    {
+      title: "Fleteros",
 
-        links: [
-          {
-            label:
-              "Ver movimientos",
+      description: "Administración de fleteros " + "disponibles para carga.",
 
-            to:
-              "/expedicion/movimientos",
-          },
-        ],
-      },
+      icon: "truck",
 
+      permiso: "EXPEDICION",
 
-      {
-        title:
-          "Fleteros",
+      home: "/expedicion/fleteros",
 
-        description:
-          (
-            "Administración de fleteros "
-            +
-            "disponibles para carga."
-          ),
+      ultimaCarga: ultimaCargaFleteros,
 
-        icon:
-          "truck",
+      links: [
+        {
+          label: "Administrar",
 
-        permiso:
-          "EXPEDICION",
+          to: "/expedicion/fleteros",
+        },
+      ],
+    },
 
-        home:
-          "/expedicion/fleteros",
+    {
+      title: "Pallets y chapadur",
 
-        ultimaCarga:
-          ultimaCargaFleteros,
+      description: "Salidas, devoluciones y " + "saldos de materiales.",
 
-        links: [
-          {
-            label:
-              "Administrar",
+      icon: "boxes",
 
-            to:
-              "/expedicion/fleteros",
-          },
-        ],
-      },
+      permiso: "EXPEDICION",
 
+      home: "/expedicion/materiales",
 
-      {
-        title:
-          "Pallets y chapadur",
+      ultimaCarga: ultimaCargaMateriales,
 
-        description:
-          (
-            "Salidas, devoluciones y "
-            +
-            "saldos de materiales."
-          ),
+      links: [
+        {
+          label: "Ver materiales",
 
-        icon:
-          "boxes",
-
-        permiso:
-          "EXPEDICION",
-
-        home:
-          "/expedicion/materiales",
-
-        ultimaCarga:
-          ultimaCargaMateriales,
-
-        links: [
-          {
-            label:
-              "Ver materiales",
-
-            to:
-              "/expedicion/materiales",
-          },
-        ],
-      },
-
-    ];
-
+          to: "/expedicion/materiales",
+        },
+      ],
+    },
+  ];
 
   // =======================================================
   // CARGANDO
   // =======================================================
 
-  if (
-    cargandoUsuario
-  ) {
-
+  if (cargandoUsuario) {
     return (
-
       <div className="pagina">
-
-        <div className="dashboard-container">
-
-          Cargando panel...
-
-        </div>
-
+        <div className="dashboard-container">Cargando panel...</div>
       </div>
-
     );
   }
-
 
   // =======================================================
   // RENDER
   // =======================================================
 
   return (
-
     <div className="pagina panel-principal-page">
-
       <div className="dashboard-container">
-
-
         {/* ===================================== */}
         {/* HERO */}
         {/* ===================================== */}
 
         <div className="panel-hero">
-
           <div>
-
             <div className="badge-panel">
-
-              <Icon
-                name="activity"
-                size={16}
-              />
-
+              <Icon name="activity" size={16} />
               Panel operativo Talca
-
             </div>
 
-
-            <h1>
-              Bienvenido, {nombre}
-            </h1>
-
+            <h1>Bienvenido, {nombre}</h1>
 
             <p>
-              Vista general de Logística
-              y Expedición con indicadores,
-              comparaciones, gráficos
-              y actividad reciente.
+              Vista general de Logística y Expedición con indicadores,
+              comparaciones, gráficos y actividad reciente.
             </p>
-
           </div>
 
-
           <div className="panel-hero-status">
-
             <span />
 
             <div>
+              <strong>Plataforma disponible</strong>
 
-              <strong>
-                Plataforma disponible
-              </strong>
-
-              <small>
-                Comparación: últimos 7 días
-              </small>
-
+              <small>Comparación: últimos 7 días</small>
             </div>
-
           </div>
-
         </div>
-
 
         {/* ================================================= */}
         {/* LOGÍSTICA */}
         {/* ================================================= */}
 
-        {
-          puedeVerLogistica
-          &&
-          (
+        {puedeVerLogistica && (
+          <section className="dashboard-area">
+            <div className="dashboard-area-header">
+              <div>
+                <span>ÁREA OPERATIVA</span>
 
-            <section className="dashboard-area">
+                <h2>Logística</h2>
 
-              <div className="dashboard-area-header">
+                <p>
+                  Comparación de los últimos 7 días contra los 7 días
+                  anteriores.
+                </p>
+              </div>
+            </div>
 
-                <div>
+            {/* KPIS */}
 
-                  <span>
-                    ÁREA OPERATIVA
-                  </span>
+            {kpisLogistica.length > 0 && (
+              <div className="dashboard-kpi-grid">
+                {kpisLogistica.map((kpi) => (
+                  <KpiCard key={kpi.label} kpi={kpi} />
+                ))}
+              </div>
+            )}
 
-                  <h2>
-                    Logística
-                  </h2>
+            {/* GRÁFICOS */}
 
-                  <p>
-                    Comparación de los últimos
-                    7 días contra los 7 días
-                    anteriores.
-                  </p>
+            <div className="dashboard-chart-grid">
+              <article className="dashboard-chart-card">
+                <div className="chart-heading">
+                  <div>
+                    <span>ÚLTIMOS 7 DÍAS</span>
 
+                    <h3>Registros por módulo</h3>
+                  </div>
                 </div>
 
-              </div>
-
-
-              {/* KPIS */}
-
-              {
-                kpisLogistica.length > 0
-                &&
-                (
-
-                  <div className="dashboard-kpi-grid">
-
-                    {
-                      kpisLogistica.map(
-                        kpi => (
-
-                          <KpiCard
-                            key={
-                              kpi.label
-                            }
-                            kpi={
-                              kpi
-                            }
-                          />
-
-                        )
-                      )
-                    }
-
-                  </div>
-
-                )
-              }
-
-
-              {/* GRÁFICOS */}
-
-              <div className="dashboard-chart-grid">
-
-
-                <article className="dashboard-chart-card">
-
-                  <div className="chart-heading">
-
-                    <div>
-
-                      <span>
-                        ÚLTIMOS 7 DÍAS
-                      </span>
-
-                      <h3>
-                        Registros por módulo
-                      </h3>
-
+                <div className="chart-container">
+                  {actividadLogistica.length === 0 ? (
+                    <div className="chart-empty">
+                      Sin registros en este período
                     </div>
+                  ) : (
+                    <ScrollableChart
+                      label="Registros por módulo"
+                      itemCount={actividadLogistica.length}
+                      itemWidth={132}
+                      height={290}
+                    >
+                      <BarChart data={actividadLogistica}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
 
-                  </div>
-
-
-                  <div className="chart-container">
-
-                    {
-                      actividadLogistica.length === 0
-                        ? (
-
-                            <div className="chart-empty">
-                              Sin registros en este período
-                            </div>
-
-                          )
-                        : (
-
-                            <ResponsiveContainer
-                              width="100%"
-                              height="100%"
-                            >
-
-                              <BarChart
-                                data={
-                                  actividadLogistica
-                                }
-                              >
-
-                                <CartesianGrid
-                                  strokeDasharray="3 3"
-                                  vertical={false}
-                                />
-
-                                <XAxis
-                                  dataKey="nombre"
-                                />
-
-                                <YAxis
-                                  allowDecimals={false}
-                                />
-
-                                <Tooltip />
-
-                                <Bar
-                                  dataKey="cantidad"
-                                  fill="#3678da"
-                                  radius={[
-                                    7,
-                                    7,
-                                    0,
-                                    0,
-                                  ]}
-                                />
-
-                              </BarChart>
-
-                            </ResponsiveContainer>
-
-                          )
-                    }
-
-                  </div>
-
-                </article>
-
-
-                <article className="dashboard-chart-card">
-
-                  <div className="chart-heading">
-
-                    <div>
-
-                      <span>
-                        DISTRIBUCIÓN
-                      </span>
-
-                      <h3>
-                        Participación por módulo
-                      </h3>
-
-                    </div>
-
-                  </div>
-
-
-                  <div className="chart-container">
-
-                    {
-                      actividadLogistica.length === 0
-                        ? (
-
-                            <div className="chart-empty">
-                              Sin registros en este período
-                            </div>
-
-                          )
-                        : (
-
-                            <ResponsiveContainer
-                              width="100%"
-                              height="100%"
-                            >
-
-                              <PieChart>
-
-                                <Pie
-                                  data={
-                                    actividadLogistica
-                                  }
-                                  dataKey="cantidad"
-                                  nameKey="nombre"
-                                  innerRadius={60}
-                                  outerRadius={95}
-                                  paddingAngle={3}
-                                >
-
-                                  {
-                                    actividadLogistica.map(
-                                      (
-                                        _,
-                                        index
-                                      ) => (
-
-                                        <Cell
-                                          key={
-                                            index
-                                          }
-                                          fill={
-                                            COLORES_PIE[
-                                              index
-                                              %
-                                              COLORES_PIE.length
-                                            ]
-                                          }
-                                        />
-
-                                      )
-                                    )
-                                  }
-
-                                </Pie>
-
-                                <Tooltip />
-
-                                <Legend />
-
-                              </PieChart>
-
-                            </ResponsiveContainer>
-
-                          )
-                    }
-
-                  </div>
-
-                </article>
-
-              </div>
-
-
-              {/* MÓDULOS */}
-
-              <div className="dashboard-module-grid">
-
-                {
-                  modulosLogisticaVisibles.map(
-                    modulo => (
-
-                      <article
-                        className="dashboard-module-card"
-                        key={
-                          modulo.title
-                        }
-                      >
-
-                        <div className="dashboard-module-top">
-
-                          <div>
-
-                            <Icon
-                              name={
-                                modulo.icon
-                              }
+                        <XAxis
+                          dataKey="nombre"
+                          interval={0}
+                          height={65}
+                          tick={
+                            <ChartCategoryTick
+                              maxCharacters={17}
+                              maxLines={3}
                             />
-
-                          </div>
-
-
-                          <span>
-                            Logística
-                          </span>
-
-                        </div>
-
-
-                        <h3>
-                          {
-                            modulo.title
                           }
-                        </h3>
-
-
-                        <p>
-                          {
-                            modulo.description
-                          }
-                        </p>
-
-
-                        <div className="dashboard-module-links">
-
-                          {
-                            modulo.links.map(
-                              link => (
-
-                                <Link
-                                  key={
-                                    link.to
-                                  }
-                                  to={
-                                    link.to
-                                  }
-                                >
-
-                                  {
-                                    link.label
-                                  }
-
-                                </Link>
-
-                              )
-                            )
-                          }
-
-                        </div>
-
-
-                        <UltimaCarga
-                          fecha={
-                            modulo.ultimaCarga
-                          }
+                          tickLine={false}
                         />
 
+                        <YAxis allowDecimals={false} />
 
-                        <Link
-                          to={
-                            modulo.home
-                          }
-                          className="dashboard-module-enter"
+                        <Tooltip />
+
+                        <Bar
+                          maxBarSize={48}
+                          dataKey="cantidad"
+                          fill="#3678da"
+                          radius={[7, 7, 0, 0]}
+                        />
+                      </BarChart>
+                    </ScrollableChart>
+                  )}
+                </div>
+              </article>
+
+              <article className="dashboard-chart-card">
+                <div className="chart-heading">
+                  <div>
+                    <span>DISTRIBUCIÓN</span>
+
+                    <h3>Participación por módulo</h3>
+                  </div>
+                </div>
+
+                <div className="chart-container">
+                  {actividadLogistica.length === 0 ? (
+                    <div className="chart-empty">
+                      Sin registros en este período
+                    </div>
+                  ) : (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={actividadLogistica}
+                          dataKey="cantidad"
+                          nameKey="nombre"
+                          innerRadius={60}
+                          outerRadius={95}
+                          paddingAngle={3}
                         >
+                          {actividadLogistica.map((_, index) => (
+                            <Cell
+                              key={index}
+                              fill={COLORES_PIE[index % COLORES_PIE.length]}
+                            />
+                          ))}
+                        </Pie>
 
-                          Ingresar
+                        <Tooltip />
 
-                          <Icon
-                            name="chevron"
-                            size={15}
-                          />
+                        <Legend />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  )}
+                </div>
+              </article>
+            </div>
 
-                        </Link>
+            {/* MÓDULOS */}
 
-                      </article>
+            <div className="dashboard-module-grid">
+              {modulosLogisticaVisibles.map((modulo) => (
+                <article className="dashboard-module-card" key={modulo.title}>
+                  <div className="dashboard-module-top">
+                    <div>
+                      <Icon name={modulo.icon} />
+                    </div>
 
-                    )
-                  )
-                }
+                    <span>Logística</span>
+                  </div>
 
+                  <h3>{modulo.title}</h3>
 
-                {
-                  puedeStockPallets
-                  &&
-                  (
+                  <p>{modulo.description}</p>
 
-                    <article className="dashboard-module-card">
+                  <div className="dashboard-module-links">
+                    {modulo.links.map((link) => (
+                      <Link key={link.to} to={link.to}>
+                        {link.label}
+                      </Link>
+                    ))}
+                  </div>
 
-                      <div className="dashboard-module-top">
+                  <UltimaCarga fecha={modulo.ultimaCarga} />
 
-                        <div>
+                  <Link to={modulo.home} className="dashboard-module-enter">
+                    Ingresar
+                    <Icon name="chevron" size={15} />
+                  </Link>
+                </article>
+              ))}
 
-                          <Icon
-                            name="boxes"
-                          />
+              {puedeStockPallets && (
+                <article className="dashboard-module-card">
+                  <div className="dashboard-module-top">
+                    <div>
+                      <Icon name="boxes" />
+                    </div>
 
-                        </div>
+                    <span>Externo</span>
+                  </div>
 
+                  <h3>Stock de pallets</h3>
 
-                        <span>
-                          Externo
-                        </span>
+                  <p>Sistema externo de control de stock de pallets.</p>
 
-                      </div>
+                  <div className="dashboard-module-links">
+                    <span className="dashboard-external-label">
+                      Aplicación independiente
+                    </span>
+                  </div>
 
+                  <UltimaCarga texto="Sistema externo" />
 
-                      <h3>
-                        Stock de pallets
-                      </h3>
-
-
-                      <p>
-                        Sistema externo de control
-                        de stock de pallets.
-                      </p>
-
-
-                      <div className="dashboard-module-links">
-
-                        <span className="dashboard-external-label">
-                          Aplicación independiente
-                        </span>
-
-                      </div>
-
-
-                      <UltimaCarga
-                        texto="Sistema externo"
-                      />
-
-
-                      <a
-                        href="http://10.242.4.13:8000/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="dashboard-module-enter"
-                      >
-
-                        Abrir sistema
-
-                        <Icon
-                          name="chevron"
-                          size={15}
-                        />
-
-                      </a>
-
-                    </article>
-
-                  )
-                }
-
-              </div>
-
-            </section>
-
-          )
-        }
-
+                  <a
+                    href="http://10.242.4.13:8000/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="dashboard-module-enter"
+                  >
+                    Abrir sistema
+                    <Icon name="chevron" size={15} />
+                  </a>
+                </article>
+              )}
+            </div>
+          </section>
+        )}
 
         {/* ================================================= */}
         {/* EXPEDICIÓN */}
         {/* ================================================= */}
 
-        {
-          puedeExpedicion
-          &&
-          (
+        {puedeExpedicion && (
+          <section className="dashboard-area expedicion-area">
+            <div className="dashboard-area-header">
+              <div>
+                <span>ÁREA OPERATIVA</span>
 
-            <section className="dashboard-area expedicion-area">
+                <h2>Expedición</h2>
 
-              <div className="dashboard-area-header">
+                <p>Comparación de órdenes y actividad de los últimos 7 días.</p>
+              </div>
 
-                <div>
+              <Link to="/expedicion/inicio" className="dashboard-area-link">
+                Ver módulo completo
+                <Icon name="chevron" size={15} />
+              </Link>
+            </div>
 
-                  <span>
-                    ÁREA OPERATIVA
-                  </span>
+            {/* KPIS */}
 
-                  <h2>
-                    Expedición
-                  </h2>
+            <div className="dashboard-kpi-grid">
+              {kpisExpedicion.map((kpi) => (
+                <KpiCard key={kpi.label} kpi={kpi} />
+              ))}
+            </div>
 
-                  <p>
-                    Comparación de órdenes y
-                    actividad de los últimos
-                    7 días.
-                  </p>
+            {/* GRÁFICOS */}
 
+            <div className="dashboard-chart-grid">
+              <article className="dashboard-chart-card">
+                <div className="chart-heading">
+                  <div>
+                    <span>ÚLTIMOS 7 DÍAS</span>
+
+                    <h3>Órdenes por estado</h3>
+                  </div>
                 </div>
 
-
-                <Link
-                  to="/expedicion/inicio"
-                  className="dashboard-area-link"
-                >
-
-                  Ver módulo completo
-
-                  <Icon
-                    name="chevron"
-                    size={15}
-                  />
-
-                </Link>
-
-              </div>
-
-
-              {/* KPIS */}
-
-              <div className="dashboard-kpi-grid">
-
-                {
-                  kpisExpedicion.map(
-                    kpi => (
-
-                      <KpiCard
-                        key={
-                          kpi.label
-                        }
-                        kpi={
-                          kpi
-                        }
-                      />
-
-                    )
-                  )
-                }
-
-              </div>
-
-
-              {/* GRÁFICOS */}
-
-              <div className="dashboard-chart-grid">
-
-
-                <article className="dashboard-chart-card">
-
-                  <div className="chart-heading">
-
-                    <div>
-
-                      <span>
-                        ÚLTIMOS 7 DÍAS
-                      </span>
-
-                      <h3>
-                        Órdenes por estado
-                      </h3>
-
+                <div className="chart-container">
+                  {ordenesPorEstado.length === 0 ? (
+                    <div className="chart-empty">
+                      Sin órdenes en este período
                     </div>
-
-                  </div>
-
-
-                  <div className="chart-container">
-
-                    {
-                      ordenesPorEstado.length === 0
-                        ? (
-
-                            <div className="chart-empty">
-                              Sin órdenes en este período
-                            </div>
-
-                          )
-                        : (
-
-                            <ResponsiveContainer
-                              width="100%"
-                              height="100%"
-                            >
-
-                              <PieChart>
-
-                                <Pie
-                                  data={
-                                    ordenesPorEstado
-                                  }
-                                  dataKey="cantidad"
-                                  nameKey="nombre"
-                                  innerRadius={60}
-                                  outerRadius={95}
-                                  paddingAngle={3}
-                                >
-
-                                  {
-                                    ordenesPorEstado.map(
-                                      (
-                                        _,
-                                        index
-                                      ) => (
-
-                                        <Cell
-                                          key={
-                                            index
-                                          }
-                                          fill={
-                                            COLORES_PIE[
-                                              index
-                                              %
-                                              COLORES_PIE.length
-                                            ]
-                                          }
-                                        />
-
-                                      )
-                                    )
-                                  }
-
-                                </Pie>
-
-                                <Tooltip />
-
-                                <Legend />
-
-                              </PieChart>
-
-                            </ResponsiveContainer>
-
-                          )
-                    }
-
-                  </div>
-
-                </article>
-
-
-                <article className="dashboard-chart-card">
-
-                  <div className="chart-heading">
-
-                    <div>
-
-                      <span>
-                        STOCK ACTUAL
-                      </span>
-
-                      <h3>
-                        Stock por producto
-                      </h3>
-
-                    </div>
-
-                  </div>
-
-
-                  <div className="stock-ranking-container">
-
-                    {
-                      stockPorProducto.length === 0
-                        ? (
-
-                            <div className="chart-empty">
-                              Sin stock registrado
-                            </div>
-
-                          )
-                        : (
-
-                            <div className="stock-ranking">
-                              {stockPorProducto.map((item, index) => (
-                                <div className="stock-ranking-row" key={item.producto}>
-                                  <span className="stock-ranking-position">{index + 1}</span>
-                                  <div className="stock-ranking-content">
-                                    <div className="stock-ranking-label">
-                                      <strong>{item.producto}</strong>
-                                      <span>{item.cantidad.toLocaleString("es-AR")}</span>
-                                    </div>
-                                    <div className="stock-ranking-track">
-                                      <span style={{ width: `${Math.max((item.cantidad / stockMaximo) * 100, 2)}%` }} />
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-
-                          )
-                    }
-
-                  </div>
-
-                </article>
-
-              </div>
-
-
-              <div className="dashboard-chart-grid">
-
-
-                <article className="dashboard-chart-card">
-
-                  <div className="chart-heading">
-
-                    <div>
-
-                      <span>
-                        ÚLTIMOS 7 DÍAS
-                      </span>
-
-                      <h3>
-                        Entradas vs salidas
-                      </h3>
-
-                    </div>
-
-                  </div>
-
-
-                  <div className="chart-container">
-
-                    <ResponsiveContainer
-                      width="100%"
-                      height="100%"
-                    >
-
-                      <BarChart
-                        data={
-                          entradasSalidas
-                        }
-                      >
-
-                        <CartesianGrid
-                          strokeDasharray="3 3"
-                          vertical={false}
-                        />
-
-                        <XAxis
-                          dataKey="nombre"
-                        />
-
-                        <YAxis />
-
-                        <Tooltip />
-
-                        <Bar
+                  ) : (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={ordenesPorEstado}
                           dataKey="cantidad"
-                          fill="#2f75d6"
-                          radius={[
-                            7,
-                            7,
-                            0,
-                            0,
-                          ]}
-                        />
-
-                      </BarChart>
-
-                    </ResponsiveContainer>
-
-                  </div>
-
-                </article>
-
-
-                <article className="dashboard-chart-card">
-
-                  <div className="chart-heading">
-
-                    <div>
-
-                      <span>
-                        ÚLTIMOS 7 DÍAS
-                      </span>
-
-                      <h3>
-                        Pallets y chapadur
-                      </h3>
-
-                    </div>
-
-                  </div>
-
-
-                  <div className="chart-container">
-
-                    <ResponsiveContainer
-                      width="100%"
-                      height="100%"
-                    >
-
-                      <BarChart
-                        data={
-                          materialesGrafico
-                        }
-                      >
-
-                        <CartesianGrid
-                          strokeDasharray="3 3"
-                          vertical={false}
-                        />
-
-                        <XAxis
-                          dataKey="material"
-                        />
-
-                        <YAxis />
+                          nameKey="nombre"
+                          innerRadius={60}
+                          outerRadius={95}
+                          paddingAngle={3}
+                        >
+                          {ordenesPorEstado.map((_, index) => (
+                            <Cell
+                              key={index}
+                              fill={COLORES_PIE[index % COLORES_PIE.length]}
+                            />
+                          ))}
+                        </Pie>
 
                         <Tooltip />
 
                         <Legend />
-
-                        <Bar
-                          dataKey="salidas"
-                          name="Salidas"
-                          fill="#3678da"
-                          radius={[
-                            6,
-                            6,
-                            0,
-                            0,
-                          ]}
-                        />
-
-                        <Bar
-                          dataKey="entradas"
-                          name="Devoluciones"
-                          fill="#20a36d"
-                          radius={[
-                            6,
-                            6,
-                            0,
-                            0,
-                          ]}
-                        />
-
-                      </BarChart>
-
+                      </PieChart>
                     </ResponsiveContainer>
+                  )}
+                </div>
+              </article>
 
+              <article className="dashboard-chart-card">
+                <div className="chart-heading">
+                  <div>
+                    <span>STOCK ACTUAL</span>
+
+                    <h3>Stock por producto</h3>
                   </div>
+                </div>
 
-                </article>
+                <div className="stock-ranking-container">
+                  {stockPorProducto.length === 0 ? (
+                    <div className="chart-empty">Sin stock registrado</div>
+                  ) : (
+                    <div className="stock-ranking">
+                      {stockPorProducto.map((item, index) => (
+                        <div className="stock-ranking-row" key={item.producto}>
+                          <span className="stock-ranking-position">
+                            {index + 1}
+                          </span>
+                          <div className="stock-ranking-content">
+                            <div className="stock-ranking-label">
+                              <strong>{item.producto}</strong>
+                              <span>
+                                {item.cantidad.toLocaleString("es-AR")}
+                              </span>
+                            </div>
+                            <div className="stock-ranking-track">
+                              <span
+                                style={{
+                                  width: `${Math.max((item.cantidad / stockMaximo) * 100, 2)}%`,
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </article>
+            </div>
 
-              </div>
+            <div className="dashboard-chart-grid">
+              <article className="dashboard-chart-card">
+                <div className="chart-heading">
+                  <div>
+                    <span>ÚLTIMOS 7 DÍAS</span>
 
+                    <h3>Entradas vs salidas</h3>
+                  </div>
+                </div>
 
-              {/* TARJETAS EXPEDICIÓN */}
+                <div className="chart-container">
+                  <ScrollableChart
+                    label="Entradas y salidas"
+                    itemCount={entradasSalidas.length}
+                    itemWidth={132}
+                    height={290}
+                  >
+                    <BarChart data={entradasSalidas}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} />
 
-              <div className="dashboard-module-grid">
+                      <XAxis
+                        dataKey="nombre"
+                        interval={0}
+                        height={65}
+                        tick={
+                          <ChartCategoryTick maxCharacters={17} maxLines={3} />
+                        }
+                        tickLine={false}
+                      />
 
-                {
-                  modulosExpedicion.map(
-                    modulo => (
+                      <YAxis />
 
-                      <article
-                        className="
+                      <Tooltip />
+
+                      <Bar
+                        maxBarSize={48}
+                        dataKey="cantidad"
+                        fill="#2f75d6"
+                        radius={[7, 7, 0, 0]}
+                      />
+                    </BarChart>
+                  </ScrollableChart>
+                </div>
+              </article>
+
+              <article className="dashboard-chart-card">
+                <div className="chart-heading">
+                  <div>
+                    <span>ÚLTIMOS 7 DÍAS</span>
+
+                    <h3>Pallets y chapadur</h3>
+                  </div>
+                </div>
+
+                <div className="chart-container">
+                  <ScrollableChart
+                    label="Pallets y chapadur"
+                    itemCount={materialesGrafico.length}
+                    itemWidth={144}
+                    height={290}
+                  >
+                    <BarChart data={materialesGrafico}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} />
+
+                      <XAxis
+                        dataKey="material"
+                        interval={0}
+                        height={65}
+                        tick={
+                          <ChartCategoryTick maxCharacters={17} maxLines={3} />
+                        }
+                        tickLine={false}
+                      />
+
+                      <YAxis />
+
+                      <Tooltip />
+
+                      <Legend />
+
+                      <Bar
+                        maxBarSize={48}
+                        dataKey="salidas"
+                        name="Salidas"
+                        fill="#3678da"
+                        radius={[6, 6, 0, 0]}
+                      />
+
+                      <Bar
+                        maxBarSize={48}
+                        dataKey="entradas"
+                        name="Devoluciones"
+                        fill="#20a36d"
+                        radius={[6, 6, 0, 0]}
+                      />
+                    </BarChart>
+                  </ScrollableChart>
+                </div>
+              </article>
+            </div>
+
+            {/* TARJETAS EXPEDICIÓN */}
+
+            <div className="dashboard-module-grid">
+              {modulosExpedicion.map((modulo) => (
+                <article
+                  className="
                           dashboard-module-card
                           dashboard-expedicion-card
                         "
-                        key={
-                          modulo.title
-                        }
-                      >
+                  key={modulo.title}
+                >
+                  <div className="dashboard-module-top">
+                    <div>
+                      <Icon name={modulo.icon} />
+                    </div>
 
-                        <div className="dashboard-module-top">
+                    <span>Expedición</span>
+                  </div>
 
-                          <div>
+                  <h3>{modulo.title}</h3>
 
-                            <Icon
-                              name={
-                                modulo.icon
-                              }
-                            />
+                  <p>{modulo.description}</p>
 
-                          </div>
+                  <div className="dashboard-module-links">
+                    {modulo.links.map((link) => (
+                      <Link key={link.to} to={link.to}>
+                        {link.label}
+                      </Link>
+                    ))}
+                  </div>
 
+                  <UltimaCarga fecha={modulo.ultimaCarga} />
 
-                          <span>
-                            Expedición
-                          </span>
-
-                        </div>
-
-
-                        <h3>
-                          {
-                            modulo.title
-                          }
-                        </h3>
-
-
-                        <p>
-                          {
-                            modulo.description
-                          }
-                        </p>
-
-
-                        <div className="dashboard-module-links">
-
-                          {
-                            modulo.links.map(
-                              link => (
-
-                                <Link
-                                  key={
-                                    link.to
-                                  }
-                                  to={
-                                    link.to
-                                  }
-                                >
-
-                                  {
-                                    link.label
-                                  }
-
-                                </Link>
-
-                              )
-                            )
-                          }
-
-                        </div>
-
-
-                        <UltimaCarga
-                          fecha={
-                            modulo.ultimaCarga
-                          }
-                        />
-
-
-                        <Link
-                          to={
-                            modulo.home
-                          }
-                          className="dashboard-module-enter"
-                        >
-
-                          Ingresar
-
-                          <Icon
-                            name="chevron"
-                            size={15}
-                          />
-
-                        </Link>
-
-                      </article>
-
-                    )
-                  )
-                }
-
-              </div>
-
-            </section>
-
-          )
-        }
-
+                  <Link to={modulo.home} className="dashboard-module-enter">
+                    Ingresar
+                    <Icon name="chevron" size={15} />
+                  </Link>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
-
     </div>
-
   );
 }

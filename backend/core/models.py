@@ -1,3 +1,19 @@
 from django.db import models
 
-# Create your models here.
+class RegistroImportacion(models.Model):
+    """Trazabilidad interna; los datos de trabajo viven en los modelos normales."""
+    modulo = models.CharField(max_length=20)
+    origen_id = models.CharField(max_length=120)
+    clave = models.CharField(max_length=120)
+    huella = models.CharField(max_length=64)
+    datos = models.JSONField()
+    reparto = models.OneToOneField('repartos.Reparto', on_delete=models.SET_NULL, null=True, blank=True, related_name='registro_importado')
+    rechazo = models.OneToOneField('rechazos.Rechazo', on_delete=models.SET_NULL, null=True, blank=True, related_name='registro_importado')
+    recibo = models.OneToOneField('cambios.ReciboCambio', on_delete=models.SET_NULL, null=True, blank=True, related_name='registro_importado')
+    recargas_autorizadas = models.BooleanField(default=False)
+    total_autorizado = models.PositiveIntegerField(null=True, blank=True)
+    creado_en = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'registro_importacion'
+        constraints = [models.UniqueConstraint(fields=['modulo','origen_id','clave'],name='uq_importacion_origen_fila')]

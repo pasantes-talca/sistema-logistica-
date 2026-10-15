@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -27,6 +28,7 @@ class RepartoListCreateAPIView(APIView):
                 "vehiculo",
                 "asignacion",
                 "creado_por",
+                "registro_importado",
             )
             .prefetch_related(
                 "personal__empleado"
@@ -88,6 +90,7 @@ class RepartoDetailAPIView(APIView):
                 "vehiculo",
                 "asignacion",
                 "creado_por",
+                "registro_importado",
             )
             .prefetch_related(
                 "personal__empleado"
@@ -186,10 +189,11 @@ class ReporteRecargasAPIView(APIView):
 
         repartos = (
             Reparto.objects
+            .select_related('registro_importado')
             .filter(
                 fecha__range=(desde, hasta),
-                recargas__gt=0,
             )
+            .filter(Q(recargas__gt=0) | Q(registro_importado__total_autorizado__gt=0))
             .prefetch_related(
                 "personal__empleado"
             )
@@ -221,10 +225,11 @@ class ReporteRecargasAPIView(APIView):
             key=lambda item: item["nombre"].lower(),
         )
 
-        total_general = sum(
+        total_por_empleados = sum(
             empleado["recargas"]
             for empleado in empleados
         )
+        total_general = sum(reparto.recargas_totales for reparto in repartos)
 
         return Response(
             {
@@ -233,5 +238,7 @@ class ReporteRecargasAPIView(APIView):
                 "cantidad_repartos": repartos.count(),
                 "empleados": empleados,
                 "total_general": total_general,
+                "total_por_empleados": total_por_empleados,
+                "diferencia_autorizada": total_general - total_por_empleados,
             }
         )

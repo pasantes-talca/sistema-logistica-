@@ -20,7 +20,7 @@
   margin: 5px 0 8px;
   font-size: 29px;
   line-height: 1.15;
-  color: #12223d;
+  color: var(--theme-text, #12223d);
   letter-spacing: -0.5px;
 }
 
@@ -28,7 +28,7 @@
 .kilometrajes-header p {
   margin: 0;
   max-width: 650px;
-  color: #71809a;
+  color: var(--theme-muted, #71809a);
   font-size: 14px;
   line-height: 1.55;
 }
@@ -38,7 +38,7 @@
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 1.2px;
-  color: #1671e8;
+  color: var(--theme-accent, #1671e8);
 }
 
 
@@ -54,8 +54,8 @@
 
 
 .kilometrajes-summary-card {
-  background: #ffffff;
-  border: 1px solid #dfe6ef;
+  background: var(--theme-surface, #ffffff);
+  border: 1px solid var(--theme-border, #dfe6ef);
   border-radius: 13px;
   padding: 18px 20px;
   min-height: 112px;
@@ -67,7 +67,7 @@
 
 
 .kilometrajes-summary-card > span {
-  color: #7b879b;
+  color: var(--theme-muted, #7b879b);
   font-size: 12px;
   font-weight: 600;
 }
@@ -75,7 +75,7 @@
 
 .kilometrajes-summary-card strong {
   margin-top: 6px;
-  color: #10203a;
+  color: var(--theme-text, #10203a);
   font-size: 24px;
   line-height: 1.1;
 }
@@ -83,7 +83,7 @@
 
 .kilometrajes-summary-card small {
   margin-top: 7px;
-  color: #a0aabb;
+  color: var(--theme-muted, #a0aabb);
   font-size: 11px;
 }
 
@@ -93,8 +93,8 @@
 /* ========================================= */
 
 .kilometrajes-card {
-  background: #ffffff;
-  border: 1px solid #dfe6ef;
+  background: var(--theme-surface, #ffffff);
+  border: 1px solid var(--theme-border, #dfe6ef);
   border-radius: 14px;
   overflow: hidden;
   box-shadow: 0 8px 24px rgba(25, 50, 85, 0.04);
@@ -103,7 +103,7 @@
 
 .kilometrajes-card-header {
   padding: 20px 24px 17px;
-  border-bottom: 1px solid #edf1f6;
+  border-bottom: 1px solid var(--theme-border, #edf1f6);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -114,7 +114,7 @@
 .kilometrajes-card-header > div:first-child > span {
   display: block;
   margin-bottom: 3px;
-  color: #1671e8;
+  color: var(--theme-accent, #1671e8);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 1px;
@@ -123,7 +123,7 @@
 
 .kilometrajes-card-header h2 {
   margin: 0;
-  color: #15243d;
+  color: var(--theme-text, #15243d);
   font-size: 19px;
 }
 
@@ -131,8 +131,8 @@
 .kilometrajes-counter {
   padding: 7px 11px;
   border-radius: 8px;
-  background: #f1f6fd;
-  color: #536680;
+  background: var(--theme-surface-muted, #f1f6fd);
+  color: var(--theme-muted, #536680);
   font-size: 12px;
   font-weight: 700;
 }
@@ -156,27 +156,27 @@
 
 
 .kilometrajes-table thead {
-  background: #f8fafc;
+  background: var(--theme-surface-muted, #f8fafc);
 }
 
 
 .kilometrajes-table th {
   padding: 12px 20px;
   text-align: left;
-  color: #8390a5;
+  color: var(--theme-muted, #8390a5);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.6px;
   text-transform: uppercase;
-  border-bottom: 1px solid #e8edf3;
+  border-bottom: 1px solid var(--theme-border, #e8edf3);
 }
 
 
 .kilometrajes-table td {
   padding: 16px 20px;
-  color: #35445a;
+  color: var(--theme-text, #35445a);
   font-size: 13px;
-  border-bottom: 1px solid #edf1f5;
+  border-bottom: 1px solid var(--theme-border, #edf1f5);
   vertical-align: middle;
 }
 
@@ -193,7 +193,7 @@
 
 
 .kilometrajes-table tbody tr:hover {
-  background: #f9fbfe;
+  background: var(--theme-surface, #f9fbfe);
 }
 
 
@@ -216,8 +216,8 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  background: #eaf3ff;
-  color: #1971de;
+  background: var(--theme-accent-bg, #eaf3ff);
+  color: var(--theme-accent, #1971de);
   font-size: 13px;
   font-weight: 800;
 }
@@ -231,13 +231,13 @@
 
 
 .kilometrajes-driver strong {
-  color: #17263d;
+  color: var(--theme-text, #17263d);
   font-size: 13px;
 }
 
 
 .kilometrajes-driver span {
-  color: #9aa5b5;
+  color: var(--theme-muted, #9aa5b5);
   font-size: 11px;
 }
 
@@ -256,12 +256,12 @@
 
 .kilometrajes-periodo strong {
   font-size: 12px;
-  color: #40516a;
+  color: var(--theme-text, #40516a);
 }
 
 
 .kilometrajes-periodo span {
-  color: #a4adba;
+  color: var(--theme-muted, #a4adba);
   font-size: 11px;
 }
 
@@ -278,13 +278,13 @@
 
 
 .kilometrajes-total strong {
-  color: #10213a;
+  color: var(--theme-text, #10213a);
   font-size: 17px;
 }
 
 
 .kilometrajes-total span {
-  color: #7c8da5;
+  color: var(--theme-muted, #7c8da5);
   font-size: 11px;
   font-weight: 700;
 }
@@ -300,8 +300,8 @@
   justify-content: center;
   padding: 6px 9px;
   border-radius: 7px;
-  background: #eef5ff;
-  color: #2b6fc8;
+  background: var(--theme-accent-bg, #eef5ff);
+  color: var(--theme-accent, #2b6fc8);
   font-size: 11px;
   font-weight: 700;
   white-space: nowrap;
@@ -314,7 +314,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: #66758b;
+  color: var(--theme-muted, #66758b);
 }
 
 
@@ -333,19 +333,19 @@
 
 
 .kilometrajes-state strong {
-  color: #23344e;
+  color: var(--theme-text, #23344e);
   font-size: 15px;
 }
 
 
 .kilometrajes-state span {
-  color: #8996a8;
+  color: var(--theme-muted, #8996a8);
   font-size: 13px;
 }
 
 
 .kilometrajes-state.error strong {
-  color: #c44747;
+  color: var(--theme-danger, #c44747);
 }
 
 
@@ -404,14 +404,14 @@
 .kilometrajes-detail-top h1 {
   margin: 5px 0 8px;
   font-size: 29px;
-  color: #12223d;
+  color: var(--theme-text, #12223d);
   letter-spacing: -0.5px;
 }
 
 
 .kilometrajes-detail-top p {
   margin: 0;
-  color: #71809a;
+  color: var(--theme-muted, #71809a);
   font-size: 14px;
 }
 
@@ -419,10 +419,10 @@
 .kilometrajes-back {
   margin-top: 8px;
   padding: 9px 13px;
-  border: 1px solid #dce5ef;
+  border: 1px solid var(--theme-border, #dce5ef);
   border-radius: 8px;
-  background: #ffffff;
-  color: #52657f;
+  background: var(--theme-surface, #ffffff);
+  color: var(--theme-muted, #52657f);
   font-size: 12px;
   font-weight: 700;
   text-decoration: none;
@@ -430,8 +430,8 @@
 
 
 .kilometrajes-back:hover {
-  background: #f5f8fc;
-  color: #176ed4;
+  background: var(--theme-surface-muted, #f5f8fc);
+  color: var(--theme-accent, #176ed4);
 }
 
 
@@ -441,8 +441,8 @@
   justify-content: center;
   padding: 7px 11px;
   border-radius: 7px;
-  background: #edf5ff;
-  color: #176ed4;
+  background: var(--theme-accent-bg, #edf5ff);
+  color: var(--theme-accent, #176ed4);
   font-size: 11px;
   font-weight: 800;
   text-decoration: none;
@@ -451,20 +451,20 @@
 
 
 .kilometrajes-detail-button:hover {
-  background: #dfeeff;
+  background: var(--theme-accent-bg, #dfeeff);
 }
 
 
 .kilometrajes-detail-observation {
   padding: 17px 20px;
-  background: #ffffff;
-  border: 1px solid #dfe6ef;
+  background: var(--theme-surface, #ffffff);
+  border: 1px solid var(--theme-border, #dfe6ef);
   border-radius: 12px;
 }
 
 
 .kilometrajes-detail-observation span {
-  color: #1671e8;
+  color: var(--theme-accent, #1671e8);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 1px;
@@ -473,29 +473,29 @@
 
 .kilometrajes-detail-observation p {
   margin: 7px 0 0;
-  color: #53647c;
+  color: var(--theme-muted, #53647c);
   font-size: 13px;
   line-height: 1.5;
 }
 
 
 .kilometrajes-destination {
-  color: #253954;
+  color: var(--theme-text, #253954);
   font-weight: 700;
 }
 
 
 .kilometrajes-table tfoot td {
-  border-top: 2px solid #dfe7f1;
+  border-top: 2px solid var(--theme-border, #dfe7f1);
   border-bottom: none;
-  background: #f8fbff;
+  background: var(--theme-surface, #f8fbff);
 }
 
 
 .kilometrajes-detail-total-label {
   padding: 16px 20px !important;
   text-align: right;
-  color: #64758c !important;
+  color: var(--theme-muted, #64758c) !important;
   font-size: 11px !important;
   font-weight: 800;
   letter-spacing: 0.6px;
@@ -504,7 +504,7 @@
 
 .kilometrajes-detail-total-value {
   padding: 16px 20px !important;
-  color: #1269cf !important;
+  color: var(--theme-accent, #1269cf) !important;
   font-size: 18px !important;
   font-weight: 800;
 }
@@ -525,8 +525,8 @@
 /* ========================================= */
 
 .kilometrajes-filter-card {
-  background: #ffffff;
-  border: 1px solid #dfe6ef;
+  background: var(--theme-surface, #ffffff);
+  border: 1px solid var(--theme-border, #dfe6ef);
   border-radius: 13px;
   padding: 18px 20px;
   box-shadow: 0 5px 18px rgba(25, 50, 85, 0.035);
@@ -542,7 +542,7 @@
 
 
 .kilometrajes-filter-title span {
-  color: #1671e8;
+  color: var(--theme-accent, #1671e8);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 1px;
@@ -550,7 +550,7 @@
 
 
 .kilometrajes-filter-title strong {
-  color: #182941;
+  color: var(--theme-text, #182941);
   font-size: 16px;
 }
 
@@ -572,7 +572,7 @@
 
 
 .kilometrajes-filter-field label {
-  color: #506079;
+  color: var(--theme-text, #506079);
   font-size: 11px;
   font-weight: 700;
 }
@@ -581,17 +581,17 @@
 .kilometrajes-filter-field input {
   min-height: 39px;
   padding: 0 11px;
-  border: 1px solid #cfd9e6;
+  border: 1px solid var(--theme-border, #cfd9e6);
   border-radius: 8px;
-  background: #ffffff;
-  color: #273950;
+  background: var(--theme-input, #ffffff);
+  color: var(--theme-text, #273950);
   font-size: 13px;
   outline: none;
 }
 
 
 .kilometrajes-filter-field input:focus {
-  border-color: #3f8ee8;
+  border-color: var(--theme-accent, #3f8ee8);
   box-shadow: 0 0 0 3px rgba(63, 142, 232, 0.08);
 }
 
@@ -599,10 +599,10 @@
 .kilometrajes-clear-filter {
   min-height: 39px;
   padding: 0 14px;
-  border: 1px solid #d5deea;
+  border: 1px solid var(--theme-border, #d5deea);
   border-radius: 8px;
-  background: #f8fafc;
-  color: #53647a;
+  background: var(--theme-surface-muted, #f8fafc);
+  color: var(--theme-muted, #53647a);
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
@@ -610,7 +610,7 @@
 
 
 .kilometrajes-clear-filter:hover {
-  background: #eef3f8;
+  background: var(--theme-surface-muted, #eef3f8);
 }
 
 
@@ -621,8 +621,8 @@
 
 
 .kilometrajes-chart-card {
-  background: #ffffff;
-  border: 1px solid #dfe6ef;
+  background: var(--theme-surface, #ffffff);
+  border: 1px solid var(--theme-border, #dfe6ef);
   border-radius: 14px;
   overflow: hidden;
   box-shadow: 0 8px 24px rgba(25, 50, 85, 0.04);
@@ -642,8 +642,8 @@
   width: 27px;
   height: 27px;
   border-radius: 7px;
-  background: #edf5ff;
-  color: #176ed4;
+  background: var(--theme-accent-bg, #edf5ff);
+  color: var(--theme-accent, #176ed4);
   font-size: 11px;
   font-weight: 800;
 }
@@ -662,7 +662,7 @@
   height: 7px;
   overflow: hidden;
   border-radius: 999px;
-  background: #edf1f6;
+  background: var(--theme-surface-muted, #edf1f6);
 }
 
 
@@ -675,7 +675,7 @@
 
 .kilometrajes-progress-row > span {
   min-width: 42px;
-  color: #697b92;
+  color: var(--theme-muted, #697b92);
   font-size: 11px;
   font-weight: 700;
   text-align: right;
@@ -708,8 +708,8 @@
 /* ========================================= */
 
 .kilometrajes-form-card {
-  background: #ffffff;
-  border: 1px solid #dfe6ef;
+  background: var(--theme-surface, #ffffff);
+  border: 1px solid var(--theme-border, #dfe6ef);
   border-radius: 14px;
   padding: 20px;
   box-shadow: 0 7px 22px rgba(25, 50, 85, 0.04);
@@ -735,7 +735,7 @@
 
 
 .kilometrajes-form-field label {
-  color: #44556d;
+  color: var(--theme-text, #44556d);
   font-size: 11px;
   font-weight: 700;
 }
@@ -745,10 +745,10 @@
 .kilometrajes-form-field select,
 .kilometrajes-form-field textarea {
   width: 100%;
-  border: 1px solid #ccd7e5;
+  border: 1px solid var(--theme-border, #ccd7e5);
   border-radius: 8px;
-  background: #ffffff;
-  color: #273950;
+  background: var(--theme-input, #ffffff);
+  color: var(--theme-text, #273950);
   font-family: inherit;
   font-size: 13px;
   outline: none;
@@ -772,7 +772,7 @@
 .kilometrajes-form-field input:focus,
 .kilometrajes-form-field select:focus,
 .kilometrajes-form-field textarea:focus {
-  border-color: #3c8de6;
+  border-color: var(--theme-accent, #3c8de6);
   box-shadow:
     0 0 0 3px
     rgba(60, 141, 230, 0.08);
@@ -789,8 +789,8 @@
 /* ========================================= */
 
 .kilometrajes-grid-card {
-  background: #ffffff;
-  border: 1px solid #dfe6ef;
+  background: var(--theme-surface, #ffffff);
+  border: 1px solid var(--theme-border, #dfe6ef);
   border-radius: 14px;
   overflow: hidden;
   box-shadow: 0 8px 24px rgba(25, 50, 85, 0.04);
@@ -803,14 +803,14 @@
   align-items: center;
   gap: 20px;
   padding: 18px 22px;
-  border-bottom: 1px solid #e9eef4;
+  border-bottom: 1px solid var(--theme-border, #e9eef4);
 }
 
 
 .kilometrajes-grid-header > div > span {
   display: block;
   margin-bottom: 3px;
-  color: #1671e8;
+  color: var(--theme-accent, #1671e8);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 1px;
@@ -819,13 +819,13 @@
 
 .kilometrajes-grid-header h2 {
   margin: 0;
-  color: #172841;
+  color: var(--theme-text, #172841);
   font-size: 18px;
 }
 
 
 .kilometrajes-grid-header small {
-  color: #8492a6;
+  color: var(--theme-muted, #8492a6);
   font-size: 11px;
 }
 
@@ -848,9 +848,9 @@
 .kilometrajes-grid-table th {
   min-width: 118px;
   padding: 13px 10px;
-  background: #f7f9fc;
-  border-bottom: 1px solid #dfe6ef;
-  border-right: 1px solid #e9eef4;
+  background: var(--theme-surface-muted, #f7f9fc);
+  border-bottom: 1px solid var(--theme-border, #dfe6ef);
+  border-right: 1px solid var(--theme-border, #e9eef4);
   text-align: center;
   vertical-align: middle;
 }
@@ -871,7 +871,7 @@
 
 .kilometrajes-destino-header strong {
   max-width: 120px;
-  color: #263a55;
+  color: var(--theme-text, #263a55);
   font-size: 11px;
   line-height: 1.25;
   font-weight: 800;
@@ -879,7 +879,7 @@
 
 
 .kilometrajes-destino-header span {
-  color: #1671e8;
+  color: var(--theme-accent, #1671e8);
   font-size: 11px;
   font-weight: 700;
 }
@@ -887,20 +887,20 @@
 
 .kilometrajes-grid-table td {
   padding: 6px 8px;
-  border-bottom: 1px solid #edf1f5;
-  border-right: 1px solid #edf1f5;
-  background: #ffffff;
+  border-bottom: 1px solid var(--theme-border, #edf1f5);
+  border-right: 1px solid var(--theme-border, #edf1f5);
+  background: var(--theme-surface, #ffffff);
   text-align: center;
 }
 
 
 .kilometrajes-grid-table tbody tr:hover td {
-  background: #fafcff;
+  background: var(--theme-surface, #fafcff);
 }
 
 
 .kilometrajes-date-cell {
-  color: #4b5e78;
+  color: var(--theme-text, #4b5e78);
   font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
@@ -912,12 +912,12 @@
   height: 30px;
   padding: 0 5px;
 
-  border: 1px solid #cad4e0;
+  border: 1px solid var(--theme-border, #cad4e0);
   border-radius: 6px;
 
-  background: #ffffff;
+  background: var(--theme-input, #ffffff);
 
-  color: #23354e;
+  color: var(--theme-text, #23354e);
 
   font-size: 12px;
   font-weight: 600;
@@ -929,7 +929,7 @@
 
 
 .kilometrajes-input-cell input:focus {
-  border-color: #2f80ed;
+  border-color: var(--theme-accent, #2f80ed);
 
   box-shadow:
     0 0 0 3px
@@ -946,7 +946,7 @@
   left: 0;
   z-index: 4;
 
-  background: #f7f9fc !important;
+  background: var(--theme-surface-muted, #f7f9fc) !important;
 
   box-shadow:
     1px 0 0
@@ -956,13 +956,13 @@
 
 tbody
 .kilometrajes-sticky-column {
-  background: #ffffff !important;
+  background: var(--theme-surface, #ffffff) !important;
 }
 
 
 tfoot
 .kilometrajes-sticky-column {
-  background: #f4f8fd !important;
+  background: var(--theme-surface-muted, #f4f8fd) !important;
 }
 
 
@@ -973,12 +973,12 @@ tfoot
 .kilometrajes-grid-table tfoot td {
   padding: 11px 8px;
 
-  background: #f4f8fd;
+  background: var(--theme-surface-muted, #f4f8fd);
 
-  border-top: 1px solid #d8e3f0;
+  border-top: 1px solid var(--theme-border, #d8e3f0);
   border-bottom: none;
 
-  color: #24415f;
+  color: var(--theme-accent, #24415f);
 
   font-size: 12px;
   font-weight: 800;
@@ -992,7 +992,7 @@ tfoot
 
 
 .kilometrajes-total-cell {
-  color: #0f6bdc !important;
+  color: var(--theme-accent, #0f6bdc) !important;
 }
 
 
@@ -1008,9 +1008,9 @@ tfoot
 
   padding: 18px 22px;
 
-  border-top: 1px solid #e8edf4;
+  border-top: 1px solid var(--theme-border, #e8edf4);
 
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 }
 
 
@@ -1022,14 +1022,14 @@ tfoot
 
 
 .kilometrajes-grid-footer span {
-  color: #718097;
+  color: var(--theme-muted, #718097);
   font-size: 11px;
   font-weight: 600;
 }
 
 
 .kilometrajes-grid-footer strong {
-  color: #12243e;
+  color: var(--theme-text, #12243e);
   font-size: 23px;
   line-height: 1;
 }
@@ -1043,7 +1043,7 @@ tfoot
   border: none;
   border-radius: 8px;
 
-  background: #126fe5;
+  background: var(--theme-primary, #126fe5);
 
   color: #ffffff;
 
@@ -1060,7 +1060,7 @@ tfoot
 
 
 .kilometrajes-save-button:hover {
-  background: #0d63cf;
+  background: var(--theme-primary, #0d63cf);
 }
 
 
@@ -1079,9 +1079,9 @@ tfoot
 
   padding: 30px;
 
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 
-  border: 1px dashed #d2dce8;
+  border: 1px dashed var(--theme-border, #d2dce8);
   border-radius: 12px;
 
   display: flex;
@@ -1094,7 +1094,7 @@ tfoot
 
 
 .kilometrajes-empty-period strong {
-  color: #2e4058;
+  color: var(--theme-accent, #2e4058);
   font-size: 14px;
 }
 
@@ -1102,7 +1102,7 @@ tfoot
 .kilometrajes-empty-period span {
   margin-top: 5px;
 
-  color: #8997aa;
+  color: var(--theme-muted, #8997aa);
 
   font-size: 12px;
 }

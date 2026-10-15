@@ -3,6 +3,21 @@ from django.db import models
 from django.db.models import Q
 
 
+class ImportacionRepartosHistoricos(models.Model):
+    """Copia íntegra y separada; nunca recalcula ni duplica repartos operativos."""
+
+    origen_id = models.CharField(max_length=120, unique=True)
+    nombre = models.CharField(max_length=200)
+    huella = models.CharField(max_length=64, unique=True)
+    fuente = models.JSONField()
+    revision = models.JSONField()
+    creado_en = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "repartos_importacion_historica"
+        ordering = ["-creado_en", "-id"]
+
+
 class Reparto(models.Model):
     """
     Representa cada registro diario del sistema actual "Recargas 2026".
@@ -105,12 +120,20 @@ class Reparto(models.Model):
         return self.personal.count()
 
     @property
+    def recargas_autorizadas(self):
+        registro = getattr(self, 'registro_importado', None)
+        return bool(registro and registro.recargas_autorizadas)
+
+    @property
     def recargas_totales(self):
         """
         En el Apps Script actual:
 
         recargasTotales = recargas * cantidad de personas
         """
+        registro = getattr(self, 'registro_importado', None)
+        if registro and registro.recargas_autorizadas and registro.total_autorizado is not None:
+            return registro.total_autorizado
         return self.recargas * self.cantidad_personas
 
 

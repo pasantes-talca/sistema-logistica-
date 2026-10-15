@@ -3,6 +3,20 @@ from django.db import models
 from django.db.models import Q
 
 
+class ImportacionCambiosHistoricos(models.Model):
+    """Copia íntegra del histórico; no participa en la acumulación operativa."""
+    origen_id = models.CharField(max_length=120, unique=True)
+    nombre = models.CharField(max_length=200)
+    huella = models.CharField(max_length=64, unique=True)
+    fuente = models.JSONField()
+    revision = models.JSONField()
+    creado_en = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'cambios_importacion_historica'
+        ordering = ['-creado_en', '-id']
+
+
 class ReciboCambio(models.Model):
     """
     Representa un recibo de cambios.

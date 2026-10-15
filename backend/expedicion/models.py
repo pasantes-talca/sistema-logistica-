@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db import models
 
 from maestros.models import Producto
+import uuid
 
 
 # ============================================================
@@ -117,6 +118,10 @@ class StockProducto(models.Model):
 # ============================================================
 
 class OrdenCarga(models.Model):
+    circuito = models.CharField(max_length=30, default="administrative")
+    turno = models.CharField(max_length=10, blank=True, default="")
+    anulada = models.BooleanField(default=False)
+    version = models.PositiveIntegerField(default=1)
 
     class Estado(models.TextChoices):
 
@@ -152,6 +157,9 @@ class OrdenCarga(models.Model):
 
 
     class Facturacion(models.TextChoices):
+        PENDIENTE = "PENDIENTE", "Pendiente"
+        PAGADA = "PAGADA", "Pagada"
+        CORREGIDA = "CORREGIDA", "Corregida"
 
         NO_APLICA = (
             "NO_APLICA",
@@ -287,6 +295,8 @@ class DetalleOrdenCarga(models.Model):
 # ============================================================
 
 class EntregaOrdenCarga(models.Model):
+    turno = models.CharField(max_length=10, blank=True, default="")
+    fecha_operativa = models.DateField(null=True, blank=True)
 
     orden = models.ForeignKey(
         OrdenCarga,
@@ -381,6 +391,7 @@ class EntregaOrdenCarga(models.Model):
 class DetalleEntregaOrdenCarga(
     models.Model
 ):
+    producto_solicitado = models.ForeignKey(Producto, null=True, blank=True, on_delete=models.PROTECT, related_name="sustituciones_expedicion")
 
     entrega = models.ForeignKey(
         EntregaOrdenCarga,
@@ -411,6 +422,7 @@ class DetalleEntregaOrdenCarga(
                 fields=[
                     "entrega",
                     "producto",
+                    "producto_solicitado",
                 ],
                 name=(
                     "unique_producto_entrega_"
@@ -432,8 +444,20 @@ class DetalleEntregaOrdenCarga(
 # ============================================================
 
 class MovimientoStock(models.Model):
+    destino = models.CharField(max_length=30, blank=True, default="")
+    operacion = models.UUIDField(default=uuid.uuid4, db_index=True)
+    turno = models.CharField(max_length=10, blank=True, default="")
+    fecha_operativa = models.DateField(null=True, blank=True)
+    sin_impacto = models.BooleanField(default=False)
+    sin_codificar = models.BooleanField(default=False)
 
     class Tipo(models.TextChoices):
+        PRODUCCION = "PRODUCCION", "Producción codificada"
+        PRODUCCION_SIN_CODIFICAR = "PRODUCCION_SIN_CODIFICAR", "Producción sin codificar"
+        CORRECCION = "CORRECCION", "Corrección de orden"
+        ANULACION = "ANULACION", "Anulación con reversión"
+        BUFFET = "BUFFET", "Consumo interno / Buffet"
+        TRANSFERENCIA = "TRANSFERENCIA", "Transferencia provincial"
 
         INGRESO = (
             "INGRESO",
@@ -563,6 +587,9 @@ class MovimientoStock(models.Model):
 # ============================================================
 
 class MovimientoMaterial(models.Model):
+    turno = models.CharField(max_length=10, blank=True, default="")
+    fecha_operativa = models.DateField(null=True, blank=True)
+    observaciones = models.TextField(blank=True, default="")
 
     fletero = models.ForeignKey(
         Fletero,
@@ -653,3 +680,83 @@ class MovimientoMaterial(models.Model):
             f"{self.fletero} - "
             f"{self.referencia}"
         )
+
+
+class ConfiguracionProducto(models.Model):
+    producto = models.OneToOneField(Producto, on_delete=models.PROTECT, related_name="config_expedicion")
+    alias = models.CharField(max_length=30, blank=True)
+    unidades_pack = models.PositiveIntegerField(default=1)
+    packs_corte = models.PositiveIntegerField(default=20)
+    cortes_pallet = models.PositiveIntegerField(default=4)
+    beneficio_empleado = models.BooleanField(default=False)
+    sin_codificar = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    pendientes_manuales = models.JSONField(default=dict)
+
+
+class AuditoriaExpedicion(models.Model):
+    fecha = models.DateTimeField(auto_now_add=True)
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
+    turno = models.CharField(max_length=10)
+    accion = models.CharField(max_length=80)
+    referencia = models.CharField(max_length=120, blank=True)
+    motivo = models.TextField(blank=True)
+    antes = models.JSONField(default=dict)
+    despues = models.JSONField(default=dict)
+
+    class Meta:
+        ordering = ["-id"]
+
+
+class EmpleadoExpedicion(models.Model):
+    legajo = models.CharField(max_length=30, unique=True)
+    nombre = models.CharField(max_length=150)
+    apellido = models.CharField(max_length=150, blank=True)
+    activo = models.BooleanField(default=True)
+    saldo_fardos = models.PositiveIntegerField(default=0)
+
+
+class ComprobanteEmpleado(models.Model):
+    numero = models.PositiveIntegerField(default=0)
+    empleado = models.ForeignKey(EmpleadoExpedicion, on_delete=models.PROTECT, related_name="comprobantes")
+    tipo = models.CharField(max_length=20)
+    fecha = models.DateTimeField(auto_now_add=True)
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
+    turno = models.CharField(max_length=10)
+    lineas = models.JSONField(default=list)
+    observaciones = models.TextField(blank=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["tipo", "numero"], name="uq_comprobante_empleado_numero")]
+
+
+class ConteoExpedicion(models.Model):
+    fecha = models.DateTimeField(auto_now_add=True)
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name="conteos_expedicion")
+    turno = models.CharField(max_length=10)
+    tipo = models.CharField(max_length=30)
+    lineas = models.JSONField(default=list)
+    observaciones = models.TextField(blank=True)
+    corroborado_por = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name="relevos_expedicion")
+    corroborado_en = models.DateTimeField(null=True)
+
+
+class OperacionExpedicion(models.Model):
+    """Idempotency key: a retried HTTP request must never duplicate stock."""
+    clave = models.UUIDField(primary_key=True)
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    resultado = models.JSONField(default=dict)
+    fecha = models.DateTimeField(auto_now_add=True)
+
+
+class ControlOperativa(models.Model):
+    """Serializa operaciones y restauraciones del módulo (fila única)."""
+    revision = models.PositiveBigIntegerField(default=0)
+    contador_consumo = models.PositiveBigIntegerField(default=0)
+    contador_anticipo = models.PositiveBigIntegerField(default=0)
+
+
+class RespaldoExpedicion(models.Model):
+    fecha = models.DateTimeField(auto_now_add=True)
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
+    motivo = models.CharField(max_length=200)
+    datos = models.JSONField()

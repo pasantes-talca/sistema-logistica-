@@ -1,10 +1,19 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
+    <script>
+      // Aplicar antes del primer pintado evita destellos claros al recargar.
+      try {
+        const savedTheme = localStorage.getItem("talca-tema") ?? localStorage.getItem("expedicion-tema");
+        document.documentElement.dataset.theme = savedTheme === "oscuro" ? "dark" : "light";
+      } catch {
+        document.documentElement.dataset.theme = "light";
+      }
+    </script>
+    <title>Logística Talca</title>
   </head>
   <body>
     <div id="root"></div>

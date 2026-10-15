@@ -202,6 +202,9 @@ class OrdenCargaSerializer(
     class Meta:
         model = OrdenCarga
         fields = [
+            "anulada",
+            "circuito",
+            "version",
             "id",
             "numero",
             "fecha",
@@ -271,6 +274,8 @@ class MovimientoStockSerializer(
     class Meta:
         model = MovimientoStock
         fields = [
+            "sin_impacto",
+            "fecha_operativa",
             "id",
             "producto",
             "codigo",

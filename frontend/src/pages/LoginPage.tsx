@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { iniciarSesion } from "../api/logistica";
 import Icon from "../components/ui/Icon";
+import ThemeToggle from "../components/ui/ThemeToggle";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ export default function LoginPage() {
       <div className="logistics-visual" aria-hidden="true"><div className="route-line route-line-one"/><div className="route-line route-line-two"/><span className="route-node node-a"><Icon name="truck"/></span><span className="route-node node-b"><Icon name="package"/></span><span className="route-node node-c"><Icon name="shield"/></span></div>
       <div className="login-features"><span><Icon name="activity"/>Operación centralizada</span><span><Icon name="shield"/>Acceso interno seguro</span></div>
     </section>
-    <section className="login-access"><div className="login-card">
+    <section className="login-access"><div className="login-theme"><ThemeToggle /></div><div className="login-card">
       <div className="login-mobile-brand"><img src="/logo-talca.png" alt="Talca"/><strong>Logística</strong></div>
       <div className="login-marca"><span className="login-kicker">Acceso al sistema</span><h2>Bienvenido</h2><p>Ingresá tus credenciales para continuar.</p></div>
       <form className="login-formulario" onSubmit={enviar}>
