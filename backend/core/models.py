@@ -1,4 +1,21 @@
 from django.db import models
+from django.conf import settings
+
+
+class EventoAuditoria(models.Model):
+    fecha = models.DateTimeField(auto_now_add=True, db_index=True)
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
+    usuario = models.CharField(max_length=150)
+    modulo = models.CharField(max_length=40)
+    accion = models.CharField(max_length=80)
+    referencia = models.CharField(max_length=180, blank=True)
+    motivo = models.CharField(max_length=2000, blank=True)
+    antes = models.JSONField(default=dict)
+    despues = models.JSONField(default=dict)
+
+    class Meta:
+        db_table = "auditoria_sistema"
+        ordering = ["-id"]
 
 class RegistroImportacion(models.Model):
     """Trazabilidad interna; los datos de trabajo viven en los modelos normales."""

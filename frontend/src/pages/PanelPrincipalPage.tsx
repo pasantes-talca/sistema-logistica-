@@ -463,7 +463,7 @@ export default function PanelPrincipalPage() {
 
   const nombre = usuario?.nombre_completo || usuario?.username || "Usuario";
 
-  const esSuperusuario = usuario?.es_superusuario ?? false;
+  const esSuperusuario = usuario?.es_administrador || usuario?.es_superusuario || false;
 
   const grupos = usuario?.grupos ?? [];
 

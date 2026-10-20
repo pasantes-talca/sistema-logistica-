@@ -115,7 +115,9 @@ class ConversionOperativaTests(TestCase):
 
     def test_reporte_diferencia_autorizada_explicita_sin_repartir(self):
         convertir(fuentes(),aplicar=True)
-        client=APIClient();client.force_authenticate(get_user_model().objects.create_user('consulta'))
+        from django.contrib.auth.models import Group
+        u=get_user_model().objects.create_user('consulta');u.groups.add(Group.objects.get_or_create(name='REPARTOS')[0])
+        client=APIClient();client.force_authenticate(u)
         data=client.get('/api/repartos/reporte-recargas/?desde=2026-01-01&hasta=2026-12-31').json()
         self.assertEqual(data['total_general'],0)
         self.assertEqual(data['total_por_empleados'],6)
@@ -126,7 +128,9 @@ class ConversionOperativaTests(TestCase):
     def test_incluye_total_positivo_aunque_recarga_individual_cero(self):
         f=fuentes();f['repartos']['pestanas'][1]['filas'][1][9]='0';f['repartos']['pestanas'][1]['filas'][1][10]='2'
         convertir(f,aplicar=True)
-        client=APIClient();client.force_authenticate(get_user_model().objects.create_user('consulta'))
+        from django.contrib.auth.models import Group
+        u=get_user_model().objects.create_user('consulta');u.groups.add(Group.objects.get_or_create(name='REPARTOS')[0])
+        client=APIClient();client.force_authenticate(u)
         data=client.get('/api/repartos/reporte-recargas/?desde=2026-01-01&hasta=2026-12-31').json()
         self.assertEqual(data['total_general'],2);self.assertEqual(data['total_por_empleados'],0)
 

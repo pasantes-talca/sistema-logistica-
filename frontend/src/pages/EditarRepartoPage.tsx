@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import MotivoCorreccion from "../components/ui/MotivoCorreccion";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -14,6 +15,7 @@ import {
 } from "../api/logistica";
 
 export default function EditarRepartoPage() {
+  const [motivoCorreccion, setMotivoCorreccion] = useState("");
   const { id } = useParams();
 
   const repartoId = Number(id);
@@ -162,7 +164,7 @@ export default function EditarRepartoPage() {
       bultos: number;
       puntos_venta: string;
       observaciones: string;
-    }) => actualizarReparto(repartoId, datos),
+    }) => actualizarReparto(repartoId, {...datos, motivo_correccion: motivoCorreccion}),
 
     onSuccess: async (repartoActualizado) => {
       await queryClient.invalidateQueries({
@@ -418,6 +420,7 @@ export default function EditarRepartoPage() {
             />
           </div>
 
+          <MotivoCorreccion value={motivoCorreccion} onChange={setMotivoCorreccion}/>
           <div className="acciones-formulario">
             <button
               type="button"

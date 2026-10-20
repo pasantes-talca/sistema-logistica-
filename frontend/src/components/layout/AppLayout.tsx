@@ -250,6 +250,9 @@ const pageNames: Record<
   string
 > = {
 
+  administracion: "Administración",
+  usuarios: "Usuarios y accesos",
+  catalogos: "Catálogos",
   repartos:
     "Repartos y recargas",
 
@@ -455,9 +458,10 @@ export default function AppLayout({
   });
 
 
-  const esSuperusuario =
-    user?.es_superusuario
-    ?? false;
+  const esSuperusuario = user?.es_superusuario ?? false;
+  const esAdministrador = user?.es_administrador ?? esSuperusuario;
+  const puedeAdministrar = user?.puede_administrar ??
+    (esAdministrador && user?.username.toLowerCase() !== "arielgarro");
 
 
   const grupos =
@@ -470,7 +474,7 @@ export default function AppLayout({
   ) {
 
     if (
-      esSuperusuario
+      esAdministrador
     ) {
 
       return true;
@@ -484,7 +488,7 @@ export default function AppLayout({
 
 
   const modulesVisibles =
-    esSuperusuario
+    esAdministrador
       ? modules
       : modules.filter(
           module =>
@@ -495,7 +499,7 @@ export default function AppLayout({
 
 
   const puedeUsarAsistente =
-    esSuperusuario
+    esAdministrador
     ||
     grupos.includes(
       "ASISTENTE"
@@ -510,7 +514,7 @@ export default function AppLayout({
    * - grupo CAMBIOS
    */
   const puedeVerStock =
-    esSuperusuario
+    esAdministrador
     ||
     grupos.includes(
       "CAMBIOS"
@@ -546,8 +550,6 @@ export default function AppLayout({
 
       await cerrarSesion();
 
-    } finally {
-
       queryClient.clear();
 
 
@@ -558,6 +560,9 @@ export default function AppLayout({
             true,
         }
       );
+
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : "No se pudo cerrar la sesión. Volvé a intentarlo.");
 
     }
 
@@ -671,6 +676,7 @@ export default function AppLayout({
           }
         >
 
+          {puedeAdministrar && <NavLink to="/administracion/usuarios" className={({isActive})=>`nav-item ${isActive ? "active" : ""}`}><Icon name="shield"/><span>Administración</span></NavLink>}
           <span className="nav-caption">
             Plataforma
           </span>

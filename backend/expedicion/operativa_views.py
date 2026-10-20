@@ -1,16 +1,17 @@
 from rest_framework.permissions import IsAuthenticated, BasePermission
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from core.api import APIView
 from .operativa import comando, snapshot
 from .respaldos import exportar, restaurar
 from .models import RespaldoExpedicion, ControlOperativa
 from django.db import transaction
 from rest_framework.exceptions import ValidationError, PermissionDenied
+from core.permissions import tiene_modulo
 
 
 class AccesoExpedicion(BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_authenticated and (request.user.is_superuser or request.user.groups.filter(name="EXPEDICION").exists())
+        return tiene_modulo(request.user, "EXPEDICION")
 
 
 class OperativaAPIView(APIView):

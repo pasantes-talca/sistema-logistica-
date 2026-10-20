@@ -4,7 +4,7 @@ from django.utils.dateparse import parse_date
 
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from core.api import APIView
 
 from .models import Rechazo
 

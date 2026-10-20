@@ -3,6 +3,7 @@ from django.contrib.auth import (
     login,
     logout,
 )
+from .permissions import es_administrador, puede_administrar
 
 from django.utils.decorators import (
     method_decorator,
@@ -60,6 +61,8 @@ def obtener_datos_usuario(user):
 
         "grupos":
             grupos,
+        "es_administrador": es_administrador(user),
+        "puede_administrar": puede_administrar(user),
     }
 
 

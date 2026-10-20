@@ -43,10 +43,19 @@ const API_URL =
   import.meta.env.VITE_API_URL ||
   "http://127.0.0.1:8000/api";
 
+async function fetchConSesion(url: string, options: RequestInit = {}) {
+  const headers = new Headers(options.headers);
+  const token = obtenerCookie("csrftoken");
+  if (token && !["GET", "HEAD", "OPTIONS"].includes(options.method || "GET")) {
+    headers.set("X-CSRFToken", token);
+  }
+  return fetch(url, { ...options, credentials: "include", headers });
+}
+
 
 
 async function getJson<T>(url: string): Promise<T> {
-  const response = await fetch(url);
+  const response = await fetchConSesion(url);
 
   if (!response.ok) {
     throw new Error("Error al consultar el servidor.");
@@ -107,7 +116,7 @@ export async function crearReparto(
   const csrfToken =
     obtenerCookie("csrftoken");
 
-  const response = await fetch(
+  const response = await fetchConSesion(
     `${API_URL}/repartos/`,
     {
       method: "POST",
@@ -172,7 +181,7 @@ export async function actualizarReparto(
   datos: CrearRepartoPayload
 ): Promise<Reparto> {
 
-  const response = await fetch(
+  const response = await fetchConSesion(
     `${API_URL}/repartos/${id}/`,
     {
       method: "PUT",
@@ -219,7 +228,7 @@ export async function crearRechazo(
   datos: CrearRechazoPayload
 ): Promise<Rechazo> {
 
-  const response = await fetch(
+  const response = await fetchConSesion(
     `${API_URL}/rechazos/`,
     {
       method: "POST",
@@ -264,7 +273,7 @@ export async function actualizarRechazo(
   datos: CrearRechazoPayload
 ): Promise<Rechazo> {
 
-  const response = await fetch(
+  const response = await fetchConSesion(
     `${API_URL}/rechazos/${id}/`,
     {
       method: "PUT",
@@ -349,7 +358,7 @@ export function obtenerMotivosCambio(
 export async function guardarReciboCambio(
   datos: CrearReciboCambioPayload
 ): Promise<RespuestaGuardarReciboCambio> {
-  const response = await fetch(
+  const response = await fetchConSesion(
     `${API_URL}/cambios/recibos/`,
     {
       method: "POST",
@@ -391,7 +400,7 @@ export async function actualizarReciboCambio(
   datos: CrearReciboCambioPayload
 ): Promise<ReciboCambio> {
 
-  const response = await fetch(
+  const response = await fetchConSesion(
     `${API_URL}/cambios/recibos/${id}/`,
     {
       method: "PUT",
@@ -452,7 +461,7 @@ export async function iniciarSesion(
   datos: LoginPayload
 ): Promise<UsuarioActual> {
 
-  const response = await fetch(
+  const response = await fetchConSesion(
     `${API_URL}/auth/login/`,
     {
       method: "POST",
@@ -481,7 +490,7 @@ export async function iniciarSesion(
 export async function obtenerUsuarioActual():
 Promise<UsuarioActual> {
 
-  const response = await fetch(
+  const response = await fetchConSesion(
     `${API_URL}/auth/usuario/`,
     {
       credentials: "include",
@@ -501,7 +510,7 @@ Promise<UsuarioActual> {
 export async function cerrarSesion():
 Promise<void> {
 
-  const response = await fetch(
+  const response = await fetchConSesion(
     `${API_URL}/auth/logout/`,
     {
       method: "POST",
@@ -524,7 +533,7 @@ export async function preguntarAsistente(
     obtenerCookie("csrftoken");
 
 
-  const response = await fetch(
+  const response = await fetchConSesion(
     `${API_URL}/asistente/preguntar/`,
     {
       method: "POST",
@@ -612,7 +621,7 @@ export async function crearViatico(
   datos: CrearViaticoPayload
 ): Promise<Viatico> {
 
-  const response = await fetch(
+  const response = await fetchConSesion(
     `${API_URL}/viaticos/`,
     {
       method: "POST",
@@ -649,7 +658,7 @@ export async function actualizarViatico(
   datos: CrearViaticoPayload
 ): Promise<Viatico> {
 
-  const response = await fetch(
+  const response = await fetchConSesion(
     `${API_URL}/viaticos/${id}/`,
     {
       method: "PUT",
@@ -685,7 +694,7 @@ export async function eliminarViatico(
   id: number
 ): Promise<void> {
 
-  const response = await fetch(
+  const response = await fetchConSesion(
     `${API_URL}/viaticos/${id}/`,
     {
       method: "DELETE",
@@ -752,7 +761,7 @@ export async function crearControlKilometraje(
     obtenerCookie("csrftoken");
 
 
-  const response = await fetch(
+  const response = await fetchConSesion(
     `${API_URL}/kilometrajes/`,
     {
       method: "POST",
@@ -812,7 +821,7 @@ export async function eliminarControlKilometraje(
     obtenerCookie("csrftoken");
 
 
-  const response = await fetch(
+  const response = await fetchConSesion(
     `${API_URL}/kilometrajes/${id}/`,
     {
       method: "DELETE",
@@ -888,7 +897,7 @@ export function obtenerEstadisticasKilometrajes(
 export async function obtenerProductosControlDiario():
   Promise<ProductoControlDiario[]> {
 
-  const response = await fetch(
+  const response = await fetchConSesion(
     `${API_URL}/control-diario/productos/`,
     {
       credentials: "include",
@@ -908,7 +917,7 @@ export async function obtenerProductosControlDiario():
 export async function obtenerUbicacionesControlDiario():
   Promise<UbicacionControlDiario[]> {
 
-  const response = await fetch(
+  const response = await fetchConSesion(
     `${API_URL}/control-diario/ubicaciones/`,
     {
       credentials: "include",
@@ -960,7 +969,7 @@ export async function obtenerControlesDiarios(
       : `${API_URL}/control-diario/`;
 
 
-  const response = await fetch(
+  const response = await fetchConSesion(
     url,
     {
       credentials: "include",
@@ -983,7 +992,7 @@ export async function obtenerControlDiario(
   id: number
 ): Promise<ControlDiario> {
 
-  const response = await fetch(
+  const response = await fetchConSesion(
     `${API_URL}/control-diario/${id}/`,
     {
       credentials: "include",
@@ -1012,7 +1021,7 @@ export async function crearControlDiario(
     );
 
 
-  const response = await fetch(
+  const response = await fetchConSesion(
     `${API_URL}/control-diario/`,
     {
       method: "POST",
@@ -1080,7 +1089,7 @@ export async function eliminarControlDiario(
     );
 
 
-  const response = await fetch(
+  const response = await fetchConSesion(
     `${API_URL}/control-diario/${id}/`,
     {
       method: "DELETE",
@@ -1111,7 +1120,7 @@ export async function obtenerResumenControlDiario(
   id: number
 ): Promise<ResumenControlDiario> {
 
-  const response = await fetch(
+  const response = await fetchConSesion(
     `${API_URL}/control-diario/${id}/resumen/`,
     {
       credentials: "include",
@@ -1164,7 +1173,7 @@ export async function obtenerEstadisticasControlDiario(
       : `${API_URL}/control-diario/estadisticas/`;
 
 
-  const response = await fetch(
+  const response = await fetchConSesion(
     url,
     {
       credentials: "include",

@@ -3,6 +3,7 @@ from datetime import date
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from rest_framework.test import APIClient
+from django.contrib.auth.models import Group
 
 from maestros.models import Producto
 from .models import DetalleOrdenCarga, EntregaOrdenCarga, Fletero, OrdenCarga
@@ -14,6 +15,7 @@ class EditarOrdenCargaTests(TestCase):
             username="expedicion-test", password="test-seguro-123"
         )
         self.cliente = APIClient()
+        self.usuario.groups.add(Group.objects.get_or_create(name="EXPEDICION")[0])
         self.cliente.force_authenticate(self.usuario)
         self.fletero = Fletero.objects.create(nombre="Fletero inicial")
         self.otro_fletero = Fletero.objects.create(nombre="Fletero nuevo")

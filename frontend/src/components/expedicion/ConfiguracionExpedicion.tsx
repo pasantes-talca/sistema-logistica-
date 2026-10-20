@@ -193,6 +193,7 @@ export default function ConfiguracionExpedicion({
           </div>
           {data.admin ? (
             <>
+              <p className="eo-config-caption">Para asignar secciones y gestionar contraseñas, usá <Link to="/administracion/usuarios">Administración → Usuarios y accesos</Link>.</p>
               <FiltroPadron
                 nombre="usuarios"
                 busqueda={usuariosBusqueda}

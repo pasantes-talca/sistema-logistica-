@@ -2,7 +2,8 @@ from django.shortcuts import get_object_or_404
 from django.http import Http404
 from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from core.api import APIView
+from core.permissions import tiene_modulo
 
 from .historicos import registros_originales, resumenes_originales
 from .models import ImportacionRepartosHistoricos
@@ -10,7 +11,7 @@ from .models import ImportacionRepartosHistoricos
 
 class AccesoHistoricoRepartos(BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_authenticated and (request.user.is_superuser or request.user.groups.filter(name='REPARTOS').exists())
+        return tiene_modulo(request.user, "REPARTOS")
 
 
 class ImportacionesHistoricasAPIView(APIView):

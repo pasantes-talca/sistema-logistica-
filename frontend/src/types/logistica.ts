@@ -59,6 +59,7 @@ export interface Reparto {
 }
 
 export interface CrearRepartoPayload {
+  motivo_correccion?: string;
   fecha: string;
   vehiculo_id: number | null;
   asignacion_id: number | null;
@@ -118,6 +119,7 @@ export interface Rechazo {
 
 
 export interface CrearRechazoPayload {
+  motivo_correccion?: string;
   fecha: string;
 
   asignacion_id: number | null;
@@ -224,6 +226,7 @@ export interface DetalleReciboCambioPayload {
 }
 
 export interface CrearReciboCambioPayload {
+  motivo_correccion?: string;
   fecha: string;
   concesionario_id: number;
 
@@ -285,6 +288,8 @@ export interface EstadisticasCambios {
 
 
 export interface UsuarioActual {
+  puede_administrar?: boolean;
+  es_administrador: boolean;
   autenticado: boolean;
   id: number;
   username: string;
@@ -376,6 +381,7 @@ export interface Viatico {
 
 
 export interface CrearViaticoPayload {
+  motivo_correccion?: string;
 
   chofer: number;
 

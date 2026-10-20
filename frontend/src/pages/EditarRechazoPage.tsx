@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import MotivoCorreccion from "../components/ui/MotivoCorreccion";
 
 import {
   useMutation,
@@ -20,6 +21,7 @@ import {
 
 
 export default function EditarRechazoPage() {
+  const [motivoCorreccion, setMotivoCorreccion] = useState("");
 
   const { id } = useParams();
 
@@ -138,7 +140,7 @@ export default function EditarRechazoPage() {
     }) =>
       actualizarRechazo(
         rechazoId,
-        datos
+        {...datos, motivo_correccion: motivoCorreccion}
       ),
 
 
@@ -471,6 +473,7 @@ export default function EditarRechazoPage() {
           </div>
 
 
+          <MotivoCorreccion value={motivoCorreccion} onChange={setMotivoCorreccion}/>
           <div className="acciones-formulario">
 
             <button

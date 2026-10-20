@@ -23,6 +23,7 @@ from .models import (
     MovimientoStock, OperacionExpedicion, OrdenCarga, StockProducto, ControlOperativa,
 )
 from .serializers import OrdenCargaSerializer
+from core.permissions import es_administrador
 
 CIRCUITOS = {
     "administrative": "Pendiente administrativo", "preventa": "Preventa",
@@ -320,7 +321,7 @@ def snapshot(user):
             pendientes=ps, pendientes_manuales=manual))
     def persona(u):
         return (u.get_full_name() or u.username) if u else ""
-    return dict(usuario=persona(user), admin=user.is_staff or user.is_superuser, superusuario=user.is_superuser,
+    return dict(usuario=persona(user), admin=es_administrador(user), superusuario=user.is_superuser,
         productos=productos, ordenes=orders,
         fleteros=list(Fletero.objects.values()), empleados=list(EmpleadoExpedicion.objects.values()),
         movimientos=[dict(id=m.pk, producto=m.producto_id, tipo=m.tipo, destino=m.destino, direccion=m.direccion,
@@ -342,7 +343,7 @@ def snapshot(user):
             accion=a.accion, referencia=a.referencia, motivo=a.motivo, antes=a.antes, despues=a.despues)
             for a in AuditoriaExpedicion.objects.select_related("usuario")],
         usuarios=[dict(id=u.pk, username=u.username, nombre=persona(u), activo=u.is_active)
-            for u in get_user_model().objects.all()] if user.is_staff or user.is_superuser else [])
+            for u in get_user_model().objects.all()] if es_administrador(user) else [])
 
 
 @transaction.atomic
@@ -532,33 +533,16 @@ def comando(data, user):
         c.save()
         auditoria(user, turno, "Corroborar relevo", c.pk)
     elif action == "usuario":
-        if not (user.is_staff or user.is_superuser):
-            raise PermissionDenied("Solo un administrador puede gestionar usuarios.")
-        User = get_user_model()
-        u = get_object_or_404(User, pk=data["id"]) if data.get("id") else User()
-        if u.is_superuser and not user.is_superuser:
-            raise PermissionDenied()
-        u.username = texto(data, "username", 150, True)
-        if User.objects.filter(username=u.username).exclude(pk=u.pk).exists():
-            raise ValidationError("El usuario ya existe.")
-        u.first_name = texto(data, "nombre", 150)
-        u.is_active = data.get("activo", True) is True
-        if u.pk == user.pk and not u.is_active:
-            raise ValidationError("No podés desactivar tu propia sesión.")
-        password = texto(data, "password", 128)
-        if password:
-            from django.contrib.auth.password_validation import validate_password
-            from django.core.exceptions import ValidationError as DjangoValidationError
-            try:
-                validate_password(password, u)
-            except DjangoValidationError as exc:
-                raise ValidationError(exc.messages)
-            u.set_password(password)
-        elif not u.pk:
-            raise ValidationError("Ingresá una contraseña.")
-        u.save()
-        from django.contrib.auth.models import Group
-        u.groups.add(Group.objects.get_or_create(name="EXPEDICION")[0])
+        from core.cuentas import guardar_cuenta
+        payload = {"username": data.get("username"), "nombre": data.get("nombre", ""), "activo": data.get("activo", True)}
+        if data.get("password"):
+            payload["password"] = data["password"]
+        if not data.get("id"):
+            payload["modulos"] = ["EXPEDICION"]
+        # No se permite elevar privilegios por el endpoint anterior.
+        if any(k in data for k in ("is_superuser", "is_staff", "grupos", "groups", "administrador", "modulos")):
+            raise ValidationError("Asigná accesos desde Administración > Usuarios.")
+        u = guardar_cuenta(user, payload, data.get("id"))
         auditoria(user, turno, "Gestionar usuario", u.username)
     else:
         raise ValidationError("Operación desconocida.")

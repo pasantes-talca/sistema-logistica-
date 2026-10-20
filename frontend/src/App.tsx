@@ -8,6 +8,7 @@ import RutaProtegida from "./components/RutaProtegida";
 import AppLayout from "./components/layout/AppLayout";
 
 import LoginPage from "./pages/LoginPage";
+import AdministracionPage from "./pages/AdministracionPage";
 import PanelPrincipalPage from "./pages/PanelPrincipalPage";
 
 
@@ -152,6 +153,7 @@ function App() {
               <AppLayout>
 
                 <Routes>
+                  <Route path="/administracion/*" element={<AdministracionPage />} />
 
 
                   {/* ============================= */}

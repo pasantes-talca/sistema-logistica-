@@ -1,5 +1,5 @@
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from core.api import APIView
 from django.db.models import IntegerField
 from django.db.models.functions import Cast
 

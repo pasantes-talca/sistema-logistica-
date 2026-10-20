@@ -1,3 +1,4 @@
+import MotivoCorreccion from "../components/ui/MotivoCorreccion";
 import {
   useEffect,
   useMemo,
@@ -34,6 +35,7 @@ interface FilaProducto {
 
 
 export default function EditarReciboCambioPage() {
+  const [motivoCorreccion, setMotivoCorreccion] = useState("");
 
   const { id } = useParams();
 
@@ -348,7 +350,7 @@ export default function EditarReciboCambioPage() {
     ) =>
       actualizarReciboCambio(
         reciboId,
-        datos
+        {...datos, motivo_correccion: motivoCorreccion}
       ),
 
 
@@ -838,6 +840,7 @@ export default function EditarReciboCambioPage() {
           </div>
 
 
+          <MotivoCorreccion value={motivoCorreccion} onChange={setMotivoCorreccion}/>
           <div className="acciones-formulario">
 
             <button
