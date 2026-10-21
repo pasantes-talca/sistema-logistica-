@@ -1,5 +1,16 @@
 # Administrador operativo de Logística Talca
 
+## Simplificación de la interfaz (21/10/2026)
+
+Por solicitud del usuario se retiraron de Administración las pantallas Catálogos y
+Configuración general, sus enlaces y formularios. Las rutas anteriores redirigen al
+panel administrativo. No se eliminaron registros, tablas, endpoints ni preferencias
+persistidas; se mantienen por compatibilidad y para no afectar los módulos operativos.
+Seguridad conserva únicamente el formulario de políticas de contraseñas/sesiones,
+y Notificaciones sigue mostrando las alertas sin enlaces a Configuración eliminada.
+La configuración propia de Expedición no cambió. Las secciones descritas más abajo
+como Catálogos/Configuración corresponden a la implementación anterior del backend.
+
 ## Rol y límites
 
 El grupo **ADMINISTRADOR** concede acceso a todos los módulos de la aplicación,
@@ -100,3 +111,61 @@ correo en memoria y cuentas ficticias. `frontend/scripts/administracion-smoke.cj
 verifica las acciones completas en navegador, roles reales, protección de cuentas,
 CSRF, exportación, modo oscuro, resoluciones pequeñas y acceso por URL directa.
 Nunca usa PostgreSQL para estas pruebas ni envía correo real.
+
+## Panel administrativo ampliado (sin sucursales)
+
+Se agregaron rutas de Administración para panel, permisos por acción, configuración,
+base de datos, incidencias, reportes, notificaciones, seguridad y estado. Conservan
+la restricción de acceso del módulo, incluida la exclusión de `arielgarro`.
+
+Las tablas nuevas son `administracion_preferencias`, `administracion_acceso_acciones`
+y `administracion_incidencia`. El 20/10/2026 se instalaron y validaron en `logistica.log`
+mediante el instalador aditivo; no se alteraron tablas de negocio ni credenciales.
+Para otra instalación equivalente, **antes de reiniciar el backend actualizado**:
+
+```text
+python manage.py instalar_panel_control
+python manage.py instalar_panel_control --aplicar
+```
+
+No ejecutar migraciones generales sobre esta BD con historial incompleto. En pruebas
+o instalaciones nuevas se usa `core/0003`. Las tres tablas existentes se validan y se
+adoptan sin alterarlas si posteriormente se reconcilia el historial de migraciones.
+
+- Los grupos actuales siguen otorgando módulos. Los perfiles de consulta u operador
+  son plantillas para restricciones individuales por acción, persistidas y auditadas.
+  Sin restricciones explícitas se conserva el acceso anterior; el panel no reduce
+  permisos automáticamente. Una política no concede módulos ni evita las protecciones
+  originales de cada API. No habilita borrado de históricos. Exportar restringe descargas
+  identificadas en el backend; no impide copiar información que el usuario puede consultar.
+- Configurar controla los comandos de catálogos y parámetros de Expedición; editar,
+  las correcciones y órdenes existentes; anular, las anulaciones. Los endpoints anteriores
+  también están sujetos a la verificación central. Se conservan fórmulas y estados del negocio.
+- El panel cuenta registros por fecha operativa de siete módulos y actividad auditada.
+  El reporte CSV agrupa por usuario, módulo y acción, con neutralización de fórmulas.
+  No reconstruye auditoría anterior ni infiere productividad laboral.
+- Preferencias: nombre del panel, período predeterminado, alertas, umbral de incidencias,
+  longitud mínima de nuevas contraseñas y duración absoluta de sesiones. Se exige motivo.
+  No admite editar SQL, tipos de negocio, fórmulas, variables de entorno ni secretos.
+- La política de longitud adicional se aplica al crear/restablecer contraseñas en Talca;
+  los comandos técnicos de Django mantienen sus propios validadores. El límite absoluto
+  de sesión se verifica para ingresos realizados con esta versión. Las sesiones anteriores
+  pueden revocarse explícitamente. No se muestran claves de sesión ni se permite cerrar
+  las de cuentas protegidas. El conteo de sesiones no significa presencia en línea.
+- Se registran respuestas HTTP de API con estado >=400 desde esta versión, incluidas
+  autenticaciones rechazadas. Solo ruta del resolver, método, código, categoría y usuario
+  autenticado; no cuerpos, consultas, credenciales ni mensajes/trazas de excepción.
+  La lista muestra las últimas 100, permite marcar revisión con motivo y conserva el historial.
+  No captura consola del navegador ni errores previos. Si no puede guardar una incidencia,
+  deja una advertencia técnica sin reemplazar la respuesta original.
+- Alertas internas: órdenes abiertas, cierres pendientes y umbral de incidencias sin revisar
+  de las últimas 24 horas. Son calculadas al consultar; no hay envío de correos ni procesos
+  programados externos. Se activan/desactivan en Configuración.
+- Diagnóstico: conexión con SELECT 1, base/schema, latencia, versiones y banderas de seguridad.
+  No expone hosts/credenciales ni permite modificaciones directas. Lista respaldos internos
+  de Expedición sin leer su contenido. El respaldo completo de PostgreSQL y servicios
+  externos figuran como **no verificados** hasta integrarlos con el responsable del servidor.
+
+La prueba `frontend/scripts/administracion-herramientas-smoke.cjs` usa exclusivamente
+el servidor efímero para recorrer las nueve pantallas nuevas, configurar accesos y
+preferencias, exportar CSV y comprobar el bloqueo de APIs, tema oscuro y responsive.

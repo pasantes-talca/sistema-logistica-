@@ -1,5 +1,6 @@
 """Respaldos del módulo: sin credenciales, restauración atómica y copia previa."""
 import json
+from copy import deepcopy
 from django.core import serializers
 from django.core.exceptions import ValidationError as ModelValidationError
 from django.contrib.auth import get_user_model
@@ -62,7 +63,7 @@ def restaurar(payload, user, preview=False):
     for p in payload.get("productos", []):
         if not isinstance(p, dict) or not p.get("codigo") or not isinstance(p.get("id"), int):
             raise ValidationError("Catálogo de respaldo inválido.")
-        obj, _ = Producto.objects.get_or_create(codigo=p["codigo"], defaults={k: p.get(k, "") for k in ("nombre", "familia", "presentacion", "sabor")})
+        obj, _ = Producto.objects.get_or_create(codigo=p["codigo"], defaults={**{k: p.get(k, "") for k in ("nombre", "familia", "presentacion", "sabor")}, "activo": p.get("activo", True)})
         products[p["id"]] = obj.pk
     names = {u["id"]: u["username"] for u in payload.get("usuarios", [])}
     users = dict(get_user_model().objects.values_list("username", "pk"))
@@ -74,7 +75,7 @@ def restaurar(payload, user, preview=False):
     try:
         for model in MODELOS:
             batch = [r for r in rows if r["model"] == model._meta.label_lower]
-            for entry in serializers.deserialize("python", batch):
+            for entry in serializers.deserialize("python", deepcopy(batch)):
                 obj = entry.object
                 for field in obj._meta.fields:
                     if not field.is_relation:

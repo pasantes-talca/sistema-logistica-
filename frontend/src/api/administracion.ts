@@ -54,7 +54,7 @@ function explicar(value: unknown): string {
   return "No se pudo completar la operación.";
 }
 
-async function respuesta(path: string, method = "GET", data?: unknown) {
+export async function respuesta(path: string, method = "GET", data?: unknown) {
   const csrf = document.cookie
     .split(";")
     .map((c) => c.trim())

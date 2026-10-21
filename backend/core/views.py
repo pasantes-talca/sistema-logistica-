@@ -139,6 +139,8 @@ class LoginAPIView(APIView):
         request.session.set_expiry(
             0
         )
+        from django.utils import timezone
+        request.session["talca_inicio"] = timezone.now().timestamp()
 
 
         datos_usuario = (

@@ -11,9 +11,15 @@ import re
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from rest_framework.exceptions import ValidationError
+from .firebase_preparacion import preparar
+
+
+def nota_origen(note, author):
+    return "\n".join(filter(None, [str(note or ""), f"Usuario original: {author}" if author else ""]))
 
 
 def convertir(payload):
+    payload, informe = preparar(payload)
     data = payload.get("data", payload)
     if not isinstance(data, dict) or not isinstance(data.get("products"), list) or not isinstance(data.get("stock"), dict):
         raise ValidationError("El archivo no es un respaldo de Talca Expedición.")
@@ -75,7 +81,8 @@ def convertir(payload):
             raise ValidationError("Hay códigos de producto vacíos o duplicados.")
         pid = len(products) + 1
         maps[("producto", code)] = pid
-        products.append({"id": pid, "codigo": code, "nombre": str(p.get("name", code)), "familia": "GASEOSA", "presentacion": "", "sabor": "", "activo": p.get("active", True)})
+        family = "SODA" if code in {"417", "4171", "4900"} else "SIFON" if code == "4910" else "AGUA" if code in {"BIDON", "8687", "8680", "8670"} else "GASEOSA"
+        products.append({"id": pid, "codigo": code, "nombre": str(p.get("name", code)), "familia": family, "presentacion": "", "sabor": "", "activo": p.get("active", True)})
         bucket = buckets.get(code, {})
         pack, cut, pallet = [qty(p.get(k, default)) for k, default in (("pack", 1), ("perCut", 20), ("cuts", 4))]
         if any(n <= 0 or n != int(n) for n in (pack, cut, pallet)):
@@ -84,8 +91,9 @@ def convertir(payload):
         add("configuracionproducto", {"producto": pid, "alias": str(p.get("alias", "")), "unidades_pack": int(pack), "packs_corte": int(cut),
             "cortes_pallet": int(pallet), "beneficio_empleado": bool(p.get("employeeBenefit", code in {"5670", "5675", "5680", "5685", "5690", "8670"})),
             "sin_codificar": qty(bucket.get("sinCodificar", 0)), "pendientes_manuales": manual})
-        add("stockproducto", {"producto": pid, "cantidad_unidades": qty(data["stock"].get(code, bucket.get("physical", 0)), True),
-            "stock_minimo": qty(p.get("minStock", 0)) * pack, "stock_critico": qty(p.get("criticalStock", 0)) * pack, "actualizado_en": stamp(None)})
+        if not p.get("historicalOnly"):
+            add("stockproducto", {"producto": pid, "cantidad_unidades": qty(data["stock"].get(code, bucket.get("physical", 0)), True),
+                "stock_minimo": qty(p.get("minStock", 0)) * pack, "stock_critico": qty(p.get("criticalStock", 0)) * pack, "actualizado_en": stamp(payload.get("exportedAt"))})
     for f in data.get("fleteros", []):
         add("fletero", {"nombre": str(f.get("name", "")), "apellido": str(f.get("surname", "")), "empresa": str(f.get("company", "")),
             "activo": f.get("active", True), "creado_en": stamp(None), "actualizado_en": stamp(None)}, f["id"])
@@ -100,7 +108,7 @@ def convertir(payload):
         circuit = o.get("pendingType", "administrative")
         oid = add("ordencarga", {"numero": str(o.get("number", "")), "fecha": str(o.get("date") or stamp(o.get("createdAt"))[:10]),
             "fletero": resolve("fletero", o.get("fleteroId")), "estado": "COMPLETA" if not outstanding else "PARCIAL" if o.get("deliveries") else "RECIBIDA",
-            "facturacion": billing.get(o.get("billing"), "NO_APLICA"), "observaciones": str(o.get("note", "")),
+            "facturacion": billing.get(o.get("billing"), "NO_APLICA"), "observaciones": nota_origen(o.get("note"), o.get("createdBy")),
             "creado_por": usernames.get(o.get("createdBy")), "creado_en": stamp(o.get("createdAt")), "actualizado_en": stamp(o.get("createdAt")),
             "circuito": circuit, "turno": str(o.get("createdShift", "")), "anulada": circuit == "cancelled", "version": 1}, o["id"])
         order_numbers[str(o.get("number"))] = oid
@@ -109,14 +117,14 @@ def convertir(payload):
         for d in o.get("deliveries", []):
             did = add("entregaordencarga", {"orden": oid, "fecha": stamp(d.get("date")), "fecha_operativa": stamp(d.get("date"))[:10], "turno": str(d.get("shift", "")),
                 "inicio_carga": None, "fin_carga": None, "pallets_salida": qty(d.get("palletOut")), "pallets_entrada": qty(d.get("palletIn")),
-                "chapadur_salida": qty(d.get("chapOut")), "chapadur_entrada": qty(d.get("chapIn")), "observaciones": str(d.get("note", "")),
+                "chapadur_salida": qty(d.get("chapOut")), "chapadur_entrada": qty(d.get("chapIn")), "observaciones": nota_origen(d.get("note"), d.get("user")),
                 "justificacion_stock": str(d.get("stockJustification", "")), "creado_por": usernames.get(d.get("user"))})
             for l in d.get("lines", []):
                 add("detalleentregaordencarga", {"entrega": did, "producto": resolve("producto", l["productId"]), "producto_solicitado": resolve("producto", l.get("sourceProductId", l["productId"])), "cantidad_entregada": qty(l.get("total"), True)})
         for h in o.get("editHistory", []):
             add("auditoriaexpedicion", {"fecha": stamp(h.get("date")), "usuario": usernames.get(h.get("user")), "turno": str(h.get("shift", "")),
                 "accion": "Corrección importada", "referencia": str(o.get("number", "")), "motivo": str(h.get("reason", "")),
-                "antes": {**h.get("before", {}), "id": oid}, "despues": {**h.get("after", {}), "id": oid}})
+                "antes": {**h.get("before", {}), "id": oid}, "despues": {**h.get("after", {}), "id": oid, "usuario_original": h.get("user", "")}})
     for m in data.get("movements", []):
         order = maps.get(("ordencarga", str(m.get("orderId"))))
         if not order and "orden" in str(m.get("type", "")).lower():
@@ -150,23 +158,23 @@ def convertir(payload):
             raise ValidationError(f"Número de comprobante inválido: {reference}.")
         add("comprobanteempleado", {"numero": int(match.group(1)), "empleado": resolve("empleadoexpedicion", e["id"]),
             "tipo": "CONSUMO" if reference.startswith("CE") else "ANTICIPO", "fecha": stamp(m.get("date")),
-            "usuario": usernames.get(m.get("user")), "turno": str(m.get("shift", "")), "observaciones": str(m.get("note", "")),
+            "usuario": usernames.get(m.get("user")), "turno": str(m.get("shift", "")), "observaciones": nota_origen(m.get("note"), m.get("user")),
             "lineas": [{"producto": resolve("producto", l["productId"]), "codigo": str(l["productId"]),
                 "nombre": next(p["nombre"] for p in products if p["codigo"] == str(l["productId"])),
                 "unidades": qty(l.get("total")), "pack": next(int(p.get("pack", 1)) for p in data["products"] if str(p["id"]) == str(l["productId"]))} for l in group]})
     for m in data.get("materialMoves", []):
         add("movimientomaterial", {"fletero": resolve("fletero", m.get("fleteroId")), "orden": maps.get(("ordencarga", str(m.get("orderId")))) or order_numbers.get(str(m.get("ref"))),
             "referencia": str(m.get("ref", "")), "origen": str(m.get("source", "")), "creado_por": usernames.get(m.get("user")),
-            "creado_en": stamp(m.get("date")), "fecha_operativa": stamp(m.get("date"))[:10], "turno": str(m.get("shift", "")), "observaciones": str(m.get("note", "")),
+            "creado_en": stamp(m.get("date")), "fecha_operativa": stamp(m.get("date"))[:10], "turno": str(m.get("shift", "")), "observaciones": nota_origen(m.get("note"), m.get("user")),
             "pallets_salida": qty(m.get("palletOut")), "pallets_entrada": qty(m.get("palletIn")), "chapadur_salida": qty(m.get("chapOut")), "chapadur_entrada": qty(m.get("chapIn"))})
     for c in data.get("counts", []):
         add("conteoexpedicion", {"fecha": stamp(c.get("date")), "usuario": usernames.get(c.get("user")), "turno": str(c.get("shift", "")), "tipo": str(c.get("type", "Cierre de turno")),
             "lineas": [{"producto": resolve("producto", l["productId"]), "codigo": str(l["productId"]), "nombre": next(p["nombre"] for p in products if p["codigo"] == str(l["productId"])),
                 "fisico": qty(l.get("physical")), "diferencia": qty(l.get("diff"), True), "sistema": qty(l.get("physical")) - qty(l.get("diff"), True)} for l in c.get("differences", [])],
-            "observaciones": str(c.get("note", "")), "corroborado_por": usernames.get(c.get("correlatedBy")), "corroborado_en": stamp(c.get("correlatedAt")) if c.get("correlatedAt") else None})
+            "observaciones": nota_origen(c.get("note"), c.get("user")), "corroborado_por": usernames.get(c.get("correlatedBy")), "corroborado_en": stamp(c.get("correlatedAt")) if c.get("correlatedAt") else None})
     for a in data.get("audit", []):
         add("auditoriaexpedicion", {"fecha": stamp(a.get("date")), "usuario": usernames.get(a.get("user")), "turno": str(a.get("shift", "")),
             "accion": str(a.get("action", "Importado")), "referencia": str(a.get("ref", "")), "motivo": str(a.get("detail", "")),
             "antes": {}, "despues": {"origen": "Firebase", "entidad": a.get("entity", ""), "usuario_original": a.get("user", "")}})
     return {"formato": "talca-expedicion-django", "version": 1, "productos": products, "contadores": data.get("counters", {}),
-        "usuarios": [{"id": u["id"], "username": u["username"]} for u in users], "registros": rows}
+        "usuarios": [{"id": u["id"], "username": u["username"]} for u in users], "registros": rows, "informe": informe}

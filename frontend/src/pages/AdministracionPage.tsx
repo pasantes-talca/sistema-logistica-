@@ -8,27 +8,23 @@ import {
   type ReactElement,
   type FormEvent,
 } from "react";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Navigate, NavLink, useLocation } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { obtenerUsuarioActual } from "../api/logistica";
 import {
   listarUsuarios,
   guardarUsuario,
   restablecerPassword,
-  listarCatalogos,
-  leerCatalogo,
-  guardarCatalogo,
   listarAuditoria,
   exportarAuditoria,
   type Cuenta,
   type DatosCuenta,
   type Modulo,
-  type Catalogo,
-  type RegistroCatalogo,
   type Evento,
 } from "../api/administracion";
 import Icon from "../components/ui/Icon";
 import "./AdministracionPage.css";
+import AdministracionHerramientas from "./AdministracionHerramientas";
 
 function Mensaje({ error, mensaje }: { error?: string; mensaje?: string }) {
   return (
@@ -88,7 +84,13 @@ function Dialogo({
     </dialog>
   );
 }
-function Campo({ label, children }: { label: string; children: ReactElement<{ id?: string }> }) {
+function Campo({
+  label,
+  children,
+}: {
+  label: string;
+  children: ReactElement<{ id?: string }>;
+}) {
   const id = useId();
   return (
     <div className="campo">
@@ -134,7 +136,9 @@ function CuentaFormulario({
     [busy, setBusy] = useState(false);
   const cambiar = (campo: "username" | "nombre" | "apellido", valor: string) =>
     setDatos((d) => ({ ...d, [campo]: valor }));
-  const administra = superusuario ? Boolean(datos.administrador) : Boolean(initial?.administrador);
+  const administra = superusuario
+    ? Boolean(datos.administrador)
+    : Boolean(initial?.administrador);
   async function submit(e: FormEvent) {
     e.preventDefault();
     setError("");
@@ -534,316 +538,6 @@ function Usuarios() {
   );
 }
 
-const nombres: Record<string, string> = {
-  nombre: "Nombre",
-  apellido: "Apellido",
-  legajo: "Legajo",
-  puesto: "Puesto",
-  disponible: "Disponible para repartos",
-  activo: "Activo",
-  patente: "Patente",
-  descripcion: "Descripción",
-  tipo: "Tipo",
-  codigo: "Código",
-  chofer_predeterminado: "Chofer predeterminado",
-};
-function CatalogoFormulario({
-  catalogo,
-  initial,
-  empleados,
-  familias,
-  close,
-  saved,
-}: {
-  catalogo: Catalogo;
-  initial: RegistroCatalogo | null;
-  empleados: { id: number; nombre: string }[];
-  familias: string[];
-  close: () => void;
-  saved: () => void;
-}) {
-  const [values, setValues] = useState<Record<string, unknown>>(() =>
-    Object.fromEntries(
-      catalogo.campos.map((f) => [
-        f.clave,
-        initial?.[f.clave] ?? (f.tipo === "boolean" ? true : ""),
-      ]),
-    ),
-  );
-  const [permitidas, setPermitidas] = useState<string[]>(
-      initial?.familias || [],
-    ),
-    [motivo, setMotivo] = useState(""),
-    [error, setError] = useState(""),
-    [busy, setBusy] = useState(false);
-  async function submit(e: FormEvent) {
-    e.preventDefault();
-    setError("");
-    setBusy(true);
-    try {
-      await guardarCatalogo(catalogo.clave, initial?.id || null, {
-        ...values,
-        ...(catalogo.clave === "motivos-cambio"
-          ? { familias: permitidas }
-          : {}),
-        ...(initial ? { motivo } : {}),
-      });
-      saved();
-    } catch (e) {
-      setError((e as Error).message);
-    } finally {
-      setBusy(false);
-    }
-  }
-  return (
-    <Dialogo
-      title={`${initial ? "Editar" : "Agregar"} · ${catalogo.nombre}`}
-      close={close}
-      busy={busy}
-    >
-      <form onSubmit={submit} className="admin-form">
-        <div className="grid-dos-columnas">
-          {catalogo.campos.map((f) => (
-            <Campo
-              key={f.clave}
-              label={`${nombres[f.clave] || f.clave}${f.requerido ? " *" : ""}`}
-            >
-              {f.tipo === "boolean" ? (
-                <select
-                  value={String(values[f.clave])}
-                  onChange={(e) =>
-                    setValues((v) => ({
-                      ...v,
-                      [f.clave]: e.target.value === "true",
-                    }))
-                  }
-                >
-                  <option value="true">Sí</option>
-                  <option value="false">No</option>
-                </select>
-              ) : f.tipo === "empleado" ? (
-                <select
-                  value={String(values[f.clave] || "")}
-                  onChange={(e) =>
-                    setValues((v) => ({
-                      ...v,
-                      [f.clave]: e.target.value ? Number(e.target.value) : null,
-                    }))
-                  }
-                >
-                  <option value="">Sin asignar</option>
-                  {empleados.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.nombre}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <input
-                  required={f.requerido}
-                  maxLength={f.maximo || undefined}
-                  value={String(values[f.clave] || "")}
-                  onChange={(e) =>
-                    setValues((v) => ({ ...v, [f.clave]: e.target.value }))
-                  }
-                />
-              )}
-            </Campo>
-          ))}
-        </div>
-        {catalogo.clave === "motivos-cambio" && (
-          <fieldset className="admin-access">
-            <legend>Familias de producto permitidas</legend>
-            {familias.map((f) => (
-              <label key={f} className="admin-check">
-                <input
-                  type="checkbox"
-                  checked={permitidas.includes(f)}
-                  onChange={(e) =>
-                    setPermitidas((a) =>
-                      e.target.checked ? [...a, f] : a.filter((x) => x !== f),
-                    )
-                  }
-                />
-                {f}
-              </label>
-            ))}
-          </fieldset>
-        )}
-        {initial && (
-          <Campo label="Motivo de la modificación *">
-            <textarea
-              required
-              maxLength={2000}
-              value={motivo}
-              onChange={(e) => setMotivo(e.target.value)}
-            />
-          </Campo>
-        )}
-        <Mensaje error={error} />
-        <div className="acciones-formulario">
-          <button className="boton-guardar" disabled={busy}>
-            {busy ? "Guardando…" : "Guardar cambios"}
-          </button>
-          <button
-            type="button"
-            className="boton-cancelar"
-            disabled={busy}
-            onClick={close}
-          >
-            Cancelar
-          </button>
-        </div>
-      </form>
-    </Dialogo>
-  );
-}
-function Catalogos() {
-  const cache = useQueryClient(),
-    meta = useQuery({
-      queryKey: ["administracion-catalogos"],
-      queryFn: listarCatalogos,
-    });
-  const [clave, setClave] = useState("empleados"),
-    [busqueda, setBusqueda] = useState(""),
-    [editar, setEditar] = useState<RegistroCatalogo | null | undefined>(),
-    [mensaje, setMensaje] = useState("");
-  const datos = useQuery({
-      queryKey: ["administracion-catalogo", clave],
-      queryFn: () => leerCatalogo(clave),
-    }),
-    catalogo = meta.data?.catalogos.find((c) => c.clave === clave);
-  const registros = (datos.data || []).filter((r) =>
-    Object.values(r)
-      .join(" ")
-      .toLocaleLowerCase()
-      .includes(busqueda.toLocaleLowerCase()),
-  );
-  async function saved() {
-    setEditar(undefined);
-    setMensaje(
-      "Catálogo actualizado. El cambio quedó registrado en auditoría.",
-    );
-    await cache.invalidateQueries({
-      predicate: (q) => q.queryKey[0] !== "usuario-actual",
-    });
-  }
-  return (
-    <>
-      <div className="admin-note">
-        <strong>Productos, equivalencias y fleteros</strong>
-        <p>
-          Se gestionan en Expedición, conservando sus validaciones y movimientos
-          de stock.
-        </p>
-        <Link className="boton-secundario" to="/expedicion/configuracion">
-          Ir a configuración de Expedición
-        </Link>
-      </div>
-      <div className="admin-toolbar">
-        <Campo label="Catálogo">
-          <select
-            value={clave}
-            onChange={(e) => {
-              setClave(e.target.value);
-              setBusqueda("");
-              setMensaje("");
-            }}
-          >
-            {meta.data?.catalogos.map((c) => (
-              <option key={c.clave} value={c.clave}>
-                {c.nombre}
-              </option>
-            ))}
-          </select>
-        </Campo>
-        <Campo label="Buscar">
-          <input
-            value={busqueda}
-            placeholder="Buscar en el catálogo"
-            onChange={(e) => setBusqueda(e.target.value)}
-          />
-        </Campo>
-        <button
-          className="boton-guardar"
-          disabled={!catalogo}
-          onClick={() => setEditar(null)}
-        >
-          Agregar registro
-        </button>
-      </div>
-      <Mensaje
-        error={meta.error?.message || datos.error?.message}
-        mensaje={mensaje}
-      />
-      {datos.isPending ? (
-        <p role="status">Cargando catálogo…</p>
-      ) : (
-        catalogo && (
-          <div className="tabla-wrapper">
-            <table className="tabla-repartos">
-              <thead>
-                <tr>
-                  {catalogo.campos.map((f) => (
-                    <th key={f.clave}>{nombres[f.clave] || f.clave}</th>
-                  ))}
-                  <th>Acción</th>
-                </tr>
-              </thead>
-              <tbody>
-                {registros.map((r) => (
-                  <tr key={r.id}>
-                    {catalogo.campos.map((f) => (
-                      <td key={f.clave}>
-                        {typeof r[f.clave] === "boolean"
-                          ? r[f.clave]
-                            ? "Sí"
-                            : "No"
-                          : f.tipo === "empleado"
-                            ? meta.data?.empleados.find(
-                                (e) => e.id === r[f.clave],
-                              )?.nombre || "Sin asignar"
-                            : String(r[f.clave] ?? "—")}
-                      </td>
-                    ))}
-                    <td>
-                      <button
-                        className="boton-editar"
-                        onClick={() => setEditar(r)}
-                      >
-                        Editar
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {!registros.length && (
-              <div className="estado-vacio">
-                No hay registros para esta búsqueda.
-              </div>
-            )}
-          </div>
-        )
-      )}
-      <p className="admin-help">
-        Para dejar de usar un registro, editá su estado Activo. No se borran los
-        datos ni sus referencias históricas.
-      </p>
-      {editar !== undefined && catalogo && meta.data && (
-        <CatalogoFormulario
-          catalogo={catalogo}
-          initial={editar}
-          empleados={meta.data.empleados}
-          familias={meta.data.familias}
-          close={() => setEditar(undefined)}
-          saved={saved}
-        />
-      )}
-    </>
-  );
-}
-
 function Auditoria() {
   const [buscar, setBuscar] = useState(""),
     [desde, setDesde] = useState(""),
@@ -1002,6 +696,9 @@ function Auditoria() {
 export default function AdministracionPage() {
   const location = useLocation(),
     section = location.pathname.split("/")[2] || "usuarios";
+  if (section === "catalogos" || section === "configuracion") {
+    return <Navigate to="/administracion/panel" replace />;
+  }
   return (
     <div className="pagina admin-page">
       <div className="contenedor-grande">
@@ -1010,22 +707,29 @@ export default function AdministracionPage() {
             <span className="admin-eyebrow">GESTIÓN Y CONTROL DE ACCESOS</span>
             <h1>Administración</h1>
             <p className="subtitulo">
-              Usuarios, configuración y trazabilidad de Logística Talca.
+              Usuarios, permisos y trazabilidad de Logística Talca.
             </p>
           </div>
           <Icon name="shield" size={32} />
         </div>
         <nav className="admin-tabs" aria-label="Administración">
+          <NavLink to="/administracion/panel">Panel de control</NavLink>
           <NavLink to="/administracion/usuarios">Usuarios y accesos</NavLink>
-          <NavLink to="/administracion/catalogos">Catálogos</NavLink>
+          <NavLink to="/administracion/permisos">Roles y permisos</NavLink>
           <NavLink to="/administracion/auditoria">Auditoría general</NavLink>
+          <NavLink to="/administracion/base-datos">Base de datos</NavLink>
+          <NavLink to="/administracion/errores">Registros de errores</NavLink>
+          <NavLink to="/administracion/reportes">Reportes</NavLink>
+          <NavLink to="/administracion/notificaciones">Notificaciones</NavLink>
+          <NavLink to="/administracion/seguridad">Seguridad</NavLink>
+          <NavLink to="/administracion/estado">Estado del sistema</NavLink>
         </nav>
-        {section === "catalogos" ? (
-          <Catalogos />
-        ) : section === "auditoria" ? (
+        {section === "auditoria" ? (
           <Auditoria />
-        ) : (
+        ) : section === "usuarios" ? (
           <Usuarios />
+        ) : (
+          <AdministracionHerramientas key={section} section={section} />
         )}
       </div>
     </div>

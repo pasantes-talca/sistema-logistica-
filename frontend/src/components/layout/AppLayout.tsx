@@ -253,6 +253,14 @@ const pageNames: Record<
   administracion: "Administración",
   usuarios: "Usuarios y accesos",
   catalogos: "Catálogos",
+  permisos: "Roles y permisos",
+  panel: "Panel de control",
+  "base-datos": "Base de datos",
+  errores: "Registros de errores",
+  reportes: "Reportes",
+  notificaciones: "Notificaciones",
+  seguridad: "Seguridad",
+  estado: "Estado del sistema",
   repartos:
     "Repartos y recargas",
 
@@ -329,6 +337,7 @@ function Breadcrumbs() {
 
   const location =
     useLocation();
+
 
 
   const segments =
@@ -431,6 +440,17 @@ export default function AppLayout({
 
 
   const esExpedicion = location.pathname === "/expedicion" || location.pathname.startsWith("/expedicion/");
+
+  const [modulosAbiertos, setModulosAbiertos] = useState<Record<string, boolean>>({});
+  const estaAbierto = (base: string) =>
+    modulosAbiertos[base] ?? location.pathname.startsWith(base);
+
+  function alternarModulo(base: string) {
+    setModulosAbiertos(actual => ({
+      ...actual,
+      [base]: !(actual[base] ?? location.pathname.startsWith(base)),
+    }));
+  }
 
   const navigate =
     useNavigate();
@@ -622,6 +642,14 @@ export default function AppLayout({
 
         <div className="sidebar-brand">
 
+          <NavLink
+            to="/panel"
+            className="sidebar-home-link"
+            aria-label="Ir al inicio"
+            title="Ir al inicio"
+            onClick={() => setOpen(false)}
+          >
+
           <img
             className="sidebar-logo"
             src="/logo-talca.png"
@@ -640,6 +668,8 @@ export default function AppLayout({
             </span>
 
           </div>
+
+          </NavLink>
 
 
           <button
@@ -669,10 +699,9 @@ export default function AppLayout({
         <nav
           className="sidebar-nav"
           onClick={
-            () =>
-              setOpen(
-                false
-              )
+            event => {
+              if ((event.target as Element).closest("a")) setOpen(false);
+            }
           }
         >
 
@@ -764,10 +793,7 @@ export default function AppLayout({
                 <div
                   className={
                     `nav-module ${
-                      location.pathname
-                        .startsWith(
-                          module.base
-                        )
+                      estaAbierto(module.base)
                         ? "expanded"
                         : ""
                     }`
@@ -777,11 +803,12 @@ export default function AppLayout({
                   }
                 >
 
-                  <NavLink
-                    to={
-                      `${module.base}/inicio`
-                    }
+                  <button
+                    type="button"
                     className="nav-module-title"
+                    aria-expanded={estaAbierto(module.base)}
+                    aria-controls={`submenu-${module.base.slice(1)}`}
+                    onClick={() => alternarModulo(module.base)}
                   >
 
                     <Icon
@@ -796,15 +823,11 @@ export default function AppLayout({
                       }
                     </span>
 
-                    <Icon
-                      name="chevron"
-                      size={15}
-                    />
-
-                  </NavLink>
+                    <Icon name="chevron" size={15} />
+                  </button>
 
 
-                  <div className="nav-subitems">
+                  <div className="nav-subitems" id={`submenu-${module.base.slice(1)}`} hidden={!estaAbierto(module.base)}>
 
                     {
                       module.links.map(

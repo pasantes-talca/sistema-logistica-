@@ -26,6 +26,9 @@ def datos_cuenta(user, actor):
 def validar_password(password, user):
     if not isinstance(password, str) or not password or len(password) > 128:
         raise ValidationError({"password": "Ingresá una contraseña de hasta 128 caracteres."})
+    from .panel_servicios import preferencias
+    if len(password) < preferencias()["minimo_password"]:
+        raise ValidationError({"password": "La contraseña no alcanza el mínimo configurado por el administrador."})
     try:
         validate_password(password, user)
     except DjangoValidationError as exc:

@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from .autoria import nombre_autor
 
 from maestros.models import Producto
 
@@ -165,7 +166,7 @@ class EntregaOrdenCargaSerializer(
         obj,
     ):
         if not obj.creado_por:
-            return ""
+            return nombre_autor(None, obj.observaciones)
 
         return (
             obj.creado_por.get_full_name()
@@ -243,7 +244,7 @@ class OrdenCargaSerializer(
         obj,
     ):
         if not obj.creado_por:
-            return ""
+            return nombre_autor(None, obj.observaciones)
 
         return (
             obj.creado_por.get_full_name()
@@ -296,7 +297,7 @@ class MovimientoStockSerializer(
         obj,
     ):
         if not obj.creado_por:
-            return ""
+            return nombre_autor(None, obj.observaciones)
 
         return (
             obj.creado_por.get_full_name()

@@ -22,6 +22,7 @@ from .models import (
     EmpleadoExpedicion, EntregaOrdenCarga, Fletero, MovimientoMaterial,
     MovimientoStock, OperacionExpedicion, OrdenCarga, StockProducto, ControlOperativa,
 )
+from .autoria import nombre_autor
 from .serializers import OrdenCargaSerializer
 from core.permissions import es_administrador
 
@@ -327,19 +328,19 @@ def snapshot(user):
         movimientos=[dict(id=m.pk, producto=m.producto_id, tipo=m.tipo, destino=m.destino, direccion=m.direccion,
             cantidad=float(m.cantidad), referencia=m.referencia, observaciones=m.observaciones,
             orden=m.orden_id, operacion=str(m.operacion), fecha=str(m.fecha_operativa or timezone.localtime(m.creado_en).date()),
-            turno=m.turno, usuario=persona(m.creado_por), sin_impacto=m.sin_impacto, sin_codificar=m.sin_codificar)
+            turno=m.turno, usuario=nombre_autor(m.creado_por, m.observaciones), sin_impacto=m.sin_impacto, sin_codificar=m.sin_codificar)
             for m in MovimientoStock.objects.select_related("creado_por")],
         materiales=[dict(id=m.pk, fletero=m.fletero_id, orden=m.orden_id, referencia=m.referencia, origen=m.origen,
             fecha=str(m.fecha_operativa or timezone.localtime(m.creado_en).date()), turno=m.turno,
             observaciones=m.observaciones, **{k: float(getattr(m, k)) for k in MATERIALES}) for m in MovimientoMaterial.objects.all()],
         comprobantes=[dict(id=c.pk, empleado=c.empleado_id, tipo=c.tipo, fecha=c.fecha.isoformat(),
-            usuario=persona(c.usuario), turno=c.turno, lineas=c.lineas, observaciones=c.observaciones,
+            usuario=nombre_autor(c.usuario, c.observaciones), turno=c.turno, lineas=c.lineas, observaciones=c.observaciones,
             numero=f'{"CE" if c.tipo == "CONSUMO" else "AE"}-{c.numero:06d}') for c in ComprobanteEmpleado.objects.select_related("usuario").order_by("-id")],
-        conteos=[dict(id=c.pk, fecha=c.fecha.isoformat(), usuario=persona(c.usuario), turno=c.turno,
+        conteos=[dict(id=c.pk, fecha=c.fecha.isoformat(), usuario=nombre_autor(c.usuario, c.observaciones), turno=c.turno,
             tipo=c.tipo, lineas=c.lineas, observaciones=c.observaciones, corroborado_por=persona(c.corroborado_por),
             corroborado_en=c.corroborado_en.isoformat() if c.corroborado_en else None)
             for c in ConteoExpedicion.objects.select_related("usuario", "corroborado_por").order_by("-id")],
-        auditoria=[dict(id=a.pk, fecha=a.fecha.isoformat(), usuario=persona(a.usuario), turno=a.turno,
+        auditoria=[dict(id=a.pk, fecha=a.fecha.isoformat(), usuario=persona(a.usuario) or a.despues.get("usuario_original", ""), turno=a.turno,
             accion=a.accion, referencia=a.referencia, motivo=a.motivo, antes=a.antes, despues=a.despues)
             for a in AuditoriaExpedicion.objects.select_related("usuario")],
         usuarios=[dict(id=u.pk, username=u.username, nombre=persona(u), activo=u.is_active)

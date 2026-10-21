@@ -2,6 +2,36 @@ from django.db import models
 from django.conf import settings
 
 
+class PreferenciaAdministracion(models.Model):
+    datos = models.JSONField(default=dict)
+
+    class Meta:
+        db_table = "administracion_preferencias"
+
+
+class AccesoAcciones(models.Model):
+    usuario = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    permisos = models.JSONField(default=dict)
+
+    class Meta:
+        db_table = "administracion_acceso_acciones"
+
+
+class IncidenciaSistema(models.Model):
+    fecha = models.DateTimeField(auto_now_add=True, db_index=True)
+    ruta = models.CharField(max_length=200)
+    metodo = models.CharField(max_length=10)
+    estado = models.PositiveSmallIntegerField()
+    categoria = models.CharField(max_length=80)
+    usuario = models.CharField(max_length=150, blank=True)
+    resuelta = models.BooleanField(default=False)
+    resolucion = models.CharField(max_length=1000, blank=True)
+
+    class Meta:
+        db_table = "administracion_incidencia"
+        ordering = ["-id"]
+
+
 class EventoAuditoria(models.Model):
     fecha = models.DateTimeField(auto_now_add=True, db_index=True)
     actor = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)

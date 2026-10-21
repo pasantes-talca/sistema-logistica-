@@ -55,5 +55,22 @@ class AccesoSistema(BasePermission):
             if es_administrador(user):
                 return True
             allowed = MAESTROS_LECTURA.get(parts[2] if len(parts) > 2 else "", set())
-            return request.method in SAFE_METHODS and user.groups.filter(name__in=allowed).exists()
-        return section in PREFIJOS and tiene_modulo(user, PREFIJOS[section])
+            if request.method not in SAFE_METHODS:
+                return False
+            from .models import AccesoAcciones
+            policy = AccesoAcciones.objects.filter(usuario=user).first()
+            return any(policy is None or "consultar" in policy.permisos.get(module, ["consultar"])
+                for module in user.groups.filter(name__in=allowed).values_list("name", flat=True))
+        if section not in PREFIJOS or not tiene_modulo(user, PREFIJOS[section]):
+            return False
+        if es_administrador(user):
+            return True
+        from .models import AccesoAcciones
+        from .panel_servicios import accion_solicitada
+        policy = AccesoAcciones.objects.filter(usuario=user).first()
+        # Sin política explícita se conserva el comportamiento anterior.
+        allowed = policy.permisos.get(PREFIJOS[section]) if policy else None
+        if allowed is not None and accion_solicitada(request) not in allowed:
+            self.message = "No tenés permiso para realizar esta acción. Consultá al administrador."
+            return False
+        return True
