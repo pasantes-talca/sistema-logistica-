@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import FusionRespaldo from "./FusionRespaldo";
 import {
   exportarRespaldo,
   importarRespaldo,
@@ -18,6 +19,7 @@ export default function CopiasSeguridad({
   cambiarAbierto,
   descargar,
   revisar,
+  actualizar,
 }: {
   data: ExpedicionOperativa;
   online: boolean;
@@ -25,6 +27,7 @@ export default function CopiasSeguridad({
   cambiarAbierto: (v: boolean) => void;
   descargar: (nombre: string, contenido: string) => void;
   revisar: (p: Preview) => void;
+  actualizar: () => Promise<unknown>;
 }) {
   const [copias, setCopias] = useState<
     { id: number; fecha: string; motivo: string }[] | null
@@ -92,6 +95,7 @@ export default function CopiasSeguridad({
         {data.superusuario ? (
           <>
             <h3>Copias completas y restauración</h3>
+            <FusionRespaldo online={online} actualizar={actualizar} />
             <p className="eo-config-caption">
               La copia completa no incluye contraseñas. Al importar se revisa el
               archivo primero: la restauración requiere confirmar con RESTAURAR

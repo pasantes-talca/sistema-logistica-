@@ -368,7 +368,10 @@ def comando(data, user):
         return previous.resultado
     action = data.get("accion")
     result = {}
-    if action == "orden":
+    if action in {"base_conciliacion", "conciliar_estados", "calibrar_stock"}:
+        from .conciliacion import conciliar
+        result = conciliar(data, user, turno)
+    elif action == "orden":
         result = guardar_orden(data, user, turno, op)
     elif action == "entrega":
         result = entregar(data, user, turno, op)

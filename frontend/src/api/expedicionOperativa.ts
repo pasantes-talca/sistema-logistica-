@@ -204,6 +204,63 @@ async function request<T>(
   return data as T;
 }
 export const obtenerOperativa = () => request<ExpedicionOperativa>();
+export type DiagnosticoExpedicion = {
+  huella: string;
+  base: number | null;
+  base_fecha: string | null;
+  base_valida: boolean;
+  aviso: string;
+  productos: {
+    producto: number;
+    codigo: string;
+    nombre: string;
+    actual: string;
+    esperado: string | null;
+    diferencia: string | null;
+    sin_codificar: string;
+    sin_codificar_esperado: string | null;
+    inconsistente: boolean;
+    calibrable: boolean;
+    ordenes_inconsistentes: boolean;
+  }[];
+  ordenes: {
+    id: number;
+    numero: string;
+    estado: string;
+    esperado: string;
+    estado_incorrecto: boolean;
+    diferencias: Record<string, string>;
+    reparable: boolean;
+  }[];
+};
+export const obtenerDiagnostico = () =>
+  request<DiagnosticoExpedicion>(
+    undefined,
+    URL.replace("operativa/", "diagnostico/"),
+  );
+export type PreviewFusion = {
+  revision: number;
+  huella: string;
+  nuevos: Record<string, number>;
+  conflictos: { tabla: string; id: number }[];
+  total_conflictos: number;
+  aplicable: boolean;
+  fusionado?: boolean;
+};
+export const fusionarRespaldo = (
+  archivo: unknown,
+  preview?: PreviewFusion,
+  confirmacion?: string,
+) =>
+  request<PreviewFusion>(
+    {
+      archivo,
+      revision: preview?.revision,
+      huella: preview?.huella,
+      confirmacion,
+    },
+    URL.replace("operativa/", "respaldos/fusion/"),
+  );
 export const ejecutarOperacion = (body: Record<string, unknown>) =>
   request<{ id?: number; comprobante?: number }>(body);
 export const exportarRespaldo = (id?: number) =>

@@ -1,5 +1,5 @@
 from django.urls import path
-from .operativa_views import OperativaAPIView, RespaldosAPIView
+from .operativa_views import OperativaAPIView, RespaldosAPIView, DiagnosticoAPIView, FusionRespaldoAPIView
 
 from .views import (
     CrearEntregaOrdenAPIView,
@@ -13,6 +13,8 @@ from .views import (
 
 
 urlpatterns = [
+    path("respaldos/fusion/", FusionRespaldoAPIView.as_view(), name="expedicion-fusion"),
+    path("diagnostico/", DiagnosticoAPIView.as_view(), name="expedicion-diagnostico"),
     path("respaldos/", RespaldosAPIView.as_view(), name="expedicion-respaldos"),
     path("operativa/", OperativaAPIView.as_view(), name="expedicion-operativa"),
     path(

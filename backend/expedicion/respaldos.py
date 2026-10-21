@@ -17,6 +17,15 @@ MODELOS = [Fletero, ConfiguracionProducto, StockProducto, EmpleadoExpedicion, Or
     MovimientoMaterial, ComprobanteEmpleado, ConteoExpedicion, AuditoriaExpedicion]
 
 
+def origen_respaldo():
+    # Identifica esta instalación sin exportar host, nombre de BD ni secretos.
+    from django.db import connection
+    from django.utils.crypto import salted_hmac
+    cfg = connection.settings_dict
+    identidad = {k: cfg.get(k) for k in ("ENGINE", "HOST", "PORT", "NAME", "OPTIONS")}
+    return salted_hmac("expedicion.origen", json.dumps(identidad, sort_keys=True, default=str)).hexdigest()
+
+
 def exportar():
     rows = []
     for model in MODELOS:
@@ -24,7 +33,7 @@ def exportar():
     # DjangoJSONEncoder serializa fechas y Decimal sin pérdida de precisión.
     from django.core.serializers.json import DjangoJSONEncoder
     control = ControlOperativa.objects.filter(pk=1).first()
-    return json.loads(json.dumps({"formato": "talca-expedicion-django", "version": 1,
+    return json.loads(json.dumps({"formato": "talca-expedicion-django", "version": 1, "origen": origen_respaldo(),
         "contadores": {"CE": control.contador_consumo if control else 0, "AE": control.contador_anticipo if control else 0},
         "productos": list(Producto.objects.values("id", "codigo", "nombre", "familia", "presentacion", "sabor", "activo")),
         "usuarios": list(get_user_model().objects.values("id", "username")), "registros": rows}, cls=DjangoJSONEncoder))

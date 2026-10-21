@@ -27,7 +27,7 @@ def accion_solicitada(request):
     action = str(data.get("accion", ""))
     if request.method == "DELETE" or action == "anular":
         return "anular"
-    if action in {"usuario", "fletero", "producto", "empleado", "acreditar", "configuracion", "depurar_fleteros", "pendientes"}:
+    if action in {"usuario", "fletero", "producto", "empleado", "acreditar", "configuracion", "depurar_fleteros", "pendientes", "base_conciliacion", "conciliar_estados", "calibrar_stock"}:
         return "configurar"
     if request.method in {"PUT", "PATCH"} or (action == "orden" and data.get("id")) or action in {"corregir_movimiento", "corregir_fecha"}:
         return "editar"

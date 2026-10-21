@@ -640,6 +640,51 @@
 #eo-print-document {
   display: none;
 }
+.eo-consumption-summary,
+.eo-diagnostic {
+  margin-bottom: 20px;
+  min-width: 0;
+}
+.eo-consumption-summary .eo-table,
+.eo-diagnostic .eo-table,
+.eo-backup-merge .eo-table {
+  max-height: 440px;
+  overflow: auto;
+  scrollbar-gutter: stable;
+}
+.eo-consumption-summary table,
+.eo-diagnostic table {
+  min-width: 880px;
+}
+.eo-consumption-summary .eo-kpis {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  margin-block: 16px;
+}
+.eo-consumption-summary .eo-kpis strong {
+  font-size: 21px;
+}
+.eo-conciliation-confirm,
+.eo-backup-merge {
+  margin-block: 18px;
+  padding: 16px;
+  border: 1px solid var(--theme-border, #dce4ef);
+  border-radius: 12px;
+}
+.eo-conciliation-confirm label,
+.eo-backup-merge label {
+  display: block;
+  margin-block: 12px;
+}
+.eo-conciliation-confirm input[type="checkbox"],
+.eo-diagnostic input[type="checkbox"] {
+  width: auto;
+  min-width: 18px;
+  height: 18px;
+}
+.eo-movements-table tfoot td {
+  font-weight: 700;
+  border-top: 2px solid var(--theme-border, #dce4ef);
+}
 @media print {
   body:has(#eo-print-document) > *:not(#eo-print-document) {
     display: none !important;

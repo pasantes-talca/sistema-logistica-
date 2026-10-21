@@ -4,6 +4,7 @@ import {
   agruparMovimientos,
   filtrarMovimientos,
   fechaMovimiento,
+  totalesMovimientos,
 } from "../src/components/expedicion/movimientos.ts";
 const productos = [
   { id: 1, codigo: "5670", nombre: "Cola", alias: "CO3", unidades_pack: 6 },
@@ -32,6 +33,72 @@ const mov = (props = {}) => ({
   sin_impacto: false,
   sin_codificar: false,
   ...props,
+});
+test("Mendoza separa recepciones y producción referenciada; excluye envíos", () => {
+  const groups = agruparMovimientos(
+    [
+      mov({
+        id: 1,
+        orden: null,
+        operacion: "a",
+        direccion: "ENTRADA",
+        tipo: "PRODUCCION",
+        referencia: "Local",
+      }),
+      mov({
+        id: 2,
+        orden: null,
+        operacion: "b",
+        direccion: "ENTRADA",
+        tipo: "PRODUCCION_SIN_CODIFICAR",
+        referencia: "Mendoza planta",
+      }),
+      mov({
+        id: 3,
+        orden: null,
+        operacion: "c",
+        direccion: "ENTRADA",
+        tipo: "TRANSFERENCIA",
+        destino: "Mendoza",
+      }),
+      mov({
+        id: 4,
+        orden: null,
+        operacion: "d",
+        direccion: "SALIDA",
+        tipo: "TRANSFERENCIA",
+        destino: "Mendoza",
+      }),
+    ],
+    productos,
+  );
+  assert.equal(
+    filtrarMovimientos(
+      groups,
+      { desde: "", hasta: "", tipo: "Producción Mendoza" },
+      productos,
+    ).length,
+    2,
+  );
+  assert.equal(
+    filtrarMovimientos(
+      groups,
+      { desde: "", hasta: "", tipo: "Producción" },
+      productos,
+    ).length,
+    1,
+  );
+  assert.deepEqual(totalesMovimientos(groups), {
+    entrada: 6,
+    salida: 2,
+    neutral: 0,
+    completos: true,
+  });
+  assert.equal(
+    totalesMovimientos(agruparMovimientos([mov({ producto: 999 })], productos))
+      .completos,
+    false,
+  );
 });
 test("una orden aparece una sola vez con todas sus entregas y correcciones", () => {
   const source = [

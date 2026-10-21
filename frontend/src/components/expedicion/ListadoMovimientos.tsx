@@ -11,6 +11,7 @@ import {
   agruparMovimientos,
   fechaMovimiento,
   filtrarMovimientos,
+  totalesMovimientos,
   type FiltrosMovimientos,
   type GrupoMovimiento,
 } from "./movimientos";
@@ -41,6 +42,7 @@ export function ReporteMovimientos({
   corregir?: (m: MovimientoOperativo) => void;
   imprimible?: boolean;
 }) {
+  const totales = totalesMovimientos(grupos);
   const cantidad = (g: GrupoMovimiento, q: number) =>
     !g.equivalenciasCompletas ? (
       <span title="Falta la configuración de algún producto. Consultá el detalle.">
@@ -55,6 +57,19 @@ export function ReporteMovimientos({
     <div className="eo-orders-table eo-movements-table">
       <Table
         headers={imprimible ? columnas.slice(0, -1) : columnas}
+        footer={[
+          `TOTAL (${grupos.length} operaciones)`,
+          "",
+          "",
+          ...[totales.entrada, totales.salida, totales.neutral].map((q) =>
+            totales.completos
+              ? `${fmt(q)} fardos`
+              : "Sin equivalencia completa",
+          ),
+          "",
+          "",
+          ...(!imprimible ? [""] : []),
+        ]}
         emptyMessage="No hay movimientos con los filtros seleccionados."
         rows={grupos.map((g) => {
           const cells = [
@@ -219,7 +234,12 @@ export default function ListadoMovimientos({
             }
           >
             <option value="">Todos</option>
-            <option value="Producción">Producción (Todas)</option>
+            <option value="Producción">
+              Producción local (codificada y sin codificar)
+            </option>
+            <option value="Producción Mendoza">
+              Ingresos de producción de Mendoza
+            </option>
             {tipos.map((t) => (
               <option key={t}>{t}</option>
             ))}

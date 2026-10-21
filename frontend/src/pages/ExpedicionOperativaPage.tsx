@@ -57,6 +57,8 @@ import ConfiguracionExpedicion, {
   ReporteConfiguracion,
 } from "../components/expedicion/ConfiguracionExpedicion";
 import CopiasSeguridad from "../components/expedicion/CopiasSeguridad";
+import ResumenConsumos from "../components/expedicion/ResumenConsumos";
+import DiagnosticoStock from "../components/expedicion/DiagnosticoStock";
 import {
   detalleAuditoria,
   entidadAuditoria,
@@ -1388,6 +1390,11 @@ export default function ExpedicionOperativaPage() {
                 abierto={copiasAbiertas}
                 cambiarAbierto={setCopiasAbiertas}
                 descargar={download}
+                actualizar={() =>
+                  cache.invalidateQueries({
+                    queryKey: ["expedicion-operativa"],
+                  })
+                }
                 revisar={(preview) => {
                   setRestore(preview);
                   open({
@@ -1677,7 +1684,30 @@ export default function ExpedicionOperativaPage() {
               </button>
             </div>
           )}
-        <main className="eo-content">{renderContent()}</main>
+        <main className="eo-content">
+          {["inicio", "movimientos", "empleados"].includes(section) && (
+            <ResumenConsumos data={data} imprimir={setPrint} />
+          )}
+          {["stock", "configuracion"].includes(section) && (
+            <DiagnosticoStock
+              admin={data.admin}
+              online={online}
+              turno={turno}
+              actualizar={() =>
+                cache.invalidateQueries({ queryKey: ["expedicion-operativa"] })
+              }
+            />
+          )}
+          {renderContent()}
+          {section === "inicio" && (
+            <Link
+              to="/expedicion/configuracion#eo-config-backups"
+              onClick={() => setCopiasAbiertas(true)}
+            >
+              Copias de seguridad de Expedición
+            </Link>
+          )}
+        </main>
         {dialog && (
           <div
             className="eo-overlay"

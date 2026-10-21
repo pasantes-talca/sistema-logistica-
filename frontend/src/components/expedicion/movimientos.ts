@@ -51,6 +51,28 @@ const normalizar = (s: string) =>
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase();
 
+export function esIngresoMendoza(m: MovimientoOperativo): boolean {
+  return (
+    !m.sin_impacto &&
+    m.direccion === "ENTRADA" &&
+    ((m.tipo === "TRANSFERENCIA" && normalizar(m.destino) === "mendoza") ||
+      (["PRODUCCION", "PRODUCCION_SIN_CODIFICAR"].includes(m.tipo) &&
+        normalizar(m.referencia).includes("mendoza")))
+  );
+}
+
+export function totalesMovimientos(grupos: GrupoMovimiento[]) {
+  return grupos.reduce(
+    (t, g) => ({
+      entrada: t.entrada + g.entrada,
+      salida: t.salida + g.salida,
+      neutral: t.neutral + g.neutral,
+      completos: t.completos && g.equivalenciasCompletas,
+    }),
+    { entrada: 0, salida: 0, neutral: 0, completos: true },
+  );
+}
+
 export function agruparMovimientos(
   movimientos: MovimientoOperativo[],
   productos: ProductoOperativo[],
@@ -121,11 +143,13 @@ export function filtrarMovimientos(
       (!filtros.desde || dia >= filtros.desde) &&
       (!filtros.hasta || dia <= filtros.hasta) &&
       (!filtros.tipo ||
-        (filtros.tipo === "Producción"
-          ? g.lineas.some((m) =>
-              ["PRODUCCION", "PRODUCCION_SIN_CODIFICAR"].includes(m.tipo),
-            )
-          : g.tipo === filtros.tipo)) &&
+        (filtros.tipo === "Producción Mendoza"
+          ? g.lineas.some(esIngresoMendoza)
+          : filtros.tipo === "Producción"
+            ? g.lineas.some((m) =>
+                ["PRODUCCION", "PRODUCCION_SIN_CODIFICAR"].includes(m.tipo),
+              ) && !g.lineas.some(esIngresoMendoza)
+            : g.tipo === filtros.tipo)) &&
       (!filtros.turno || g.lineas.some((m) => m.turno === filtros.turno)) &&
       (!q ||
         normalizar(

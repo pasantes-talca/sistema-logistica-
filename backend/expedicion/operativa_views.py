@@ -24,6 +24,51 @@ class OperativaAPIView(APIView):
         return Response(comando(request.data, request.user))
 
 
+class DiagnosticoAPIView(APIView):
+    permission_classes = [IsAuthenticated, AccesoExpedicion]
+
+    def get(self, request):
+        from .conciliacion import diagnosticar
+        with transaction.atomic():
+            ControlOperativa.objects.select_for_update().filter(pk=1).first()
+            return Response(diagnosticar())
+
+
+class FusionRespaldoAPIView(APIView):
+    permission_classes = [IsAuthenticated, AccesoExpedicion]
+    auditoria_explicita = True
+
+    def check_permissions(self, request):
+        super().check_permissions(request)
+        if not request.user.is_superuser:
+            raise PermissionDenied("La fusión requiere un superusuario.")
+
+    def get_parsers(self):
+        from io import BytesIO
+        from rest_framework.parsers import JSONParser
+
+        class RespaldoJSONParser(JSONParser):
+            def parse(self, stream, media_type=None, parser_context=None):
+                # Límite exclusivo de este endpoint; no ampliar límites globales.
+                contenido = stream.read(26_000_001)
+                if len(contenido) > 26_000_000:
+                    raise ValidationError("La solicitud supera el límite de 26 MB.")
+                return super().parse(BytesIO(contenido), media_type, parser_context)
+
+        return [RespaldoJSONParser()]
+
+    def post(self, request):
+        from .fusion import fusionar
+        from django.core.serializers.base import DeserializationError
+        from django.core.exceptions import ValidationError as ModelValidationError
+        from django.db import IntegrityError
+        try:
+            return Response(fusionar(request.data.get("archivo"), request.user,
+                request.data.get("revision"), request.data.get("huella"), request.data.get("confirmacion")))
+        except (DeserializationError, ModelValidationError, IntegrityError, ValueError, TypeError, OverflowError):
+            raise ValidationError("El respaldo contiene datos o relaciones inconsistentes. No se modificó el sistema.")
+
+
 class RespaldosAPIView(APIView):
     permission_classes = [IsAuthenticated, AccesoExpedicion]
 
