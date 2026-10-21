@@ -16,6 +16,7 @@ def main():
     from django.contrib.auth.models import Group
     from core.permissions import ADMINISTRADOR
     call_command("migrate", verbosity=0)
+    call_command("cargar_maestros_control_diario", verbosity=0)
     User = get_user_model()
     User.objects.create_superuser("arielgarro", "smoke@example.test", "Prueba-local-492!")
     admin = User.objects.create_user("administrador", first_name="Administrador", password="Prueba-local-492!")
