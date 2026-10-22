@@ -1,0 +1,78 @@
+.nr-km-day-nav {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.nr-km-day-nav label {
+  flex: 1;
+  min-width: 180px;
+  max-width: 300px;
+}
+.nr-km-period {
+  margin-top: 24px;
+}
+.nr-km-destination {
+  background: var(--theme-surface-muted, #f7f9fc);
+  border: 1px solid var(--theme-border, #d6dfeb);
+  border-radius: 12px;
+  padding: 18px;
+}
+.nr-km-detail-title {
+  margin-top: 26px;
+  font-size: 20px;
+}
+.nr-km-review-table {
+  overflow: auto;
+  max-height: 480px;
+  border: 1px solid var(--theme-border, #d6dfeb);
+  border-radius: 10px;
+}
+.nr-km-review-table table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 570px;
+  font-size: 16px;
+}
+.nr-km-review-table caption {
+  text-align: left;
+  padding: 14px;
+  color: var(--theme-muted, #526079);
+}
+.nr-km-review-table th,
+.nr-km-review-table td {
+  padding: 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--theme-border, #d6dfeb);
+}
+.nr-km-review-table th {
+  background: var(--theme-surface-muted, #f1f5fa);
+  position: sticky;
+  top: 0;
+}
+.nr-page .nr-km-checkbox {
+  display: flex;
+  align-items: start;
+  gap: 12px;
+  font-size: 16px;
+}
+.nr-page .nr-km-checkbox input {
+  width: 24px;
+  min-width: 24px;
+  height: 24px;
+  min-height: 24px;
+  margin: 2px 0;
+  padding: 0;
+}
+@media (max-width: 640px) {
+  .nr-km-day-nav label {
+    order: -1;
+    min-width: 100%;
+    max-width: none;
+  }
+  .nr-km-day-nav button {
+    flex: 1;
+    padding-inline: 10px;
+  }
+}

@@ -1,0 +1,61 @@
+.nr-product {
+  margin-bottom: 22px;
+  padding: 20px;
+  border: 1px solid var(--theme-border, #d6dfeb);
+  background: var(--theme-surface-muted, #f7f9fc);
+  border-radius: 12px;
+  min-width: 0;
+}
+.nr-product-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.nr-product-heading h3 {
+  margin: 0;
+  font-size: 19px;
+}
+.nr-product .nr-grid,
+.nr-other .nr-grid {
+  row-gap: 20px;
+}
+.nr-other {
+  border-top: 1px solid var(--theme-border, #d6dfeb);
+  padding-top: 22px;
+  margin-top: 22px;
+}
+.nr-other:first-of-type {
+  border: 0;
+  margin-top: 0;
+  padding-top: 0;
+}
+.nr-receipt-summary {
+  margin-top: 24px;
+}
+.nr-receipt-summary article {
+  border-top: 1px solid var(--theme-border, #d6dfeb);
+  margin-top: 20px;
+  padding-top: 20px;
+}
+.nr-receipt-summary h3 {
+  font-size: 19px;
+}
+.nr-page .nr-warning {
+  padding: 16px 20px;
+  border-radius: 10px;
+  font-size: 16px;
+  line-height: 1.6;
+  background: var(--theme-warning-bg, #fff7e7);
+  border: 1px solid var(--theme-warning-border, #e7cf97);
+  color: var(--theme-warning, #765017);
+}
+.nr-page .nr-form .nr-error {
+  margin-bottom: 0;
+}
+@media (max-width: 640px) {
+  .nr-product {
+    padding: 16px 12px;
+  }
+}
