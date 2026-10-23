@@ -13,6 +13,7 @@ from maestros.models import (
 
 from .models import Rechazo
 
+
 # ============================================================
 # EQUIVALENCIAS DE MOTIVOS HISTÓRICOS DE GOOGLE FORMS
 # ============================================================
@@ -20,8 +21,8 @@ from .models import Rechazo
 EQUIVALENCIAS_MOTIVOS = {
     "no tenia sistema": "sin sistema",
 
-    "sobre stock": "sobrestock",
-    "rechazo por sobre estok": "sobrestock",
+    "sobre stock": "sobre stock",
+    "rechazo por sobre estok": "sobre stock",
 
     "observado": "observado por producto cambiado",
 
@@ -29,7 +30,6 @@ EQUIVALENCIAS_MOTIVOS = {
 
     "no pidio": "no es lo que pidio",
 }
-
 
 
 # ============================================================
@@ -200,6 +200,7 @@ def obtener_motivo(valor):
 
     return None
 
+
 # ============================================================
 # LEER GOOGLE
 # ============================================================
@@ -288,6 +289,11 @@ def sincronizar_rechazos_google():
                 "Fecha"
             )
         )
+
+        if not fecha:
+            fecha = convertir_fecha(
+                marca_temporal
+            )
 
         asignacion_valor = obtener_valor(
             fila,
