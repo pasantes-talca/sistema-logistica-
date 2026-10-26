@@ -36,6 +36,7 @@ import {
 } from "../components/expedicion/stockReporte";
 import ListadoOrdenesCarga, {
   ReporteOrdenesCarga,
+  TotalesProductosOrdenes,
 } from "../components/expedicion/ListadoOrdenesCarga";
 import "./ExpedicionOperativa.css";
 import ListadoMateriales, {
@@ -857,13 +858,17 @@ export default function ExpedicionOperativaPage() {
             imprimir={(ordenes, filtros) =>
               setPrint(
                 <>
-                  <h2>Reporte de órdenes de carga</h2>
+                  <h2>Órdenes de carga · resumen consolidado</h2>
                   <p>
                     {filtros.dia ? `Día: ${filtros.dia} · ` : ""}
                     {filtros.encargado
                       ? `Encargado: ${filtros.encargado} · `
                       : ""}
                     {filtros.turno ? `Turno: ${filtros.turno} · ` : ""}
+                    {filtros.desde ? `Desde: ${filtros.desde} · ` : ""}
+                    {filtros.hasta ? `Hasta: ${filtros.hasta} · ` : ""}
+                    {filtros.busqueda ? `Búsqueda: ${filtros.busqueda} · ` : ""}
+                    {filtros.estado ? `Estado: ${filtros.estado} · ` : ""}
                     {filtros.fletero
                       ? `Fletero: ${carrierName(filtros.fletero)} · `
                       : ""}
@@ -872,8 +877,10 @@ export default function ExpedicionOperativaPage() {
                   <ReporteOrdenesCarga
                     ordenes={ordenes}
                     productos={data.productos}
+                    filtros={filtros}
                     imprimible
                   />
+                  <TotalesProductosOrdenes ordenes={ordenes} productos={data.productos} filtros={filtros} />
                 </>,
               )
             }

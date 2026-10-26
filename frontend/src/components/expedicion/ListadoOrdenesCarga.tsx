@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type SetStateAction } from "react";
 import { Link } from "react-router-dom";
 import type {
   ExpedicionOperativa,
@@ -11,6 +11,8 @@ import {
   estiloEstadoOrden,
   filtrarOrdenes,
   resumenOrden,
+  hayFiltrosDespacho,
+  totalizarProductosOrdenes,
   type FiltrosOrdenes,
 } from "./ordenes";
 
@@ -22,14 +24,14 @@ const vacios: FiltrosOrdenes = {
 };
 const columnas = [
   "Orden",
-  "Fecha",
+  "Fecha despacho",
   "Fletero",
   "Tipo",
-  "Encargado",
-  "Turno",
+  "Encargado despacho",
+  "Turno despacho",
   "Estado",
-  "Solicitado",
-  "Entregado",
+  "Solicitado (orden)",
+  "Despachado",
   "Acciones",
 ];
 const fardos = (value: number | null) =>
@@ -39,20 +41,37 @@ export function ReporteOrdenesCarga({
   ordenes,
   productos,
   imprimible = false,
+  filtros,
+  seleccionados,
+  seleccionar,
 }: {
   ordenes: OrdenOperativa[];
   productos: ProductoOperativo[];
   imprimible?: boolean;
+  filtros?: FiltrosOrdenes;
+  seleccionados?: number[];
+  seleccionar?: (id: number) => void;
 }) {
   return (
     <div className={`eo-orders-table${imprimible ? " eo-orders-print" : ""}`}>
       <Table
         headers={imprimible ? columnas.slice(0, -1) : columnas}
         rows={ordenes.map((o) => {
-          const resumen = resumenOrden(o, productos);
+          const resumen = resumenOrden(o, productos, filtros);
           const cells = [
-            <b>{o.numero}</b>,
-            o.fecha,
+            <label className="eo-order-select">
+              {!imprimible && seleccionar && (
+                <input
+                  type="checkbox"
+                  aria-label={`Seleccionar orden ${o.numero}`}
+                  checked={seleccionados?.includes(o.id) || false}
+                  onChange={() => seleccionar(o.id)}
+                  disabled={o.anulada}
+                />
+              )}
+              <b>{o.numero}</b>
+            </label>,
+            <span title={`Fecha de carga: ${o.fecha}`}>{resumen.fecha}</span>,
             o.fletero_nombre,
             resumen.tipo,
             resumen.encargado,
@@ -86,6 +105,61 @@ export function ReporteOrdenesCarga({
   );
 }
 
+const cantidadProducto = (unidades: number, pack: number | null) => {
+  if (!pack) return `${fmt(unidades)} un. · Sin equivalencia`;
+  const absoluto = Math.abs(unidades),
+    fardos = Math.floor(absoluto / pack),
+    sueltas = absoluto % pack;
+  return `${unidades < 0 ? "−" : ""}${fardos} fardos${sueltas ? ` + ${fmt(sueltas)} un.` : ""}`;
+};
+
+export function TotalesProductosOrdenes({
+  ordenes,
+  productos,
+  filtros,
+}: {
+  ordenes: OrdenOperativa[];
+  productos: ProductoOperativo[];
+  filtros?: FiltrosOrdenes;
+}) {
+  const despacho = hayFiltrosDespacho(filtros);
+  const totales = totalizarProductosOrdenes(ordenes, productos, filtros).filter(
+    (p) => !despacho || p.despachado !== 0,
+  );
+  return (
+    <section className="eo-orders-product-totals">
+      <h3>Totales por producto</h3>
+      <p>
+        {despacho
+          ? "Solo mercadería despachada en las entregas que coinciden con el día, período, encargado y turno elegidos."
+          : "Solicitado: orden completa. Despachado: entregas registradas. Las sustituciones se suman al producto que realmente salió."}
+      </p>
+      {ordenes.some((o) => o.anulada) && (
+        <p>Las órdenes anuladas no participan en los totales.</p>
+      )}
+      <Table
+        headers={[
+          "Código",
+          "Producto",
+          ...(!despacho ? ["Solicitado (orden completa)"] : []),
+          "Despachado",
+          "Unidades despachadas",
+        ]}
+        rows={totales.map((p) => [
+          p.codigo,
+          p.nombre,
+          ...(!despacho
+            ? [cantidadProducto(p.solicitado, p.unidades_pack)]
+            : []),
+          cantidadProducto(p.despachado, p.unidades_pack),
+          fmt(p.despachado),
+        ])}
+        emptyMessage="No hay productos despachados para esta selección y estos filtros."
+      />
+    </section>
+  );
+}
+
 export default function ListadoOrdenesCarga({
   data,
   imprimir,
@@ -95,17 +169,22 @@ export default function ListadoOrdenesCarga({
   imprimir: (ordenes: OrdenOperativa[], filtros: FiltrosOrdenes) => void;
   exportar: (headers: string[], rows: unknown[][]) => void;
 }) {
-  const [filtros, setFiltros] = useState<FiltrosOrdenes>(vacios);
+  const [filtros, setEstadoFiltros] = useState<FiltrosOrdenes>(vacios);
+  const [seleccionados, setSeleccionados] = useState<number[]>([]);
+  function setFiltros(valor: SetStateAction<FiltrosOrdenes>) {
+    setSeleccionados([]);
+    setEstadoFiltros(valor);
+  }
   const [avanzados, setAvanzados] = useState(false);
   const list = filtrarOrdenes(data.ordenes, filtros);
+  const elegidas = list.filter(
+    (o) => seleccionados.includes(o.id) && !o.anulada,
+  );
+  const seleccionables = list.filter((o) => !o.anulada);
   const encargados = [
-    ...new Set([
-      ...data.usuarios.map((u) => u.nombre),
-      ...data.ordenes.flatMap((o) => [
-        o.creado_por_nombre,
-        ...o.entregas.map((e) => e.creado_por_nombre),
-      ]),
-    ]),
+    ...new Set(
+      data.ordenes.flatMap((o) => o.entregas.map((e) => e.creado_por_nombre)),
+    ),
   ]
     .filter(Boolean)
     .sort((a, b) => a.localeCompare(b, "es"));
@@ -135,7 +214,7 @@ export default function ListadoOrdenesCarga({
           </select>
         </label>
         <label>
-          Día
+          Día de despacho
           <input
             aria-label="Día"
             type="date"
@@ -144,7 +223,7 @@ export default function ListadoOrdenesCarga({
           />
         </label>
         <label>
-          Encargado
+          Encargado del despacho
           <select
             aria-label="Encargado"
             value={filtros.encargado}
@@ -159,7 +238,7 @@ export default function ListadoOrdenesCarga({
           </select>
         </label>
         <label>
-          Turno
+          Turno del despacho
           <select
             aria-label="Turno"
             value={filtros.turno}
@@ -179,9 +258,11 @@ export default function ListadoOrdenesCarga({
           <button
             type="button"
             className="eo-primary"
+            disabled={!list.length}
+            title="Imprimir todas las órdenes visibles y sus totales"
             onClick={() => imprimir(list, filtros)}
           >
-            Imprimir
+            Imprimir listado
           </button>
         </div>
       </div>
@@ -243,7 +324,73 @@ export default function ListadoOrdenesCarga({
           </label>
         </div>
       )}
-      <ReporteOrdenesCarga ordenes={list} productos={data.productos} />
+      <p className="eo-help">
+        Día, período, encargado y turno corresponden al despacho, no a la carga
+        de la orden. Si elegís estos filtros, se muestran y totalizan únicamente
+        las entregas coincidentes. Sin esos filtros también podés ver las
+        órdenes sin despachar.
+      </p>
+      <div
+        className="eo-orders-selection"
+        role="group"
+        aria-label="Impresión conjunta de órdenes"
+      >
+        <label>
+          <input
+            type="checkbox"
+            aria-label="Seleccionar todas las órdenes visibles"
+            disabled={!seleccionables.length}
+            checked={
+              !!seleccionables.length &&
+              elegidas.length === seleccionables.length
+            }
+            ref={(el) => {
+              if (el)
+                el.indeterminate =
+                  elegidas.length > 0 &&
+                  elegidas.length < seleccionables.length;
+            }}
+            onChange={(e) =>
+              setSeleccionados(
+                e.target.checked ? seleccionables.map((o) => o.id) : [],
+              )
+            }
+          />
+          Seleccionar todas las visibles
+        </label>
+        <span role="status">
+          {elegidas.length}{" "}
+          {elegidas.length === 1
+            ? "orden seleccionada"
+            : "órdenes seleccionadas"}
+        </span>
+        <button
+          type="button"
+          onClick={() => setSeleccionados([])}
+          disabled={!elegidas.length}
+        >
+          Quitar selección
+        </button>
+        <button
+          type="button"
+          className="eo-primary"
+          disabled={!elegidas.length}
+          onClick={() => imprimir(elegidas, filtros)}
+        >
+          Imprimir seleccionadas ({elegidas.length})
+        </button>
+      </div>
+      <ReporteOrdenesCarga
+        ordenes={list}
+        productos={data.productos}
+        filtros={filtros}
+        seleccionados={elegidas.map((o) => o.id)}
+        seleccionar={(id) =>
+          setSeleccionados((ids) =>
+            ids.includes(id) ? ids.filter((i) => i !== id) : [...ids, id],
+          )
+        }
+      />
       <div className="eo-orders-footer">
         <span>
           {list.length} {list.length === 1 ? "orden" : "órdenes"} · Totales
@@ -266,10 +413,10 @@ export default function ListadoOrdenesCarga({
             exportar(
               columnas.slice(0, -1),
               list.map((o) => {
-                const r = resumenOrden(o, data.productos);
+                const r = resumenOrden(o, data.productos, filtros);
                 return [
                   o.numero,
-                  o.fecha,
+                  r.fecha,
                   o.fletero_nombre,
                   r.tipo,
                   r.encargado,

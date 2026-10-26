@@ -25,7 +25,7 @@ const fs = require("node:fs");
     await page.waitForURL("**/panel");
     await page.goto("http://127.0.0.1:5175/expedicion/ordenes");
     await page
-      .getByRole("columnheader", { name: "Solicitado", exact: true })
+      .getByRole("columnheader", { name: "Solicitado (orden)", exact: true })
       .waitFor();
     const filters = page.getByRole("group", {
       name: "Filtros de órdenes de carga",
@@ -35,12 +35,12 @@ const fs = require("node:fs");
       path: path.join(output, "ordenes-listado-escritorio.png"),
       fullPage: true,
     });
-    await page.getByRole("button", { name: "Tema oscuro" }).click();
+    await page.getByRole("button", { name: "Activar tema oscuro" }).click();
     await page.screenshot({
       path: path.join(output, "ordenes-listado-oscuro.png"),
       fullPage: true,
     });
-    await page.getByRole("button", { name: "Tema claro" }).click();
+    await page.getByRole("button", { name: "Activar tema claro" }).click();
     await page.setViewportSize({ width: 768, height: 1024 });
     assert(
       await page.evaluate(
@@ -56,12 +56,13 @@ const fs = require("node:fs");
       window.print = () => {};
     });
     await filters
-      .getByRole("button", { name: "Imprimir", exact: true })
+      .getByRole("button", { name: "Imprimir listado", exact: true })
       .click();
     await page.locator("#eo-print-document").waitFor({ state: "attached" });
     await page.emulateMedia({ media: "print" });
     const report = page.locator("#eo-print-document");
-    assert.equal(await report.getByRole("columnheader").count(), 9);
+    assert.equal(await report.locator(".eo-orders-table").getByRole("columnheader").count(), 9);
+    assert.equal(await report.getByRole("heading", {name:"Totales por producto", exact:true}).count(), 1);
     assert.equal(await report.getByRole("link").count(), 0);
     await page.pdf({
       path: path.join(output, "ordenes-listado.pdf"),
