@@ -64,7 +64,7 @@ class Command(BaseCommand):
                     "Sharp / Mai-Gua",
 
                 "distancia_km":
-                    Decimal("20"),
+                    Decimal("5"),
             },
 
             {

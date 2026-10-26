@@ -19,6 +19,8 @@ def preferencias():
 
 
 def accion_solicitada(request):
+    if request.path.startswith("/api/kilometrajes/") and request.path.endswith("/finalizar/"):
+        return "exportar"
     if request.method in {"GET", "HEAD", "OPTIONS"}:
         path = request.path.lower()
         return "exportar" if (any(s in path for s in ("export", "pdf", "excel", "respaldo")) or

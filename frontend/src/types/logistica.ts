@@ -471,6 +471,12 @@ export interface RegistroKilometraje {
 }
 
 export interface ControlKilometraje {
+  estado: "BORRADOR" | "FINALIZADA";
+  version: number;
+  columnas: DestinoKilometraje[];
+  envio_estado: "PENDIENTE" | "ENVIANDO" | "ENVIADO" | "ERROR";
+  enviado_en: string | null;
+  error_envio: string;
   id: number;
   chofer: number;
   chofer_nombre: string;

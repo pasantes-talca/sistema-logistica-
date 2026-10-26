@@ -1,4 +1,5 @@
 from django.db.models import Prefetch
+from django.db import IntegrityError, transaction
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -6,15 +7,14 @@ from core.api import APIView
 
 from .models import (
     ControlKilometraje,
-    DestinoKilometraje,
     RegistroKilometraje,
 )
 
 from .serializers import (
     ControlKilometrajeSerializer,
     CrearControlKilometrajeSerializer,
-    DestinoKilometrajeSerializer,
 )
+from .planilla import columnas_actuales
 
 from django.db.models import (
     DecimalField,
@@ -30,24 +30,7 @@ class DestinosKilometrajeAPIView(APIView):
         request,
     ):
 
-        destinos = (
-            DestinoKilometraje.objects
-            .filter(
-                activo=True
-            )
-            .order_by(
-                "nombre"
-            )
-        )
-
-        serializer = DestinoKilometrajeSerializer(
-            destinos,
-            many=True,
-        )
-
-        return Response(
-            serializer.data
-        )
+        return Response(columnas_actuales())
 
 
 class ControlesKilometrajeAPIView(APIView):
@@ -142,7 +125,14 @@ class ControlesKilometrajeAPIView(APIView):
             raise_exception=True
         )
 
-        control = serializer.save()
+        try:
+            with transaction.atomic():
+                control = serializer.save()
+        except IntegrityError:
+            if ControlKilometraje.objects.filter(chofer=serializer.validated_data["chofer"],
+                    fecha_desde=serializer.validated_data["fecha_desde"], fecha_hasta=serializer.validated_data["fecha_hasta"]).exists():
+                return Response({"error": "Ya existe esa planilla. Abrila desde el historial para continuar."}, status=409)
+            raise
 
         salida = ControlKilometrajeSerializer(
             control
@@ -156,6 +146,17 @@ class ControlesKilometrajeAPIView(APIView):
 
 
 class ControlKilometrajeDetalleAPIView(APIView):
+
+    def put(self, request, pk):
+        control = ControlKilometraje.objects.select_for_update().filter(pk=pk).first()
+        if control is None:
+            return Response({"error": "Planilla no encontrada."}, status=404)
+        if request.data.get("version") != control.version:
+            return Response({"error": "Otra persona modificó esta planilla. Volvé a abrirla; no se sobrescribió nada."}, status=409)
+        serializer = CrearControlKilometrajeSerializer(control, data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+        self.antes_auditoria["registros"] = list(control.registros.values())
+        return Response(ControlKilometrajeSerializer(serializer.save()).data)
 
     def get_object(
         self,

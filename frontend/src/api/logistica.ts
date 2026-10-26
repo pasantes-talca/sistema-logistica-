@@ -813,6 +813,40 @@ export async function crearControlKilometraje(
 }
 
 
+export async function buscarPlanillaKilometraje(chofer: number, desde: string, hasta: string) {
+  const params = new URLSearchParams({ chofer: String(chofer), fecha_desde: desde, fecha_hasta: hasta });
+  const controles = await getJson<ControlKilometraje[]>(`${API_URL}/kilometrajes/?${params}`);
+  return controles.find(c => c.chofer === chofer && c.fecha_desde === desde && c.fecha_hasta === hasta) || null;
+}
+
+export async function actualizarPlanillaKilometraje(id: number, datos: CrearControlKilometrajePayload & {version: number; motivo_correccion: string}) {
+  return escribirPlanilla(`${id}/`, "PUT", datos);
+}
+
+export async function finalizarPlanillaKilometraje(id: number, version: number) {
+  return escribirPlanilla(`${id}/finalizar/`, "POST", {version, confirmar: true});
+}
+
+async function escribirPlanilla(ruta: string, method: string, datos: unknown): Promise<ControlKilometraje> {
+  const respuesta = await fetchConSesion(`${API_URL}/kilometrajes/${ruta}`, {
+    method, headers: {"Content-Type": "application/json"}, body: JSON.stringify(datos),
+  });
+  const data = await respuesta.json();
+  if (!respuesta.ok) throw new Error(data.error || data.detail || JSON.stringify(data));
+  return data;
+}
+
+export async function descargarPlanillaKilometraje(id: number, formato: "xlsx" | "pdf") {
+  const respuesta = await fetchConSesion(`${API_URL}/kilometrajes/${id}/exportar/${formato}/`);
+  if (!respuesta.ok) throw new Error("No se pudo descargar la planilla. Revisá tu conexión y tus permisos.");
+  const url = URL.createObjectURL(await respuesta.blob());
+  const enlace = document.createElement("a");
+  enlace.href = url;
+  enlace.download = `kilometraje-${id}.${formato}`;
+  enlace.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 export async function eliminarControlKilometraje(
   id: number
 ): Promise<void> {

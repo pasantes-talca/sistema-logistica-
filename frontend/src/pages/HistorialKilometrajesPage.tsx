@@ -359,7 +359,7 @@ export default function HistorialKilometrajesPage() {
                     </th>
 
                     <th>
-                      Observaciones
+                      Estado / Observaciones
                     </th>
 
                     <th>
@@ -490,6 +490,7 @@ export default function HistorialKilometrajesPage() {
                           <td>
 
                             <span className="kilometrajes-observacion">
+                              <strong>{control.estado === "FINALIZADA" ? "Finalizada" : "Borrador"} · {control.envio_estado === "ENVIADO" ? "Enviada" : control.envio_estado === "ERROR" ? "Revisar envío" : control.envio_estado === "ENVIANDO" ? "Envío en curso" : "Sin enviar"}</strong><br />
 
                               {
                                 control.observaciones
@@ -507,7 +508,7 @@ export default function HistorialKilometrajesPage() {
                                 to={`/kilometrajes/${control.id}`}
                                 className="kilometrajes-detail-button"
                             >
-                                Ver detalle
+                                Abrir planilla
                             </Link>
 
                             </td>

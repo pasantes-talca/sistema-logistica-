@@ -62,6 +62,13 @@ class DestinoKilometraje(models.Model):
 
 class ControlKilometraje(models.Model):
 
+    estado = models.CharField(max_length=12, default="BORRADOR")
+    version = models.PositiveIntegerField(default=1)
+    columnas = models.JSONField(default=list, blank=True)
+    envio_estado = models.CharField(max_length=12, default="PENDIENTE")
+    enviado_en = models.DateTimeField(null=True, blank=True)
+    error_envio = models.TextField(blank=True)
+
     chofer = models.ForeignKey(
         Empleado,
         on_delete=models.PROTECT,
