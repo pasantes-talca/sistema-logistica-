@@ -3,7 +3,7 @@ import type { SVGProps } from "react";
 export type IconName =
   | "home" | "truck" | "alert" | "boxes" | "plus" | "history"
   | "chart" | "user" | "logout" | "menu" | "chevron" | "activity"
-  | "route" | "shield" | "calendar" | "package" | "close" | "sun" | "moon";
+  | "route" | "shield" | "calendar" | "package" | "close" | "sun" | "moon" | "eye" | "eye-off";
 
 interface IconProps extends SVGProps<SVGSVGElement> {
   name: IconName;
@@ -11,6 +11,8 @@ interface IconProps extends SVGProps<SVGSVGElement> {
 }
 
 const paths: Record<IconName, React.ReactNode> = {
+  eye: <><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></>,
+  "eye-off": <><path d="m3 3 18 18M10.6 5.1A11 11 0 0 1 12 5c6.5 0 10 7 10 7a19 19 0 0 1-3 4M6.2 6.2A21 21 0 0 0 2 12s3.5 7 10 7a12 12 0 0 0 5.8-1.8M9.9 9.9a3 3 0 0 0 4.2 4.2"/></>,
   sun: <><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.4 1.4M17.6 17.6 19 19M5 19l1.4-1.4M17.6 6.4 19 5"/></>,
   moon: <path d="M20.8 13A8.7 8.7 0 0 1 11 3.2 8.8 8.8 0 1 0 20.8 13Z"/>,
   home: <><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></>,

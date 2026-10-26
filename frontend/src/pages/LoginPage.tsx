@@ -4,12 +4,14 @@ import { useNavigate } from "react-router-dom";
 import { iniciarSesion } from "../api/logistica";
 import Icon from "../components/ui/Icon";
 import ThemeToggle from "../components/ui/ThemeToggle";
+import "./LoginPage.css";
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [mostrarPassword, setMostrarPassword] = useState(false);
   const [error, setError] = useState("");
   const mutation = useMutation({
     mutationFn: iniciarSesion,
@@ -18,6 +20,7 @@ export default function LoginPage() {
   });
   function enviar(event: React.FormEvent) {
     event.preventDefault(); setError("");
+    setMostrarPassword(false);
     if (!username.trim() || !password) { setError("Ingresá usuario y contraseña."); return; }
     mutation.mutate({ username: username.trim(), password });
   }
@@ -33,7 +36,7 @@ export default function LoginPage() {
       <div className="login-marca"><span className="login-kicker">Acceso al sistema</span><h2>Bienvenido</h2><p>Ingresá tus credenciales para continuar.</p></div>
       <form className="login-formulario" onSubmit={enviar}>
         <div className="campo campo-login"><label htmlFor="username">Usuario</label><div className="input-with-icon"><Icon name="user" size={19}/><input id="username" type="text" value={username} onChange={event => setUsername(event.target.value)} autoComplete="username" autoFocus placeholder="Ingresá tu usuario"/></div></div>
-        <div className="campo campo-login"><label htmlFor="password">Contraseña</label><div className="input-with-icon"><Icon name="shield" size={19}/><input id="password" type="password" value={password} onChange={event => setPassword(event.target.value)} autoComplete="current-password" placeholder="Ingresá tu contraseña"/></div></div>
+        <div className="campo campo-login"><label htmlFor="password">Contraseña</label><div className="input-with-icon login-password"><Icon name="shield" size={19}/><input id="password" type={mostrarPassword ? "text" : "password"} value={password} onChange={event => setPassword(event.target.value)} autoComplete="current-password" placeholder="Ingresá tu contraseña"/><button type="button" className="login-password-toggle" aria-label={mostrarPassword ? "Ocultar contraseña" : "Mostrar contraseña"} title={mostrarPassword ? "Ocultar contraseña" : "Mostrar contraseña"} aria-pressed={mostrarPassword} aria-controls="password" disabled={mutation.isPending} onClick={() => setMostrarPassword(visible => !visible)}><Icon name={mostrarPassword ? "eye-off" : "eye"} size={20}/></button></div></div>
         {error && <div className="login-error">{error}</div>}
         <button className="boton-guardar login-boton" type="submit" disabled={mutation.isPending}>{mutation.isPending ? "Ingresando..." : "Ingresar al sistema"}</button>
       </form>

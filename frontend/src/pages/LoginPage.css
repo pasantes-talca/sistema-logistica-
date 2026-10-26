@@ -1,0 +1,30 @@
+.login-formulario .login-password input {
+  padding-right: 54px;
+}
+.login-password-toggle {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 44px;
+  min-height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--theme-muted, #5f718a);
+  cursor: pointer;
+}
+.login-password-toggle:hover {
+  color: var(--theme-accent, #185dc5);
+  background: var(--theme-accent-bg, #eaf2ff);
+}
+.login-password-toggle:focus-visible {
+  outline: 2px solid var(--theme-accent, #185dc5);
+  outline-offset: 1px;
+}
+.login-password input::-ms-reveal {
+  display: none;
+}

@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import App from "./App";
 import "./index.css";
 import "./styles/theme.css";
+import "./styles/identidad-talca.css";
 
 
 const queryClient = new QueryClient();
