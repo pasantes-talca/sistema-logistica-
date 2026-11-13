@@ -7,6 +7,7 @@ import type {
 } from "../../api/expedicionOperativa";
 import { Table } from "./Controles";
 import { fmt } from "./format";
+import AnularRegistro from "./AnularRegistro";
 import {
   estiloEstadoOrden,
   filtrarOrdenes,
@@ -92,12 +93,21 @@ export function ReporteOrdenesCarga({
             ? cells
             : [
                 ...cells,
-                <Link
-                  className="eo-order-open"
-                  to={`/expedicion/ordenes/${o.id}`}
-                >
-                  Abrir
-                </Link>,
+                <div className="historial-fila-acciones">
+                  <Link
+                    className="eo-order-open"
+                    to={`/expedicion/ordenes/${o.id}`}
+                  >
+                    Abrir
+                  </Link>
+                  <AnularRegistro
+                    tipo="orden"
+                    id={o.id}
+                    version={o.version}
+                    anulado={o.anulada}
+                    descripcion={`orden ${o.numero}`}
+                  />
+                </div>,
               ];
         })}
       />

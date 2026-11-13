@@ -15,6 +15,7 @@ from .serializers import (
     CrearControlKilometrajeSerializer,
 )
 from .planilla import columnas_actuales
+from core.eliminacion_historial import eliminar_registro
 
 from django.db.models import (
     DecimalField,
@@ -147,6 +148,12 @@ class ControlesKilometrajeAPIView(APIView):
 
 class ControlKilometrajeDetalleAPIView(APIView):
 
+    eliminacion_administrador = True
+
+    def finalize_response(self, request, response, *args, **kwargs):
+        self.auditoria_explicita = request.method == "DELETE"
+        return super().finalize_response(request, response, *args, **kwargs)
+
     def put(self, request, pk):
         control = ControlKilometraje.objects.select_for_update().filter(pk=pk).first()
         if control is None:
@@ -228,28 +235,7 @@ class ControlKilometrajeDetalleAPIView(APIView):
         pk,
     ):
 
-        control = self.get_object(
-            pk
-        )
-
-        if control is None:
-
-            return Response(
-                {
-                    "error":
-                        "Control de kilometraje no encontrado."
-                },
-                status=
-                    status.HTTP_404_NOT_FOUND,
-            )
-
-
-        control.delete()
-
-        return Response(
-            status=
-                status.HTTP_204_NO_CONTENT
-        )
+        return eliminar_registro(request, ControlKilometraje, ControlKilometrajeSerializer, pk, "KILOMETRAJES")
 
 class EstadisticasKilometrajeAPIView(APIView):
 

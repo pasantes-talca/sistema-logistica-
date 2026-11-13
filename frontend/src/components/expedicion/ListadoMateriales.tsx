@@ -5,6 +5,7 @@ import type {
 } from "../../api/expedicionOperativa";
 import { Table } from "./Controles";
 import { fmt } from "./format";
+import AnularRegistro from "./AnularRegistro";
 import { fechaMovimiento } from "./movimientos";
 import {
   filtrarMateriales,
@@ -32,9 +33,11 @@ const saldo = (n: number) => (
 export function ReporteMateriales({
   movimientos,
   fleteros,
+  acciones = false,
 }: {
   movimientos: MaterialOperativo[];
   fleteros: FleteroOperativo[];
+  acciones?: boolean;
 }) {
   const totals = totalesMateriales(movimientos);
   const balances = saldosMateriales(movimientos, fleteros);
@@ -102,6 +105,7 @@ export function ReporteMateriales({
               "Chapadur entregado",
               "Chapadur devuelto",
               "Resultado",
+              ...(acciones ? ["Acciones"] : []),
             ]}
             emptyMessage="No hay movimientos de materiales con los filtros seleccionados."
             rows={movimientos.map((m) => [
@@ -117,7 +121,7 @@ export function ReporteMateriales({
                 {m.referencia || "—"}
                 {m.observaciones && <small>{m.observaciones}</small>}
               </span>,
-              m.origen,
+              `${m.origen}${m.anulado ? " · Anulado" : ""}`,
               fmt(m.pallets_salida),
               fmt(m.pallets_entrada),
               fmt(m.chapadur_salida),
@@ -128,6 +132,19 @@ export function ReporteMateriales({
                   Chapadur: {saldo(m.chapadur_salida - m.chapadur_entrada)}
                 </small>
               </span>,
+              ...(acciones
+                ? [
+                    <AnularRegistro
+                      tipo="material"
+                      id={m.id}
+                      descripcion={`el movimiento de materiales ${m.referencia || m.id}`}
+                      huella={m.huella}
+                      anulado={m.anulado}
+                      reversion={m.reversion}
+                      orden={m.orden}
+                    />,
+                  ]
+                : []),
             ])}
           />
         </div>
@@ -282,7 +299,7 @@ export default function ListadoMateriales({
           </label>
         </div>
       )}
-      <ReporteMateriales movimientos={rows} fleteros={fleteros} />
+      <ReporteMateriales movimientos={rows} fleteros={fleteros} acciones />
       <div className="eo-orders-footer">
         <span>{rows.length} movimientos en el período seleccionado</span>
         <button

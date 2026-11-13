@@ -10,6 +10,7 @@ from decimal import Decimal
 from django.db.models import Max
 from rest_framework.exceptions import ValidationError, PermissionDenied
 from core.permissions import es_administrador
+from .reapertura import entregas_vigentes, limites_reapertura
 from .models import (AuditoriaExpedicion, ConfiguracionProducto, MovimientoStock,
                      OrdenCarga, StockProducto, RespaldoExpedicion)
 
@@ -68,17 +69,21 @@ def diagnosticar():
                 esperado >= uncoded >= 0 and (esperado != s.cantidad_unidades or uncoded != bloqueado))))
     ordenes = []
     productos_ambiguos = set()
+    limites = limites_reapertura()
     for o in OrdenCarga.objects.prefetch_related("detalles__producto", "entregas__detalles__producto").select_related("fletero", "creado_por"):
+        o._limite_reapertura = limites.get(o.pk, {})
+        o._limite_reapertura_version = o.version
+        vigentes = entregas_vigentes(o)
         resueltos = defaultdict(Decimal)
-        for e in o.entregas.all():
+        for e in vigentes:
             for l in e.detalles.all():
                 if l.producto_solicitado_id in (None, l.producto_id):
                     resueltos[l.producto_id] += l.cantidad_entregada
         completo = all(resueltos[l.producto_id] >= l.cantidad_solicitada for l in o.detalles.all())
-        esperado = "COMPLETA" if completo else "PARCIAL" if o.entregas.all() else "RECIBIDA"
+        esperado = "COMPLETA" if completo else "PARCIAL" if vigentes else "RECIBIDA"
         entregado = defaultdict(Decimal)
         if not o.anulada:
-            for e in o.entregas.all():
+            for e in vigentes:
                 for l in e.detalles.all():
                     entregado[l.producto_id] += l.cantidad_entregada
         diferencias = {str(pid): str(entregado[pid] - movimientos[o.pk][pid])

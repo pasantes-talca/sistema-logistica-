@@ -9,7 +9,7 @@ export function cantidadDiferencias(c: ConteoOperativo): number {
   return c.lineas.filter((l) => l.diferencia !== 0).length;
 }
 export function puedeCorroborar(c: ConteoOperativo, turno: string): boolean {
-  return !c.corroborado_en && c.turno !== turno;
+  return !c.anulado && !c.corroborado_en && c.turno !== turno;
 }
 export function filtrarConteos(conteos: ConteoOperativo[], f: FiltrosConteos) {
   const normalizar = (s: string) =>

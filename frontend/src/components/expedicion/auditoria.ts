@@ -15,6 +15,7 @@ const categorias: Record<string, string> = {
   "Corregir orden": "Orden de carga",
   Entrega: "Orden de carga",
   "Anular orden": "Orden de carga",
+  "Reabrir orden": "Orden de carga",
   PRODUCCION: "Stock",
   PRODUCCION_SIN_CODIFICAR: "Stock",
   REBOTE: "Stock",

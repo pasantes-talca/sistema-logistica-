@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import AnularRegistro from "./AnularRegistro";
 import {
   claveOperacion,
   type ComprobanteOperativo,
@@ -346,14 +347,25 @@ function HistorialEmpleado({
                   `Empleado #${c.empleado}`,
               ]
             : []),
-          c.tipo === "CONSUMO" ? "Consumo" : "Anticipo",
+          `${c.tipo === "CONSUMO" ? "Consumo" : "Anticipo"}${c.anulado ? " · Anulado" : ""}`,
           c.lineas
             .map(
               (l) =>
                 `${l.nombre}: ${Math.floor(l.unidades / l.pack)} fardos${l.unidades % l.pack ? ` + ${l.unidades % l.pack} un.` : ""}`,
             )
             .join(" · "),
-          <button onClick={() => imprimir(c.id)}>Imprimir dos copias</button>,
+          <div className="historial-fila-acciones">
+            <button disabled={c.anulado} onClick={() => imprimir(c.id)}>
+              Imprimir dos copias
+            </button>
+            <AnularRegistro
+              tipo="comprobante"
+              id={c.id}
+              descripcion={`el comprobante ${c.numero}`}
+              huella={c.huella}
+              anulado={c.anulado}
+            />
+          </div>,
         ])}
       />
       {rows.length > limite && (

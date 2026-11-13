@@ -12,6 +12,7 @@ from rest_framework.response import Response
 from core.api import APIView
 
 from .models import Viatico
+from core.eliminacion_historial import eliminar_registro
 
 from .serializers import (
     CrearActualizarViaticoSerializer,
@@ -124,6 +125,12 @@ class ViaticoDetalleAPIView(
     APIView
 ):
 
+    eliminacion_administrador = True
+
+    def finalize_response(self, request, response, *args, **kwargs):
+        self.auditoria_explicita = request.method == "DELETE"
+        return super().finalize_response(request, response, *args, **kwargs)
+
     def get_object(
         self,
         pk,
@@ -227,26 +234,7 @@ class ViaticoDetalleAPIView(
         request,
         pk,
     ):
-        viatico = self.get_object(
-            pk
-        )
-
-        if viatico is None:
-            return Response(
-                {
-                    "error":
-                        "Viático no encontrado."
-                },
-                status=
-                    status.HTTP_404_NOT_FOUND,
-            )
-
-        viatico.delete()
-
-        return Response(
-            status=
-                status.HTTP_204_NO_CONTENT
-        )
+        return eliminar_registro(request, Viatico, ViaticoSerializer, pk, "VIATICOS")
 
 
 class ResumenAnualViaticosAPIView(

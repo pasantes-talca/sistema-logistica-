@@ -44,9 +44,14 @@ class AccesoSistema(BasePermission):
         user = request.user
         if not user or not user.is_authenticated or not user.is_active:
             return False
-        if request.method == "DELETE" and hasattr(view, "delete") and not user.is_superuser:
-            self.message = "No se permite borrar históricos. Usá las correcciones o anulaciones disponibles."
-            return False
+        if request.method == "DELETE" and hasattr(view, "delete"):
+            if getattr(view, "eliminacion_administrador", False):
+                if not puede_administrar(user):
+                    self.message = "Solo el administrador puede eliminar estos registros."
+                    return False
+            elif not user.is_superuser:
+                self.message = "No se permite borrar históricos. Usá las correcciones o anulaciones disponibles."
+                return False
         parts = request.path.strip("/").split("/")
         section = parts[1] if len(parts) > 1 else ""
         if section == "administracion":

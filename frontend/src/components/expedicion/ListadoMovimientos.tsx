@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import AnularRegistro from "./AnularRegistro";
 import type {
   MovimientoOperativo,
   ProductoOperativo,
@@ -75,7 +76,10 @@ export function ReporteMovimientos({
           const cells = [
             fechaMovimiento(g.fecha),
             <div>
-              <span>{g.tipo}</span>
+              <span>
+                {g.tipo}
+                {g.lineas[0].anulado ? " · Anulado" : ""}
+              </span>
               {!imprimible && (
                 <details className="eo-movement-detail">
                   <summary>
@@ -128,24 +132,37 @@ export function ReporteMovimientos({
             ? cells
             : [
                 ...cells,
-                g.orden ? (
-                  <Link
-                    className="eo-order-open"
-                    to={`/expedicion/ordenes/${g.orden}`}
-                  >
-                    Ver orden
-                  </Link>
-                ) : corregir ? (
-                  <button
-                    type="button"
-                    disabled={!online}
-                    onClick={() => corregir(g.lineas[0])}
-                  >
-                    Corregir fecha/ref.
-                  </button>
-                ) : (
-                  ""
-                ),
+                <div className="historial-fila-acciones">
+                  {g.orden ? (
+                    <Link
+                      className="eo-order-open"
+                      to={`/expedicion/ordenes/${g.orden}`}
+                    >
+                      Ver orden
+                    </Link>
+                  ) : corregir ? (
+                    <button
+                      type="button"
+                      disabled={!online}
+                      onClick={() => corregir(g.lineas[0])}
+                    >
+                      Corregir fecha/ref.
+                    </button>
+                  ) : (
+                    ""
+                  )}
+                  <AnularRegistro
+                    tipo="movimiento"
+                    id={g.lineas[0].operacion}
+                    descripcion={`la operación ${g.referencia || g.tipo}`}
+                    huella={g.lineas[0].huella}
+                    anulado={g.lineas[0].anulado}
+                    reversion={g.lineas[0].reversion}
+                    orden={g.orden}
+                    referencia={g.lineas[0].referencia}
+                    movimientoTipo={g.lineas[0].tipo}
+                  />
+                </div>,
               ];
         })}
       />

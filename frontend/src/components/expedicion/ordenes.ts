@@ -49,6 +49,7 @@ export function fechaDespacho(e: OrdenOperativa["entregas"][number]) {
 export function entregasFiltradas(o: OrdenOperativa, f?: FiltrosOrdenes) {
   if (o.anulada) return [];
   return o.entregas.filter((e) => {
+    if (e.anulada) return false;
     const dia = fechaDespacho(e);
     return (
       (!f?.dia || dia === f.dia) &&

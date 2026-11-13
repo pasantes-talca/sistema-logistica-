@@ -1,16 +1,9 @@
 import { useEffect, useState } from "react";
 import MotivoCorreccion from "../components/ui/MotivoCorreccion";
 
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import {
-  useNavigate,
-  useParams,
-} from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import {
   actualizarRechazo,
@@ -18,7 +11,6 @@ import {
   obtenerMotivosRechazo,
   obtenerRechazo,
 } from "../api/logistica";
-
 
 export default function EditarRechazoPage() {
   const [motivoCorreccion, setMotivoCorreccion] = useState("");
@@ -31,105 +23,59 @@ export default function EditarRechazoPage() {
 
   const rechazoId = Number(id);
 
+  const [fecha, setFecha] = useState("");
 
-  const [fecha, setFecha] =
-    useState("");
+  const [asignacionId, setAsignacionId] = useState("");
 
-  const [asignacionId, setAsignacionId] =
-    useState("");
+  const [puntoVenta, setPuntoVenta] = useState("");
 
-  const [puntoVenta, setPuntoVenta] =
-    useState("");
+  const [bultos, setBultos] = useState("");
 
-  const [bultos, setBultos] =
-    useState("");
+  const [motivoId, setMotivoId] = useState("");
 
-  const [motivoId, setMotivoId] =
-    useState("");
-
-  const [observacion, setObservacion] =
-    useState("");
-
+  const [observacion, setObservacion] = useState("");
 
   const {
     data: rechazo,
     isLoading: cargandoRechazo,
     isError: errorRechazo,
   } = useQuery({
+    queryKey: ["rechazo", rechazoId],
 
-    queryKey: [
-      "rechazo",
-      rechazoId,
-    ],
+    queryFn: () => obtenerRechazo(rechazoId),
 
-    queryFn: () =>
-      obtenerRechazo(
-        rechazoId
-      ),
-
-    enabled:
-      Number.isFinite(rechazoId),
+    enabled: Number.isFinite(rechazoId),
   });
 
-
-  const {
-    data: asignaciones = [],
-  } = useQuery({
+  const { data: asignaciones = [] } = useQuery({
     queryKey: ["asignaciones"],
     queryFn: obtenerAsignaciones,
   });
 
-
-  const {
-    data: motivos = [],
-  } = useQuery({
+  const { data: motivos = [] } = useQuery({
     queryKey: ["motivos-rechazo"],
     queryFn: obtenerMotivosRechazo,
   });
 
-
   useEffect(() => {
-
     if (!rechazo) {
       return;
     }
 
+    setFecha(rechazo.fecha);
 
-    setFecha(
-      rechazo.fecha
-    );
+    setAsignacionId(rechazo.asignacion_id ? String(rechazo.asignacion_id) : "");
 
-    setAsignacionId(
-      rechazo.asignacion_id
-        ? String(
-            rechazo.asignacion_id
-          )
-        : ""
-    );
+    setPuntoVenta(rechazo.punto_venta);
 
-    setPuntoVenta(
-      rechazo.punto_venta
-    );
+    setBultos(rechazo.bultos);
 
-    setBultos(
-      rechazo.bultos
-    );
+    setMotivoId(String(rechazo.motivo_id));
 
-    setMotivoId(
-      String(
-        rechazo.motivo_id
-      )
-    );
-
-    setObservacion(
-      rechazo.observacion
-    );
-
+    setObservacion(rechazo.observacion);
   }, [rechazo]);
 
-
   const mutation = useMutation({
-
     mutationFn: (datos: {
       fecha: string;
       asignacion_id: number | null;
@@ -138,379 +84,199 @@ export default function EditarRechazoPage() {
       motivo_id: number;
       observacion: string;
     }) =>
-      actualizarRechazo(
-        rechazoId,
-        {...datos, motivo_correccion: motivoCorreccion}
-      ),
-
+      actualizarRechazo(rechazoId, {
+        ...datos,
+        motivo_correccion: motivoCorreccion,
+      }),
 
     onSuccess: async () => {
-
       await queryClient.invalidateQueries({
         queryKey: ["rechazos"],
       });
 
       await queryClient.invalidateQueries({
-        queryKey: [
-          "rechazo",
-          rechazoId,
-        ],
+        queryKey: ["rechazo", rechazoId],
       });
 
+      alert("Rechazo actualizado correctamente.");
 
-      alert(
-        "Rechazo actualizado correctamente."
-      );
-
-
-      navigate(
-        "/rechazos"
-      );
+      navigate("/rechazos");
     },
-
 
     onError: (error) => {
-
-      alert(
-        `No se pudo actualizar el rechazo.\n\n${error.message}`
-      );
+      alert(`No se pudo actualizar el rechazo.\n\n${error.message}`);
     },
-
   });
 
-
-  function enviarFormulario(
-    event: React.FormEvent
-  ) {
-
+  function enviarFormulario(event: React.FormEvent) {
     event.preventDefault();
 
-
     if (!fecha) {
-      alert(
-        "Seleccioná una fecha."
-      );
+      alert("Seleccioná una fecha.");
       return;
     }
-
 
     if (!asignacionId) {
-      alert(
-        "Seleccioná una asignación."
-      );
+      alert("Seleccioná una asignación.");
       return;
     }
-
 
     if (!puntoVenta.trim()) {
-      alert(
-        "Ingresá el punto de venta."
-      );
+      alert("Ingresá el punto de venta.");
       return;
     }
-
 
     if (!bultos.trim()) {
-      alert(
-        "Ingresá los bultos."
-      );
+      alert("Ingresá los bultos.");
       return;
     }
-
 
     if (!motivoId) {
-      alert(
-        "Seleccioná el motivo de NO entrega."
-      );
+      alert("Seleccioná el motivo de NO entrega.");
       return;
     }
 
-
     mutation.mutate({
-
       fecha,
 
-      asignacion_id:
-        Number(
-          asignacionId
-        ),
+      asignacion_id: Number(asignacionId),
 
-      punto_venta:
-        puntoVenta.trim(),
+      punto_venta: puntoVenta.trim(),
 
-      bultos:
-        bultos.trim(),
+      bultos: bultos.trim(),
 
-      motivo_id:
-        Number(
-          motivoId
-        ),
+      motivo_id: Number(motivoId),
 
-      observacion:
-        observacion.trim(),
+      observacion: observacion.trim(),
     });
   }
 
-
   if (cargandoRechazo) {
-
     return (
       <div className="pagina">
-
-        <div className="contenedor">
-
-          Cargando rechazo...
-
-        </div>
-
+        <div className="contenedor">Cargando rechazo...</div>
       </div>
     );
   }
-
 
   if (errorRechazo) {
-
     return (
       <div className="pagina">
-
-        <div className="contenedor">
-
-          No se pudo cargar el rechazo.
-
-        </div>
-
+        <div className="contenedor">No se pudo cargar el rechazo.</div>
       </div>
     );
   }
-
 
   return (
     <div className="pagina">
-
       <div className="contenedor">
+        <h1>Editar rechazo</h1>
 
-        <h1>
-          Editar rechazo
-        </h1>
+        <p className="subtitulo">Modificar una entrega no realizada</p>
 
-        <p className="subtitulo">
-          Modificar una entrega no realizada
-        </p>
-
-
-        <form
-          className="formulario"
-          onSubmit={enviarFormulario}
-        >
-
-
+        <form className="formulario" onSubmit={enviarFormulario}>
           <div className="campo">
-
-            <label>
-              Fecha
-            </label>
+            <label>Fecha</label>
 
             <input
               type="date"
               value={fecha}
-              onChange={(event) =>
-                setFecha(
-                  event.target.value
-                )
-              }
+              onChange={(event) => setFecha(event.target.value)}
               required
             />
-
           </div>
 
-
           <div className="campo">
-
-            <label>
-              Asignación
-            </label>
+            <label>Asignación</label>
 
             <select
               value={asignacionId}
-              onChange={(event) =>
-                setAsignacionId(
-                  event.target.value
-                )
-              }
+              onChange={(event) => setAsignacionId(event.target.value)}
               required
             >
+              <option value="">Seleccionar asignación</option>
 
-              <option value="">
-                Seleccionar asignación
-              </option>
-
-
-              {asignaciones.map(
-                (asignacion) => (
-
-                  <option
-                    key={
-                      asignacion.id
-                    }
-                    value={
-                      asignacion.id
-                    }
-                  >
-                    {
-                      asignacion.codigo
-                    }
-                  </option>
-
-                )
-              )}
-
+              {asignaciones.map((asignacion) => (
+                <option key={asignacion.id} value={asignacion.id}>
+                  {asignacion.codigo}
+                </option>
+              ))}
             </select>
-
           </div>
 
-
           <div className="campo">
-
-            <label>
-              Punto de venta
-            </label>
+            <label>Punto de venta</label>
 
             <input
               type="text"
               value={puntoVenta}
-              onChange={(event) =>
-                setPuntoVenta(
-                  event.target.value
-                )
-              }
+              onChange={(event) => setPuntoVenta(event.target.value)}
               required
             />
-
           </div>
 
-
           <div className="campo">
-
-            <label>
-              Bultos
-            </label>
+            <label>Bultos</label>
 
             <input
               type="text"
               value={bultos}
-              onChange={(event) =>
-                setBultos(
-                  event.target.value
-                )
-              }
+              onChange={(event) => setBultos(event.target.value)}
               required
             />
-
           </div>
 
-
           <div className="campo">
-
-            <label>
-              Motivo de NO entrega
-            </label>
+            <label>Motivo de NO entrega</label>
 
             <select
               value={motivoId}
-              onChange={(event) =>
-                setMotivoId(
-                  event.target.value
-                )
-              }
+              onChange={(event) => setMotivoId(event.target.value)}
               required
             >
+              <option value="">Seleccionar motivo</option>
 
-              <option value="">
-                Seleccionar motivo
-              </option>
-
-
-              {motivos.map(
-                (motivo) => (
-
-                  <option
-                    key={
-                      motivo.id
-                    }
-                    value={
-                      motivo.id
-                    }
-                  >
-                    {
-                      motivo.nombre
-                    }
-                  </option>
-
-                )
-              )}
-
+              {motivos.map((motivo) => (
+                <option key={motivo.id} value={motivo.id}>
+                  {motivo.nombre}
+                </option>
+              ))}
             </select>
-
           </div>
 
-
           <div className="campo">
-
-            <label>
-              Observación
-            </label>
+            <label>Observación</label>
 
             <textarea
               value={observacion}
-              onChange={(event) =>
-                setObservacion(
-                  event.target.value
-                )
-              }
+              onChange={(event) => setObservacion(event.target.value)}
               rows={4}
             />
-
           </div>
 
-
-          <MotivoCorreccion value={motivoCorreccion} onChange={setMotivoCorreccion}/>
+          <MotivoCorreccion
+            value={motivoCorreccion}
+            onChange={setMotivoCorreccion}
+          />
           <div className="acciones-formulario">
-
             <button
               type="button"
               className="boton-cancelar"
-              onClick={() =>
-                navigate(
-                  "/rechazos"
-                )
-              }
+              onClick={() => navigate("/rechazos")}
             >
               Cancelar
             </button>
 
-
             <button
               type="submit"
               className="boton-guardar"
-              disabled={
-                mutation.isPending
-              }
+              disabled={mutation.isPending}
             >
-
-              {
-                mutation.isPending
-                  ? "Guardando..."
-                  : "Guardar cambios"
-              }
-
+              {mutation.isPending ? "Guardando..." : "Guardar cambios"}
             </button>
-
           </div>
-
         </form>
-
       </div>
-
     </div>
   );
 }

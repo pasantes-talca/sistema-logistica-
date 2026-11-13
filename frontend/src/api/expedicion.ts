@@ -1,7 +1,4 @@
-const API_URL =
-  import.meta.env.VITE_API_URL ||
-  "http://127.0.0.1:8000/api";
-
+const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000/api";
 
 // ============================================================
 // TIPOS
@@ -15,7 +12,6 @@ export type Fletero = {
   activo: boolean;
 };
 
-
 export type StockProducto = {
   id: number;
   producto_id: number;
@@ -27,7 +23,6 @@ export type StockProducto = {
   actualizado_en: string;
 };
 
-
 export type DetalleOrdenCarga = {
   id: number;
   producto: number;
@@ -35,7 +30,6 @@ export type DetalleOrdenCarga = {
   producto_nombre: string;
   cantidad_solicitada: string;
 };
-
 
 export type DetalleEntregaOrdenCarga = {
   id: number;
@@ -45,9 +39,9 @@ export type DetalleEntregaOrdenCarga = {
   cantidad_entregada: string;
 };
 
-
 export type EntregaOrdenCarga = {
   id: number;
+  anulada?: boolean;
   orden: number;
   fecha: string;
 
@@ -68,7 +62,6 @@ export type EntregaOrdenCarga = {
 
   detalles: DetalleEntregaOrdenCarga[];
 };
-
 
 export type OrdenCarga = {
   anulada?: boolean;
@@ -95,7 +88,6 @@ export type OrdenCarga = {
   entregas: EntregaOrdenCarga[];
 };
 
-
 export type MovimientoStock = {
   sin_impacto?: boolean;
   fecha_operativa?: string | null;
@@ -121,7 +113,6 @@ export type MovimientoStock = {
   creado_en: string;
 };
 
-
 export type MovimientoMaterial = {
   id: number;
 
@@ -143,7 +134,6 @@ export type MovimientoMaterial = {
   creado_en: string;
 };
 
-
 // ============================================================
 // PAYLOADS
 // ============================================================
@@ -155,12 +145,10 @@ export type CrearFleteroPayload = {
   activo?: boolean;
 };
 
-
 export type CrearDetalleOrdenPayload = {
   producto_id: number;
   cantidad_solicitada: number;
 };
-
 
 export type CrearOrdenCargaPayload = {
   numero: string;
@@ -170,12 +158,10 @@ export type CrearOrdenCargaPayload = {
   detalles: CrearDetalleOrdenPayload[];
 };
 
-
 export type CrearDetalleEntregaPayload = {
   producto_id: number;
   cantidad_entregada: number;
 };
-
 
 export type CrearEntregaPayload = {
   inicio_carga?: string | null;
@@ -193,7 +179,6 @@ export type CrearEntregaPayload = {
   detalles: CrearDetalleEntregaPayload[];
 };
 
-
 export type CrearMovimientoStockPayload = {
   producto_id: number;
 
@@ -206,9 +191,7 @@ export type CrearMovimientoStockPayload = {
     | "CONSUMO_EMPLEADO"
     | "ANTICIPO_EMPLEADO";
 
-  direccion:
-    | "ENTRADA"
-    | "SALIDA";
+  direccion: "ENTRADA" | "SALIDA";
 
   cantidad: number;
 
@@ -216,257 +199,144 @@ export type CrearMovimientoStockPayload = {
   observaciones?: string;
 };
 
-
 // ============================================================
 // UTILIDADES
 // ============================================================
 
-function obtenerCookie(
-  nombre: string
-): string | null {
+function obtenerCookie(nombre: string): string | null {
+  const cookies = document.cookie.split(";");
 
-  const cookies =
-    document.cookie.split(";");
+  for (const cookie of cookies) {
+    const [clave, ...resto] = cookie.trim().split("=");
 
-
-  for (
-    const cookie
-    of cookies
-  ) {
-
-    const [
-      clave,
-      ...resto
-    ] =
-      cookie
-        .trim()
-        .split("=");
-
-
-    if (
-      clave === nombre
-    ) {
-
-      return decodeURIComponent(
-        resto.join("=")
-      );
+    if (clave === nombre) {
+      return decodeURIComponent(resto.join("="));
     }
   }
-
 
   return null;
 }
 
-
-async function procesarError(
-  response: Response
-): Promise<never> {
-
+async function procesarError(response: Response): Promise<never> {
   let datos: any = null;
 
   try {
-    datos =
-      await response.json();
-
+    datos = await response.json();
   } catch {
     datos = null;
   }
 
-
   const mensaje =
-    datos?.error
-    ??
-    datos?.detail
-    ??
-    (
-      datos
-        ? JSON.stringify(datos)
-        : `Error HTTP ${response.status}`
-    );
+    datos?.error ??
+    datos?.detail ??
+    (datos ? JSON.stringify(datos) : `Error HTTP ${response.status}`);
 
-
-  throw new Error(
-    mensaje
-  );
+  throw new Error(mensaje);
 }
 
-
-async function getJson<T>(
-  url: string
-): Promise<T> {
-
-  const response =
-    await fetch(
-      url,
-      {
-        credentials:
-          "include",
-      }
-    );
-
+async function getJson<T>(url: string): Promise<T> {
+  const response = await fetch(url, {
+    credentials: "include",
+  });
 
   if (!response.ok) {
-    return procesarError(
-      response
-    );
+    return procesarError(response);
   }
-
 
   return response.json();
 }
-
 
 async function enviarJson<T>(
   url: string,
   method: "POST" | "PUT" | "PATCH",
-  datos: unknown
+  datos: unknown,
 ): Promise<T> {
+  const csrfToken = obtenerCookie("csrftoken");
 
-  const csrfToken =
-    obtenerCookie(
-      "csrftoken"
-    );
+  const response = await fetch(url, {
+    method,
 
+    credentials: "include",
 
-  const response =
-    await fetch(
-      url,
-      {
-        method,
+    headers: {
+      "Content-Type": "application/json",
 
-        credentials:
-          "include",
+      ...(csrfToken
+        ? {
+            "X-CSRFToken": csrfToken,
+          }
+        : {}),
+    },
 
-        headers: {
-          "Content-Type":
-            "application/json",
-
-          ...(
-            csrfToken
-              ? {
-                  "X-CSRFToken":
-                    csrfToken,
-                }
-              : {}
-          ),
-        },
-
-        body:
-          JSON.stringify(
-            datos
-          ),
-      }
-    );
-
+    body: JSON.stringify(datos),
+  });
 
   if (!response.ok) {
-    return procesarError(
-      response
-    );
+    return procesarError(response);
   }
-
 
   return response.json();
 }
-
 
 // ============================================================
 // FLETEROS
 // ============================================================
 
-export function obtenerFleteros():
-Promise<Fletero[]> {
-
-  return getJson<Fletero[]>(
-    `${API_URL}/expedicion/fleteros/`
-  );
+export function obtenerFleteros(): Promise<Fletero[]> {
+  return getJson<Fletero[]>(`${API_URL}/expedicion/fleteros/`);
 }
 
-
-export function crearFletero(
-  datos: CrearFleteroPayload
-): Promise<Fletero> {
-
-  return enviarJson<Fletero>(
-    `${API_URL}/expedicion/fleteros/`,
-    "POST",
-    datos
-  );
+export function crearFletero(datos: CrearFleteroPayload): Promise<Fletero> {
+  return enviarJson<Fletero>(`${API_URL}/expedicion/fleteros/`, "POST", datos);
 }
-
 
 // ============================================================
 // STOCK
 // ============================================================
 
-export function obtenerStockExpedicion():
-Promise<StockProducto[]> {
-
-  return getJson<StockProducto[]>(
-    `${API_URL}/expedicion/stock/`
-  );
+export function obtenerStockExpedicion(): Promise<StockProducto[]> {
+  return getJson<StockProducto[]>(`${API_URL}/expedicion/stock/`);
 }
-
 
 // ============================================================
 // MOVIMIENTOS DE STOCK
 // ============================================================
 
-export function obtenerMovimientosStock():
-Promise<MovimientoStock[]> {
-
-  return getJson<MovimientoStock[]>(
-    `${API_URL}/expedicion/movimientos/`
-  );
+export function obtenerMovimientosStock(): Promise<MovimientoStock[]> {
+  return getJson<MovimientoStock[]>(`${API_URL}/expedicion/movimientos/`);
 }
 
-
 export function crearMovimientoStock(
-  datos: CrearMovimientoStockPayload
+  datos: CrearMovimientoStockPayload,
 ): Promise<MovimientoStock> {
-
   return enviarJson<MovimientoStock>(
     `${API_URL}/expedicion/movimientos/`,
     "POST",
-    datos
+    datos,
   );
 }
-
 
 // ============================================================
 // ÓRDENES
 // ============================================================
 
-export function obtenerOrdenesCarga():
-Promise<OrdenCarga[]> {
-
-  return getJson<OrdenCarga[]>(
-    `${API_URL}/expedicion/ordenes/`
-  );
+export function obtenerOrdenesCarga(): Promise<OrdenCarga[]> {
+  return getJson<OrdenCarga[]>(`${API_URL}/expedicion/ordenes/`);
 }
 
-
-export function obtenerOrdenCarga(
-  id: number
-): Promise<OrdenCarga> {
-
-  return getJson<OrdenCarga>(
-    `${API_URL}/expedicion/ordenes/${id}/`
-  );
+export function obtenerOrdenCarga(id: number): Promise<OrdenCarga> {
+  return getJson<OrdenCarga>(`${API_URL}/expedicion/ordenes/${id}/`);
 }
-
 
 export function crearOrdenCarga(
-  datos: CrearOrdenCargaPayload
+  datos: CrearOrdenCargaPayload,
 ): Promise<OrdenCarga> {
-
   return enviarJson<OrdenCarga>(
     `${API_URL}/expedicion/ordenes/`,
     "POST",
-    datos
+    datos,
   );
 }
-
 
 // ============================================================
 // ENTREGAS
@@ -474,7 +344,7 @@ export function crearOrdenCarga(
 
 export function crearEntregaOrden(
   ordenId: number,
-  datos: CrearEntregaPayload
+  datos: CrearEntregaPayload,
 ): Promise<{
   mensaje: string;
   entrega: {
@@ -483,36 +353,28 @@ export function crearEntregaOrden(
     estado_orden: string;
   };
 }> {
-
   return enviarJson(
     `${API_URL}/expedicion/ordenes/${ordenId}/entregas/`,
     "POST",
-    datos
+    datos,
   );
 }
-
 
 // ============================================================
 // MATERIALES
 // ============================================================
 
-export function obtenerMovimientosMaterial():
-Promise<MovimientoMaterial[]> {
-
-  return getJson<MovimientoMaterial[]>(
-    `${API_URL}/expedicion/materiales/`
-  );
+export function obtenerMovimientosMaterial(): Promise<MovimientoMaterial[]> {
+  return getJson<MovimientoMaterial[]>(`${API_URL}/expedicion/materiales/`);
 }
-
 
 export function actualizarOrdenCarga(
   id: number,
-  datos: CrearOrdenCargaPayload
+  datos: CrearOrdenCargaPayload,
 ): Promise<OrdenCarga> {
-
   return enviarJson<OrdenCarga>(
     `${API_URL}/expedicion/ordenes/${id}/`,
     "PUT",
-    datos
+    datos,
   );
 }

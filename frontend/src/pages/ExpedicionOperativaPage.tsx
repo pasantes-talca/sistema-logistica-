@@ -303,14 +303,16 @@ export default function ExpedicionOperativaPage() {
     });
     if (o?.circuito === "immediate") {
       const totals = new Map<number, number>();
-      o.entregas.forEach((e) =>
-        e.detalles.forEach((l) =>
-          totals.set(
-            l.producto,
-            (totals.get(l.producto) || 0) + l.cantidad_entregada,
+      o.entregas
+        .filter((e) => !e.anulada)
+        .forEach((e) =>
+          e.detalles.forEach((l) =>
+            totals.set(
+              l.producto,
+              (totals.get(l.producto) || 0) + l.cantidad_entregada,
+            ),
           ),
-        ),
-      );
+        );
       setActual(
         [...totals].filter(([, q]) => q > 0).map(([p, q]) => qtyLine(p, q)),
       );
@@ -503,7 +505,11 @@ export default function ExpedicionOperativaPage() {
         predicate: (q) => String(q.queryKey[0]).startsWith("expedicion"),
       });
       setDialog(null);
-      setMessage("Operación guardada correctamente.");
+      setMessage(
+        dialog.accion === "reabrir_orden"
+          ? "Orden reabierta: quedó pendiente de un nuevo despacho. El stock y los materiales no se modificaron."
+          : "Operación guardada correctamente.",
+      );
       if (result.id && ["orden", "entrega"].includes(dialog.accion))
         navigate(`/expedicion/ordenes/${result.id}`);
       if (result.comprobante) {
@@ -627,10 +633,28 @@ export default function ExpedicionOperativaPage() {
               })}
             </>
           )}
+          {o.anulada &&
+            button("Reabrir orden", {
+              accion: "reabrir_orden",
+              title: `Reabrir orden ${o.numero}`,
+              values: {
+                id: o.id,
+                version: o.version,
+                circuito: ["immediate", "cancelled"].includes(o.circuito)
+                  ? "preventa"
+                  : o.circuito,
+              },
+            })}
         </div>
         <h3>Entregas y correcciones</h3>
         {o.entregas.map((e) => (
           <article className="eo-card" key={e.id}>
+            {e.anulada && (
+              <p className="eo-notice">
+                Entrega anulada y revertida. Se conserva como historial; no
+                cuenta como despacho vigente.
+              </p>
+            )}
             <p>
               {new Date(e.fecha).toLocaleString("es-AR")} ·{" "}
               {e.creado_por_nombre} · Turno {e.turno || "Histórico"} ·{" "}
@@ -724,7 +748,7 @@ export default function ExpedicionOperativaPage() {
     (o) =>
       (o.creado_en.slice(0, 10) === today() && o.turno === turno) ||
       o.entregas.some(
-        (e) => e.fecha_operativa === today() && e.turno === turno,
+        (e) => !e.anulada && e.fecha_operativa === today() && e.turno === turno,
       ) ||
       data.auditoria.some(
         (a) =>
@@ -818,7 +842,8 @@ export default function ExpedicionOperativaPage() {
                 ],
                 [
                   "Relevos por corroborar",
-                  data.conteos.filter((c) => !c.corroborado_en).length,
+                  data.conteos.filter((c) => !c.anulado && !c.corroborado_en)
+                    .length,
                 ],
               ].map(([label, value]) => (
                 <article className="eo-card" key={label}>
@@ -841,7 +866,9 @@ export default function ExpedicionOperativaPage() {
               </button>
             </div>
             {data.conteos
-              .filter((c) => !c.corroborado_en && c.turno !== turno)
+              .filter(
+                (c) => !c.anulado && !c.corroborado_en && c.turno !== turno,
+              )
               .map((c) => (
                 <p className="eo-notice" key={c.id}>
                   Relevo pendiente: turno {c.turno} · {c.usuario}.{" "}
@@ -880,7 +907,11 @@ export default function ExpedicionOperativaPage() {
                     filtros={filtros}
                     imprimible
                   />
-                  <TotalesProductosOrdenes ordenes={ordenes} productos={data.productos} filtros={filtros} />
+                  <TotalesProductosOrdenes
+                    ordenes={ordenes}
+                    productos={data.productos}
+                    filtros={filtros}
+                  />
                 </>,
               )
             }
@@ -1983,6 +2014,42 @@ export default function ExpedicionOperativaPage() {
                     Las entregas y la auditoría permanecerán disponibles.
                   </p>
                 )}
+                {dialog.accion === "reabrir_orden" && (
+                  <>
+                    <p className="eo-notice">
+                      La orden volverá a quedar pendiente por todas las
+                      cantidades solicitadas. Reabrir no mueve stock ni
+                      materiales. Confirmá la nueva salida cuando la mercadería
+                      realmente se despache, con su fecha, turno y encargado.
+                      Las entregas anteriores seguirán disponibles como
+                      anuladas.
+                    </p>
+                    {select(
+                      "circuito",
+                      "Circuito para el nuevo despacho",
+                      Object.fromEntries(
+                        Object.entries(circuitos).filter(
+                          ([k]) => !["immediate", "cancelled"].includes(k),
+                        ),
+                      ),
+                    )}
+                    <label className="eo-check">
+                      <input
+                        type="checkbox"
+                        required
+                        checked={Boolean(values.confirmar)}
+                        onChange={(e) =>
+                          setValues((v) => ({
+                            ...v,
+                            confirmar: e.target.checked,
+                          }))
+                        }
+                      />
+                      Confirmo que la mercadería todavía debe salir y la orden
+                      debe quedar pendiente.
+                    </label>
+                  </>
+                )}
                 {dialog.accion === "acreditar" && (
                   <p className="eo-notice">
                     Se sumarán dos fardos al saldo de cada empleado activo. Esta
@@ -2175,6 +2242,7 @@ export default function ExpedicionOperativaPage() {
                 )}
                 {([
                   "anular",
+                  "reabrir_orden",
                   "pendientes",
                   "acreditar",
                   "corregir_movimiento",

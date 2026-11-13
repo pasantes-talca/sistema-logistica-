@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from core.api import APIView
 
 from .models import Reparto
+from core.eliminacion_historial import EliminacionHistorialMixin, eliminar_registro
 from .serializers import (
     RepartoSerializer,
     RepartoCreateSerializer,
@@ -69,7 +70,10 @@ class RepartoListCreateAPIView(APIView):
         )
 
 
-class RepartoDetailAPIView(APIView):
+class RepartoDetailAPIView(EliminacionHistorialMixin, APIView):
+    def delete(self, request, pk):
+        return eliminar_registro(request, Reparto, RepartoSerializer, pk, "REPARTOS")
+
     """
     GET:
         Devuelve un reparto específico.

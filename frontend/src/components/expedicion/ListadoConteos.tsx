@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { ConteoOperativo } from "../../api/expedicionOperativa";
 import { Table } from "./Controles";
 import { fmt } from "./format";
+import AnularRegistro from "./AnularRegistro";
 import {
   cantidadDiferencias,
   filtrarConteos,
@@ -52,13 +53,26 @@ export function ReporteConteos({
             <span
               className={`eo-badge ${c.corroborado_en ? "eo-count-confirmed" : "eo-count-pending"}`}
             >
-              {c.corroborado_en ? "Corroborado" : "Pendiente de corroboración"}
+              {c.anulado
+                ? "Anulado"
+                : c.corroborado_en
+                  ? "Corroborado"
+                  : "Pendiente de corroboración"}
             </span>,
             ...(seleccionar
               ? [
-                  <button type="button" onClick={() => seleccionar(c.id)}>
-                    Ver detalle
-                  </button>,
+                  <div className="historial-fila-acciones">
+                    <button type="button" onClick={() => seleccionar(c.id)}>
+                      Ver detalle
+                    </button>
+                    <AnularRegistro
+                      tipo="conteo"
+                      id={c.id}
+                      descripcion={`el conteo del ${new Date(c.fecha).toLocaleString("es-AR")}`}
+                      huella={c.huella}
+                      anulado={c.anulado}
+                    />
+                  </div>,
                 ]
               : []),
           ];
@@ -103,9 +117,11 @@ export function DetalleConteo({ conteo }: { conteo: ConteoOperativo }) {
         </p>
       )}
       <p>
-        {conteo.corroborado_en
-          ? `Corroborado por ${conteo.corroborado_por || "responsable no informado"} · ${new Date(conteo.corroborado_en).toLocaleString("es-AR")}`
-          : "Pendiente de corroboración"}
+        {conteo.anulado
+          ? "Anulado administrativamente. No requiere corroboración."
+          : conteo.corroborado_en
+            ? `Corroborado por ${conteo.corroborado_por || "responsable no informado"} · ${new Date(conteo.corroborado_en).toLocaleString("es-AR")}`
+            : "Pendiente de corroboración"}
       </p>
     </>
   );

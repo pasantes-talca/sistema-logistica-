@@ -200,6 +200,14 @@ class OrdenCargaSerializer(
 
     creado_por_nombre = serializers.SerializerMethodField()
 
+    def to_representation(self, instance):
+        from .reapertura import limite_reapertura
+        datos = super().to_representation(instance)
+        limite = limite_reapertura(instance).get("entrega_hasta", 0)
+        for entrega in datos["entregas"]:
+            entrega["anulada"] = instance.anulada or entrega["id"] <= limite
+        return datos
+
     class Meta:
         model = OrdenCarga
         fields = [

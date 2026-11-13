@@ -42,6 +42,7 @@ export type OrdenOperativa = {
   creado_en: string;
   entregas: {
     id: number;
+    anulada?: boolean;
     fecha: string;
     fecha_operativa: string;
     turno: string;
@@ -72,7 +73,12 @@ export type EmpleadoOperativo = {
   activo: boolean;
   saldo_fardos: number;
 };
-export type MovimientoOperativo = {
+export type EstadoAnulacion = {
+  huella?: string;
+  anulado?: boolean;
+  reversion?: boolean;
+};
+export type MovimientoOperativo = EstadoAnulacion & {
   id: number;
   producto: number;
   tipo: string;
@@ -89,7 +95,7 @@ export type MovimientoOperativo = {
   sin_impacto: boolean;
   sin_codificar: boolean;
 };
-export type MaterialOperativo = {
+export type MaterialOperativo = EstadoAnulacion & {
   id: number;
   fletero: number;
   orden: number | null;
@@ -103,7 +109,7 @@ export type MaterialOperativo = {
   chapadur_salida: number;
   chapadur_entrada: number;
 };
-export type ComprobanteOperativo = {
+export type ComprobanteOperativo = EstadoAnulacion & {
   id: number;
   empleado: number;
   tipo: string;
@@ -120,7 +126,7 @@ export type ComprobanteOperativo = {
     pack: number;
   }[];
 };
-export type ConteoOperativo = {
+export type ConteoOperativo = EstadoAnulacion & {
   id: number;
   fecha: string;
   usuario: string;

@@ -730,6 +730,9 @@ class CrearEntregaOrdenAPIView(
         # NO PERMITIR ENTREGAS SOBRE ÓRDENES COMPLETAS
         # ----------------------------------------------------
 
+        if orden.anulada:
+            return Response({"orden": "La orden está anulada. Reabrila antes de despacharla."}, status=400)
+
         if orden.estado in [
             OrdenCarga.Estado.COMPLETA,
             OrdenCarga.Estado.COMPLETA_CON_CAMBIO,
@@ -899,10 +902,12 @@ class CrearEntregaOrdenAPIView(
             # CALCULAR LO YA ENTREGADO
             # ------------------------------------------------
 
+            from .reapertura import limite_reapertura
             cantidad_ya_entregada = (
 
                 DetalleEntregaOrdenCarga.objects
                 .filter(
+                    entrega_id__gt=limite_reapertura(orden).get("entrega_hasta", 0),
                     entrega__orden=
                         orden,
 

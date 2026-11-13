@@ -88,7 +88,7 @@ export function agruparMovimientos(
     const deOrden = !!m.orden && ["ORDEN_CARGA", "CORRECCION"].includes(m.tipo);
     const tipo = deOrden ? "Orden de carga" : nombreMovimiento(m);
     const clave = deOrden
-      ? `orden:${m.orden}`
+      ? `orden:${m.orden}:${m.anulado ? "anulada" : "vigente"}`
       : m.operacion
         ? `operacion:${m.operacion}:${tipo}`
         : `movimiento:${m.id}`;

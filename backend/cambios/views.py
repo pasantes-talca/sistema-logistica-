@@ -8,6 +8,7 @@ from django.utils.dateparse import parse_date
 from rest_framework import status
 from rest_framework.response import Response
 from core.api import APIView
+from core.eliminacion_historial import EliminacionHistorialMixin, eliminar_registro
 
 from .models import (
     DetalleReciboCambio,
@@ -245,7 +246,10 @@ class ReciboCambioListCreateAPIView(APIView):
         )
 
 
-class ReciboCambioDetailAPIView(APIView):
+class ReciboCambioDetailAPIView(EliminacionHistorialMixin, APIView):
+    def delete(self, request, pk):
+        return eliminar_registro(request, ReciboCambio, ReciboCambioSerializer, pk, "CAMBIOS")
+
     """
     GET
         Consulta un recibo completo.

@@ -24,6 +24,7 @@ from .models import (
 )
 from .autoria import nombre_autor
 from .serializers import OrdenCargaSerializer
+from .reapertura import entregas_vigentes, limites_reapertura
 from core.permissions import es_administrador
 
 CIRCUITOS = {
@@ -158,7 +159,8 @@ def detalle_orden(o):
     datos = dict(OrdenCargaSerializer(o).data)
     resueltos = defaultdict(Decimal)
     sustituciones = False
-    for entrega in o.entregas.all():
+    vigentes = entregas_vigentes(o)
+    for entrega in vigentes:
         for d in entrega.detalles.all():
             if d.producto_solicitado_id and d.producto_solicitado_id != d.producto_id:
                 sustituciones = True
@@ -170,7 +172,7 @@ def detalle_orden(o):
         d["pendiente"] = max(0, float(d["cantidad_solicitada"]) - d["resuelto"])
     pending = sum(d["pendiente"] for d in datos["detalles"])
     datos["estado_operativo"] = ("Anulada" if o.anulada else "Despachada" if not pending else
-        "Pendiente de definición" if sustituciones else "Parcialmente despachada" if o.entregas.exists() else
+        "Pendiente de definición" if sustituciones else "Parcialmente despachada" if vigentes else
         "PENDIENTE" if o.circuito == "administrative" else "Pendiente de despacho")
     for e, modelo in zip(datos["entregas"], o.entregas.all()):
         e["turno"] = modelo.turno
@@ -183,7 +185,7 @@ def detalle_orden(o):
 
 def actualizar_estado(o):
     d = detalle_orden(o)
-    o.estado = "COMPLETA" if d["estado_operativo"] == "Despachada" else "PARCIAL" if o.entregas.exists() else "RECIBIDA"
+    o.estado = "COMPLETA" if d["estado_operativo"] == "Despachada" else "PARCIAL" if entregas_vigentes(o) else "RECIBIDA"
     o.version += 1
     o.save()
 
@@ -201,7 +203,7 @@ def guardar_orden(data, user, turno, op):
     circuito = data.get("circuito", "administrative")
     if circuito not in CIRCUITOS or circuito == "cancelled":
         raise ValidationError("Seleccioná un circuito válido. Para anular, usá la acción de anulación.")
-    if o and o.entregas.exists() and circuito != o.circuito:
+    if o and entregas_vigentes(o) and circuito != o.circuito:
         if o.circuito == "immediate" or circuito == "immediate" or (circuito == "administrative" and o.circuito != "administrative"):
             raise ValidationError("Una salida confirmada debe permanecer en un circuito operativo compatible.")
     numero_orden = texto(data, "numero", 60, True)
@@ -225,8 +227,9 @@ def guardar_orden(data, user, turno, op):
     o.detalles.exclude(pk__in=ids).delete()
     if circuito == "immediate":
         previous = defaultdict(Decimal)
-        for d in DetalleEntregaOrdenCarga.objects.filter(entrega__orden=o):
-            previous[d.producto_id] += d.cantidad_entregada
+        for entrega in entregas_vigentes(o):
+            for d in entrega.detalles.all():
+                previous[d.producto_id] += d.cantidad_entregada
         actual_rows = lineas(data, "entregado") if "entregado" in data else rows
         actual = {p.pk: qty for p, qty, _ in actual_rows}
         e = EntregaOrdenCarga.objects.create(orden=o, creado_por=user,
@@ -300,8 +303,13 @@ def entregar(data, user, turno, op):
 def snapshot(user):
     productos = []
     saldos = {s.producto_id: s for s in StockProducto.objects.all()}
-    orders = [detalle_orden(o) for o in OrdenCarga.objects.select_related("fletero", "creado_por")
-        .prefetch_related("detalles__producto", "entregas__detalles__producto", "entregas__creado_por")]
+    orders = []
+    limites = limites_reapertura()
+    for o in OrdenCarga.objects.select_related("fletero", "creado_por").prefetch_related(
+            "detalles__producto", "entregas__detalles__producto", "entregas__creado_por"):
+        o._limite_reapertura = limites.get(o.pk, {})
+        o._limite_reapertura_version = o.version
+        orders.append(detalle_orden(o))
     pend = defaultdict(lambda: defaultdict(float))
     for o in orders:
         if not o["anulada"] and o["circuito"] in OPERATIVOS:
@@ -322,7 +330,7 @@ def snapshot(user):
             pendientes=ps, pendientes_manuales=manual))
     def persona(u):
         return (u.get_full_name() or u.username) if u else ""
-    return dict(usuario=persona(user), admin=es_administrador(user), superusuario=user.is_superuser,
+    datos = dict(usuario=persona(user), admin=es_administrador(user), superusuario=user.is_superuser,
         productos=productos, ordenes=orders,
         fleteros=list(Fletero.objects.values()), empleados=list(EmpleadoExpedicion.objects.values()),
         movimientos=[dict(id=m.pk, producto=m.producto_id, tipo=m.tipo, destino=m.destino, direccion=m.direccion,
@@ -345,6 +353,8 @@ def snapshot(user):
             for a in AuditoriaExpedicion.objects.select_related("usuario")],
         usuarios=[dict(id=u.pk, username=u.username, nombre=persona(u), activo=u.is_active)
             for u in get_user_model().objects.all()] if es_administrador(user) else [])
+    from .anulacion_registros import decorar
+    return decorar(datos)
 
 
 @transaction.atomic
@@ -371,10 +381,16 @@ def comando(data, user):
     if action in {"base_conciliacion", "conciliar_estados", "calibrar_stock"}:
         from .conciliacion import conciliar
         result = conciliar(data, user, turno)
+    elif action == "anular_registro":
+        from .anulacion_registros import anular_registro
+        result = anular_registro(data,user,turno,op)
     elif action == "orden":
         result = guardar_orden(data, user, turno, op)
     elif action == "entrega":
         result = entregar(data, user, turno, op)
+    elif action == "reabrir_orden":
+        from .reapertura import reabrir_orden
+        result = reabrir_orden(data, user, turno)
     elif action == "anular":
         o = get_object_or_404(OrdenCarga.objects.select_for_update(), pk=data.get("id"))
         if o.anulada:
@@ -420,7 +436,8 @@ def comando(data, user):
             mover(p, qty, direction, tipo, data, user, turno, op,
                 neutral=tipo == "DERRAME", uncoded=tipo == "PRODUCCION_SIN_CODIFICAR")
         if tipo == "TRANSFERENCIA":
-            materiales({**data, "origen": ("Recepción desde " if direction == "ENTRADA" else "Envío a ") + data["destino"]}, user, turno)
+            m = materiales({**data, "origen": ("Recepción desde " if direction == "ENTRADA" else "Envío a ") + data["destino"]}, user, turno)
+            result["materiales_vinculados"] = [m.pk] if m else []
         auditoria(user, turno, tipo, data.get("referencia", ""), texto(data, "justificacion"),
             despues={"operacion": str(op), "lineas": [{"producto": p.pk, "unidades": float(q)} for p, q, _ in rows]})
     elif action == "corregir_movimiento":
@@ -531,6 +548,9 @@ def comando(data, user):
         auditoria(user, turno, "Conteo", c.pk, despues={"lineas": details})
     elif action == "corroborar":
         c = get_object_or_404(ConteoExpedicion.objects.select_for_update(), pk=data.get("id"))
+        from .anulacion_registros import referencias_anuladas
+        if f"conteo:{c.pk}" in referencias_anuladas():
+            raise ValidationError("Este conteo fue anulado y no puede corroborarse.")
         if c.corroborado_en or c.turno == turno:
             raise ValidationError("El relevo debe corroborarlo el turno siguiente y solo una vez.")
         c.corroborado_por, c.corroborado_en = user, timezone.now()

@@ -179,10 +179,12 @@ def calcular_cantidad_entregada(
     orden,
     producto,
 ):
+    from .reapertura import limite_reapertura
     resultado = (
         DetalleEntregaOrdenCarga.objects
         .filter(
             entrega__orden=orden,
+            entrega_id__gt=limite_reapertura(orden).get("entrega_hasta", 0),
             producto=producto,
         )
         .aggregate(
@@ -299,6 +301,11 @@ def confirmar_entrega_orden(
 
 
     orden = entrega.orden
+    if orden.anulada:
+        raise ValidationError("La orden está anulada. Reabrila antes de registrar una nueva entrega.")
+    from .reapertura import limite_reapertura
+    if entrega.pk <= limite_reapertura(orden).get("entrega_hasta", 0):
+        raise ValidationError("Esta entrega pertenece a un ciclo anulado. Registrá una nueva entrega.")
 
 
     for detalle in (

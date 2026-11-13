@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from core.api import APIView
 
 from .models import Rechazo
+from core.eliminacion_historial import EliminacionHistorialMixin, eliminar_registro
 
 from .serializers import (
     RechazoSerializer,
@@ -76,7 +77,10 @@ class RechazoListCreateAPIView(APIView):
         )
 
 
-class RechazoDetailAPIView(APIView):
+class RechazoDetailAPIView(EliminacionHistorialMixin, APIView):
+    def delete(self, request, pk):
+        return eliminar_registro(request, Rechazo, RechazoSerializer, pk, "RECHAZOS")
+
     """
     GET
         Consulta un rechazo.

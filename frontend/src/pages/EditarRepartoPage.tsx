@@ -164,7 +164,11 @@ export default function EditarRepartoPage() {
       bultos: number;
       puntos_venta: string;
       observaciones: string;
-    }) => actualizarReparto(repartoId, {...datos, motivo_correccion: motivoCorreccion}),
+    }) =>
+      actualizarReparto(repartoId, {
+        ...datos,
+        motivo_correccion: motivoCorreccion,
+      }),
 
     onSuccess: async (repartoActualizado) => {
       await queryClient.invalidateQueries({
@@ -420,7 +424,10 @@ export default function EditarRepartoPage() {
             />
           </div>
 
-          <MotivoCorreccion value={motivoCorreccion} onChange={setMotivoCorreccion}/>
+          <MotivoCorreccion
+            value={motivoCorreccion}
+            onChange={setMotivoCorreccion}
+          />
           <div className="acciones-formulario">
             <button
               type="button"

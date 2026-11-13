@@ -2,535 +2,262 @@ import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
-import {
-  obtenerControlesKilometraje,
-} from "../api/logistica";
+import { obtenerControlesKilometraje } from "../api/logistica";
 
 import "./Kilometrajes.css";
+import EliminarRegistroHistorial from "../components/ui/EliminarRegistroHistorial";
 
-
-function formatearFecha(
-  fecha: string
-): string {
-
+function formatearFecha(fecha: string): string {
   if (!fecha) {
     return "—";
   }
 
-  const [
-    anio,
-    mes,
-    dia,
-  ] = fecha.split("-");
+  const [anio, mes, dia] = fecha.split("-");
 
   return `${dia}/${mes}/${anio}`;
 }
 
+function formatearKilometros(valor: string | number): string {
+  const numero = Number(valor);
 
-function formatearKilometros(
-  valor: string | number
-): string {
-
-  const numero =
-    Number(valor);
-
-  return new Intl.NumberFormat(
-    "es-AR",
-    {
-      maximumFractionDigits: 2,
-    }
-  ).format(numero);
+  return new Intl.NumberFormat("es-AR", {
+    maximumFractionDigits: 2,
+  }).format(numero);
 }
 
-
 export default function HistorialKilometrajesPage() {
-
   const {
     data: controles = [],
     isLoading,
     isError,
   } = useQuery({
-    queryKey: [
-      "controles-kilometraje",
-    ],
-    queryFn:
-      obtenerControlesKilometraje,
+    queryKey: ["controles-kilometraje"],
+    queryFn: obtenerControlesKilometraje,
   });
 
+  const resumen = useMemo(() => {
+    const kilometrosTotales = controles.reduce(
+      (acumulado, control) => acumulado + Number(control.total_km),
+      0,
+    );
 
-  const resumen = useMemo(
-    () => {
+    const movimientosTotales = controles.reduce(
+      (acumulado, control) => acumulado + control.registros.length,
+      0,
+    );
 
-      const kilometrosTotales =
-        controles.reduce(
-          (
-            acumulado,
-            control
-          ) =>
-            acumulado
-            +
-            Number(
-              control.total_km
-            ),
-          0
-        );
+    const choferes = new Set(controles.map((control) => control.chofer));
 
+    return {
+      controles: controles.length,
 
-      const movimientosTotales =
-        controles.reduce(
-          (
-            acumulado,
-            control
-          ) =>
-            acumulado
-            +
-            control.registros.length,
-          0
-        );
+      kilometros: kilometrosTotales,
 
+      movimientos: movimientosTotales,
 
-      const choferes =
-        new Set(
-          controles.map(
-            control =>
-              control.chofer
-          )
-        );
-
-
-      return {
-        controles:
-          controles.length,
-
-        kilometros:
-          kilometrosTotales,
-
-        movimientos:
-          movimientosTotales,
-
-        choferes:
-          choferes.size,
-      };
-
-    },
-    [
-      controles,
-    ]
-  );
-
+      choferes: choferes.size,
+    };
+  }, [controles]);
 
   return (
-
     <div className="kilometrajes-page">
-
       <div className="kilometrajes-header">
-
         <div>
+          <span className="kilometrajes-eyebrow">CONTROL DE KILOMETRAJES</span>
 
-          <span className="kilometrajes-eyebrow">
-            CONTROL DE KILOMETRAJES
-          </span>
-
-          <h1>
-            Historial de kilometrajes
-          </h1>
+          <h1>Historial de kilometrajes</h1>
 
           <p>
-            Consultá los recorridos registrados,
-            períodos trabajados y kilómetros
-            acumulados por chofer.
+            Consultá los recorridos registrados, períodos trabajados y
+            kilómetros acumulados por chofer.
           </p>
-
         </div>
-
       </div>
-
 
       <div className="kilometrajes-summary-grid">
-
         <div className="kilometrajes-summary-card">
+          <span>Controles registrados</span>
 
-          <span>
-            Controles registrados
-          </span>
+          <strong>{isLoading ? "—" : resumen.controles}</strong>
 
-          <strong>
-            {
-              isLoading
-                ? "—"
-                : resumen.controles
-            }
-          </strong>
-
-          <small>
-            Períodos cargados
-          </small>
-
+          <small>Períodos cargados</small>
         </div>
 
-
         <div className="kilometrajes-summary-card">
-
-          <span>
-            Kilómetros acumulados
-          </span>
+          <span>Kilómetros acumulados</span>
 
           <strong>
-            {
-              isLoading
-                ? "—"
-                : `${formatearKilometros(
-                    resumen.kilometros
-                  )} km`
-            }
+            {isLoading ? "—" : `${formatearKilometros(resumen.kilometros)} km`}
           </strong>
 
-          <small>
-            Total registrado
-          </small>
-
+          <small>Total registrado</small>
         </div>
-
 
         <div className="kilometrajes-summary-card">
+          <span>Choferes</span>
 
-          <span>
-            Choferes
-          </span>
+          <strong>{isLoading ? "—" : resumen.choferes}</strong>
 
-          <strong>
-            {
-              isLoading
-                ? "—"
-                : resumen.choferes
-            }
-          </strong>
-
-          <small>
-            Con controles cargados
-          </small>
-
+          <small>Con controles cargados</small>
         </div>
-
 
         <div className="kilometrajes-summary-card">
+          <span>Movimientos</span>
 
-          <span>
-            Movimientos
-          </span>
+          <strong>{isLoading ? "—" : resumen.movimientos}</strong>
 
-          <strong>
-            {
-              isLoading
-                ? "—"
-                : resumen.movimientos
-            }
-          </strong>
-
-          <small>
-            Viajes registrados
-          </small>
-
+          <small>Viajes registrados</small>
         </div>
-
       </div>
-
 
       <div className="kilometrajes-card">
-
         <div className="kilometrajes-card-header">
-
           <div>
+            <span>REGISTROS</span>
 
-            <span>
-              REGISTROS
-            </span>
-
-            <h2>
-              Controles cargados
-            </h2>
-
+            <h2>Controles cargados</h2>
           </div>
 
+          {!isLoading && !isError && (
+            <div className="kilometrajes-counter">
+              {controles.length}
 
-          {
-            !isLoading
-            &&
-            !isError
-            &&
-            (
-
-              <div className="kilometrajes-counter">
-
-                {
-                  controles.length
-                }
-
-                {
-                  controles.length === 1
-                    ? " control"
-                    : " controles"
-                }
-
-              </div>
-
-            )
-          }
-
+              {controles.length === 1 ? " control" : " controles"}
+            </div>
+          )}
         </div>
 
+        {isLoading ? (
+          <div className="kilometrajes-state">
+            <strong>Cargando historial...</strong>
 
-        {
-          isLoading
-          ? (
+            <span>Obteniendo controles de kilometraje.</span>
+          </div>
+        ) : isError ? (
+          <div className="kilometrajes-state error">
+            <strong>No se pudo cargar el historial</strong>
 
-            <div className="kilometrajes-state">
+            <span>Revisá la conexión con el servidor.</span>
+          </div>
+        ) : controles.length === 0 ? (
+          <div className="kilometrajes-state">
+            <strong>Todavía no hay controles registrados</strong>
 
-              <strong>
-                Cargando historial...
-              </strong>
+            <span>
+              Los controles nuevos aparecerán automáticamente en esta sección.
+            </span>
+          </div>
+        ) : (
+          <div className="kilometrajes-table-wrapper">
+            <table className="kilometrajes-table">
+              <thead>
+                <tr>
+                  <th>Chofer</th>
 
-              <span>
-                Obteniendo controles de kilometraje.
-              </span>
+                  <th>Período</th>
 
-            </div>
+                  <th>Kilómetros</th>
 
-          )
-          :
-          isError
-          ? (
+                  <th>Movimientos</th>
 
-            <div className="kilometrajes-state error">
+                  <th>Estado / Observaciones</th>
 
-              <strong>
-                No se pudo cargar el historial
-              </strong>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
 
-              <span>
-                Revisá la conexión con el servidor.
-              </span>
+              <tbody>
+                {controles.map((control) => (
+                  <tr key={control.id}>
+                    <td>
+                      <div className="kilometrajes-driver">
+                        <div className="kilometrajes-avatar">
+                          {control.chofer_nombre?.charAt(0).toUpperCase()}
+                        </div>
 
-            </div>
+                        <div>
+                          <strong>{control.chofer_nombre}</strong>
 
-          )
-          :
-          controles.length === 0
-          ? (
+                          <span>Chofer</span>
+                        </div>
+                      </div>
+                    </td>
 
-            <div className="kilometrajes-state">
+                    <td>
+                      <div className="kilometrajes-periodo">
+                        <strong>{formatearFecha(control.fecha_desde)}</strong>
 
-              <strong>
-                Todavía no hay controles registrados
-              </strong>
+                        <span>hasta</span>
 
-              <span>
-                Los controles nuevos aparecerán
-                automáticamente en esta sección.
-              </span>
+                        <strong>{formatearFecha(control.fecha_hasta)}</strong>
+                      </div>
+                    </td>
 
-            </div>
+                    <td>
+                      <div className="kilometrajes-total">
+                        <strong>{formatearKilometros(control.total_km)}</strong>
 
-          )
-          : (
+                        <span>km</span>
+                      </div>
+                    </td>
 
-            <div className="kilometrajes-table-wrapper">
+                    <td>
+                      <span className="kilometrajes-badge">
+                        {control.registros.length}
 
-              <table className="kilometrajes-table">
+                        {control.registros.length === 1
+                          ? " registro"
+                          : " registros"}
+                      </span>
+                    </td>
 
-                <thead>
+                    <td>
+                      <span className="kilometrajes-observacion">
+                        <strong>
+                          {control.estado === "FINALIZADA"
+                            ? "Finalizada"
+                            : "Borrador"}{" "}
+                          ·{" "}
+                          {control.envio_estado === "ENVIADO"
+                            ? "Enviada"
+                            : control.envio_estado === "ERROR"
+                              ? "Revisar envío"
+                              : control.envio_estado === "ENVIANDO"
+                                ? "Envío en curso"
+                                : "Sin enviar"}
+                        </strong>
+                        <br />
 
-                  <tr>
+                        {control.observaciones || "Sin observaciones"}
+                      </span>
+                    </td>
 
-                    <th>
-                      Chofer
-                    </th>
-
-                    <th>
-                      Período
-                    </th>
-
-                    <th>
-                      Kilómetros
-                    </th>
-
-                    <th>
-                      Movimientos
-                    </th>
-
-                    <th>
-                      Estado / Observaciones
-                    </th>
-
-                    <th>
-                        Detalle
-                    </th>
-
-                  </tr>
-
-                </thead>
-
-
-                <tbody>
-
-                  {
-                    controles.map(
-                      control => (
-
-                        <tr
-                          key={
-                            control.id
-                          }
+                    <td>
+                      <div className="historial-fila-acciones">
+                        <Link
+                          to={`/kilometrajes/${control.id}`}
+                          className="kilometrajes-detail-button"
                         >
-
-                          <td>
-
-                            <div className="kilometrajes-driver">
-
-                              <div className="kilometrajes-avatar">
-
-                                {
-                                  control
-                                    .chofer_nombre
-                                    ?.charAt(0)
-                                    .toUpperCase()
-                                }
-
-                              </div>
-
-
-                              <div>
-
-                                <strong>
-                                  {
-                                    control.chofer_nombre
-                                  }
-                                </strong>
-
-                                <span>
-                                  Chofer
-                                </span>
-
-                              </div>
-
-                            </div>
-
-                          </td>
-
-
-                          <td>
-
-                            <div className="kilometrajes-periodo">
-
-                              <strong>
-                                {
-                                  formatearFecha(
-                                    control.fecha_desde
-                                  )
-                                }
-                              </strong>
-
-                              <span>
-                                hasta
-                              </span>
-
-                              <strong>
-                                {
-                                  formatearFecha(
-                                    control.fecha_hasta
-                                  )
-                                }
-                              </strong>
-
-                            </div>
-
-                          </td>
-
-
-                          <td>
-
-                            <div className="kilometrajes-total">
-
-                              <strong>
-                                {
-                                  formatearKilometros(
-                                    control.total_km
-                                  )
-                                }
-                              </strong>
-
-                              <span>
-                                km
-                              </span>
-
-                            </div>
-
-                          </td>
-
-
-                          <td>
-
-                            <span className="kilometrajes-badge">
-
-                              {
-                                control.registros.length
-                              }
-
-                              {
-                                control.registros.length === 1
-                                  ? " registro"
-                                  : " registros"
-                              }
-
-                            </span>
-
-                          </td>
-
-
-                          <td>
-
-                            <span className="kilometrajes-observacion">
-                              <strong>{control.estado === "FINALIZADA" ? "Finalizada" : "Borrador"} · {control.envio_estado === "ENVIADO" ? "Enviada" : control.envio_estado === "ERROR" ? "Revisar envío" : control.envio_estado === "ENVIANDO" ? "Envío en curso" : "Sin enviar"}</strong><br />
-
-                              {
-                                control.observaciones
-                                ||
-                                "Sin observaciones"
-                              }
-
-                            </span>
-
-                          </td>
-
-                            <td>
-
-                            <Link
-                                to={`/kilometrajes/${control.id}`}
-                                className="kilometrajes-detail-button"
-                            >
-                                Abrir planilla
-                            </Link>
-
-                            </td>
-
-                        </tr>
-
-                      )
-                    )
-                  }
-
-                </tbody>
-
-              </table>
-
-            </div>
-
-          )
-        }
-
+                          Abrir planilla
+                        </Link>
+                        <EliminarRegistroHistorial
+                          tipo="kilometrajes"
+                          id={control.id}
+                          actualizado={control.actualizado_en}
+                          version={control.version}
+                          enviado={control.envio_estado === "ENVIADO"}
+                          enviando={control.envio_estado === "ENVIANDO"}
+                          descripcion={`planilla de ${control.chofer_nombre} del ${formatearFecha(control.fecha_desde)} al ${formatearFecha(control.fecha_hasta)} · ${formatearKilometros(control.total_km)} km`}
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
-
     </div>
-
   );
 }

@@ -37,7 +37,7 @@ export function filtrarPendientes(
         (!filtros.estado || o.estado_operativo === filtros.estado) &&
         (!filtros.turno ||
           o.turno === filtros.turno ||
-          o.entregas.some((e) => e.turno === filtros.turno)) &&
+          o.entregas.some((e) => !e.anulada && e.turno === filtros.turno)) &&
         (!filtros.producto ||
           o.detalles.some(
             (l) => l.producto === filtros.producto && l.pendiente > 0,

@@ -27,7 +27,7 @@ def accion_solicitada(request):
             request.query_params.get("formato") in {"csv", "pdf", "xlsx"}) else "consultar"
     data = request.data if isinstance(request.data, dict) else {}
     action = str(data.get("accion", ""))
-    if request.method == "DELETE" or action == "anular":
+    if request.method == "DELETE" or action in {"anular", "anular_registro", "reabrir_orden"}:
         return "anular"
     if action in {"usuario", "fletero", "producto", "empleado", "acreditar", "configuracion", "depurar_fleteros", "pendientes", "base_conciliacion", "conciliar_estados", "calibrar_stock"}:
         return "configurar"

@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from core.api import APIView
+from core.eliminacion_historial import EliminacionHistorialMixin, eliminar_registro
 from decimal import Decimal
 
 from control_diario.models import (
@@ -219,7 +220,7 @@ class ControlesDiariosAPIView(APIView):
         )
 
 
-class ControlDiarioDetalleAPIView(APIView):
+class ControlDiarioDetalleAPIView(EliminacionHistorialMixin, APIView):
 
     permission_classes = [
         IsAuthenticated,
@@ -253,19 +254,7 @@ class ControlDiarioDetalleAPIView(APIView):
 
 
     def delete(self, request, pk):
-
-        control = get_object_or_404(
-            ControlDiario,
-            pk=pk,
-        )
-
-
-        control.delete()
-
-
-        return Response(
-            status=status.HTTP_204_NO_CONTENT
-        )
+        return eliminar_registro(request, ControlDiario, ControlDiarioSerializer, pk, "CONTROL_DIARIO")
 
 
 class ControlDiarioResumenAPIView(APIView):

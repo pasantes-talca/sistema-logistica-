@@ -39,6 +39,49 @@ const orden = {
 };
 const vacios = { fletero: 0, dia: "", encargado: "", turno: "" };
 
+test("Reabrir conserva entregas anuladas sin sumarlas ni usarlas en filtros de despacho", () => {
+  const reabierta = {
+    ...orden,
+    anulada: false,
+    entregas: orden.entregas.map((e) => ({ ...e, anulada: true })),
+  };
+  assert.equal(resumenOrden(reabierta, productos).entregado, 0);
+  assert.equal(resumenOrden(reabierta, productos).encargado, "Sin despacho");
+  assert.equal(entregasFiltradas(reabierta).length, 0);
+  assert.equal(
+    filtrarOrdenes([reabierta], { ...vacios, dia: "2026-10-13" }).length,
+    0,
+  );
+  assert.equal(
+    filtrarOrdenes([reabierta], { ...vacios, encargado: "Pablo" }).length,
+    0,
+  );
+  const nuevo = {
+    ...orden.entregas[0],
+    fecha_operativa: "2026-11-13",
+    turno: "Mañana",
+    creado_por_nombre: "Nuevo responsable",
+    detalles: [{ producto: 1, cantidad_entregada: 12 }],
+  };
+  const despachada = { ...reabierta, entregas: [...reabierta.entregas, nuevo] };
+  assert.equal(resumenOrden(despachada, productos).entregado, 2);
+  assert.equal(
+    resumenOrden(despachada, productos).encargado,
+    "Nuevo responsable",
+  );
+  assert.equal(
+    filtrarOrdenes([despachada], {
+      ...vacios,
+      dia: "2026-11-13",
+      turno: "Mañana",
+    }).length,
+    1,
+  );
+  const totales = totalizarProductosOrdenes([despachada], productos);
+  assert.equal(totales.find((p) => p.producto === 1).despachado, 12);
+  assert.equal(totales.find((p) => p.producto === 2).despachado, 0);
+});
+
 test("Solicitado y entregado usan el pack de cada producto, también en sustituciones", () => {
   const r = resumenOrden(orden, productos);
   assert.equal(r.solicitado, 18);

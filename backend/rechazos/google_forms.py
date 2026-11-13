@@ -12,6 +12,7 @@ from maestros.models import (
 )
 
 from .models import Rechazo
+from core.models import EventoAuditoria
 
 
 # ============================================================
@@ -276,7 +277,8 @@ def sincronizar_rechazos_google():
             f"{marca_temporal}"
         )
 
-        if Rechazo.objects.filter(
+        eliminado = EventoAuditoria.objects.filter(modulo="RECHAZOS", accion="Eliminar", antes__origen_id=origen_id).exists()
+        if eliminado or Rechazo.objects.filter(
             origen_id=origen_id
         ).exists():
 

@@ -139,8 +139,10 @@ class AdministracionTests(TestCase):
             self.assertIn(self.client.post(url,{},format="json").status_code,[401,403])
 
     def test_no_borra_usuarios_auditoria_o_historicos(self):
-        for url in [BASE+f"usuarios/{self.carlos.pk}/",BASE+"auditoria/","/api/viaticos/999/","/api/control-diario/999/","/api/kilometrajes/999/"]:
+        for url in [BASE+f"usuarios/{self.carlos.pk}/",BASE+"auditoria/"]:
             self.assertIn(self.client.delete(url).status_code,[403,405])
+        for url in ["/api/viaticos/999/", "/api/kilometrajes/999/"]:
+            self.assertEqual(self.client.delete(url).status_code, 400)  # Sin confirmación ni motivo.
 
     def test_auditoria_solo_lectura_paginada_filtrada_y_csv_sin_formulas(self):
         self.nuevo()

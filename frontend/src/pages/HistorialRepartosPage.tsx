@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 
 import { obtenerRepartos } from "../api/logistica";
+import EliminarRegistroHistorial from "../components/ui/EliminarRegistroHistorial";
 
 function formatearFecha(fecha: string) {
   const [year, month, day] = fecha.split("-");
@@ -103,7 +104,12 @@ export default function HistorialRepartosPage() {
                       <td>
                         {reparto.recargas}
                         {reparto.recargas_autorizadas && (
-                          <small style={{ display: "block", color: "var(--theme-muted, #65768c)" }}>
+                          <small
+                            style={{
+                              display: "block",
+                              color: "var(--theme-muted, #65768c)",
+                            }}
+                          >
                             Valor autorizado
                           </small>
                         )}
@@ -114,12 +120,20 @@ export default function HistorialRepartosPage() {
                       <td>{reparto.observaciones || "-"}</td>
 
                       <td>
-                        <Link
-                          className="boton-editar"
-                          to={`/repartos/${reparto.id}/editar`}
-                        >
-                          Editar
-                        </Link>
+                        <div className="historial-fila-acciones">
+                          <Link
+                            className="boton-editar"
+                            to={`/repartos/${reparto.id}/editar`}
+                          >
+                            Editar
+                          </Link>
+                          <EliminarRegistroHistorial
+                            tipo="repartos"
+                            id={reparto.id}
+                            actualizado={reparto.actualizado_en}
+                            descripcion={`reparto del ${formatearFecha(reparto.fecha)} · ${reparto.bultos} bultos`}
+                          />
+                        </div>
                       </td>
                     </tr>
                   );

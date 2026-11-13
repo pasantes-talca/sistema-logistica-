@@ -49,6 +49,7 @@ export function resumirConsumos(
     if (
       !Object.hasOwn(categoriasConsumo, m.tipo) ||
       m.sin_impacto ||
+      m.anulado ||
       m.direccion !== "SALIDA"
     )
       continue;

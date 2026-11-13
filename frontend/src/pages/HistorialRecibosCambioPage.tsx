@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 
 import { obtenerRecibosCambio } from "../api/logistica";
+import EliminarRegistroHistorial from "../components/ui/EliminarRegistroHistorial";
 
 function formatearFecha(fecha: string) {
   const [year, month, day] = fecha.split("-");
@@ -78,12 +79,20 @@ export default function HistorialRecibosCambioPage() {
                       <td>{Number(recibo.prensados)}</td>
 
                       <td>
-                        <Link
-                          className="boton-editar"
-                          to={`/cambios/recibos/${recibo.id}`}
-                        >
-                          Ver detalle
-                        </Link>
+                        <div className="historial-fila-acciones">
+                          <Link
+                            className="boton-editar"
+                            to={`/cambios/recibos/${recibo.id}`}
+                          >
+                            Ver detalle
+                          </Link>
+                          <EliminarRegistroHistorial
+                            tipo="cambios/recibos"
+                            id={recibo.id}
+                            actualizado={recibo.actualizado_en}
+                            descripcion={`recibo de ${recibo.concesionario_nombre} del ${formatearFecha(recibo.fecha)}`}
+                          />
+                        </div>
                       </td>
                     </tr>
                   ))}
