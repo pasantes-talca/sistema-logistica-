@@ -150,8 +150,10 @@ const path = require("node:path");
           .first()
           .evaluate(
             (e) =>
-              e.getBoundingClientRect().height >= 48 &&
-              parseFloat(getComputedStyle(e).fontSize) >= 16,
+              e.getBoundingClientRect().height >=
+                (location.pathname.includes("/cambios/") ? 32 : 48) &&
+              parseFloat(getComputedStyle(e).fontSize) >=
+                (location.pathname.includes("/cambios/") ? 13 : 16),
           ),
       );
     }
@@ -235,63 +237,39 @@ const path = require("node:path");
     await revisar();
     assert.equal(recibos.length, 0);
     await page.getByLabel("Fecha", { exact: false }).fill("2026-10-22");
+    await page.getByLabel("Concesionario *", { exact: true }).selectOption("7");
+    await page.getByLabel("Cantidad 4900 SODA", { exact: true }).fill("2.5");
     await page
-      .getByLabel("Concesionario (obligatorio)", { exact: true })
-      .selectOption("7");
+      .getByText("Clasificar motivos de cambio (opcional)", { exact: true })
+      .click();
     await page
-      .getByRole("combobox", { name: "Producto 1", exact: true })
-      .selectOption("10");
-    await page
-      .getByLabel("Cantidad del producto 1", { exact: true })
-      .fill("2.5");
-    await page
-      .getByLabel("Motivo del producto 1", { exact: true })
-      .selectOption("21");
-    await page
-      .getByRole("combobox", { name: "Producto 1", exact: true })
-      .selectOption("11");
+      .getByLabel("Motivo 4900 SODA", { exact: true })
+      .selectOption("22");
     assert.equal(
       await page
-        .getByLabel("Motivo del producto 1", { exact: true })
-        .inputValue(),
-      "",
+        .getByLabel("Motivo 4900 SODA", { exact: true })
+        .getByRole("option", { name: "Envase dañado" })
+        .count(),
+      0,
     );
     await page
-      .getByLabel("Motivo del producto 1", { exact: true })
-      .selectOption("22");
-    await page
-      .getByLabel("Observación del producto 1", { exact: true })
+      .getByLabel("Observación 4900 SODA", { exact: true })
       .fill("Botellas con pérdida");
+    await page.getByLabel("Cantidad 5670 COLA", { exact: true }).fill("3");
     await page
-      .getByRole("button", { name: "+ Agregar otro producto", exact: true })
-      .click();
-    await page.getByLabel("Cantidad del producto 2", { exact: true }).fill("3");
-    await revisar();
-    assert.equal(recibos.length, 0);
-    assert(
-      await page
-        .getByRole("combobox", { name: "Producto 2", exact: true })
-        .evaluate((e) => e.validity.valueMissing),
-    );
-    await page
-      .getByRole("combobox", { name: "Producto 2", exact: true })
-      .selectOption("10");
-    await page
-      .getByRole("button", { name: "+ Agregar otro producto", exact: true })
+      .getByRole("button", {
+        name: "+ Agregar otro producto del catálogo",
+        exact: true,
+      })
       .click();
     await page
-      .getByRole("button", { name: "Quitar producto 3", exact: true })
+      .getByRole("button", { name: "Quitar otro producto 1", exact: true })
       .click();
-    await page.getByLabel("Pallets (opcional)", { exact: true }).fill("2");
-    await page
-      .getByText("Agregar observación de pallets (opcional)", { exact: true })
-      .click();
+    await page.getByLabel("Pallets", { exact: true }).fill("2");
     await page
       .getByLabel("Observación de pallets", { exact: true })
       .fill("Retorno");
-    await page
-      .getByLabel("Pallets descargados (opcional)", { exact: true })
-      .fill("1");
+    await page.getByLabel("Pallets descargados", { exact: true }).fill("1");
     await page.getByRole("button", { name: "Activar tema claro" }).click();
     await foto("nuevo-recibo-claro");
     await responsive();
@@ -304,9 +282,7 @@ const path = require("node:path");
     assert.match(await page.locator(".nr-review").innerText(), /Pérdida soda/);
     await page.getByRole("button", { name: "Volver a corregir" }).click();
     assert.equal(
-      await page
-        .getByLabel("Cantidad del producto 1", { exact: true })
-        .inputValue(),
+      await page.getByLabel("Cantidad 4900 SODA", { exact: true }).inputValue(),
       "2.5",
     );
     await revisar();
@@ -350,19 +326,15 @@ const path = require("node:path");
     );
     await page.getByRole("button", { name: "Cargar otro recibo" }).click();
     assert.equal(
-      await page
-        .getByLabel("Concesionario (obligatorio)", { exact: true })
-        .inputValue(),
+      await page.getByLabel("Concesionario *", { exact: true }).inputValue(),
       "7",
     );
     assert.equal(
-      await page
-        .getByLabel("Cantidad del producto 1", { exact: true })
-        .inputValue(),
+      await page.getByLabel("Cantidad 4900 SODA", { exact: true }).inputValue(),
       "",
     );
     creado = false;
-    await page.getByLabel("Pallets (opcional)", { exact: true }).fill("1");
+    await page.getByLabel("Pallets", { exact: true }).fill("1");
     await revisar();
     await page
       .getByRole("button", { name: "Confirmar y guardar recibo" })
@@ -393,9 +365,7 @@ const path = require("node:path");
       .getByRole("button", { name: "Volver a intentar", exact: true })
       .click();
     await page.waitForFunction(
-      () =>
-        !document.querySelector("#recibo-concesionario").closest("fieldset")
-          .disabled,
+      () => !document.querySelector("#recibo-concesionario").disabled,
     );
     assert.deepEqual(errors, []);
     console.log(

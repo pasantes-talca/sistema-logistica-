@@ -1,0 +1,331 @@
+/* Hoja de carga con el diseño del recibo impreso, también en tema oscuro. */
+.rc-recibo {
+  --rc-line: #262626;
+  --rc-cell: #fff2cc;
+  color-scheme: light;
+  background: #fff;
+  color: #151515;
+  border: 1px solid #d1d1d1;
+  box-shadow: 0 5px 22px #0000000d;
+  border-radius: 0;
+  padding: 28px;
+  min-width: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.rc-recibo input,
+.rc-recibo select {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 32px;
+  padding: 4px 7px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #111;
+  font: inherit;
+  font-size: 14px;
+  box-shadow: none;
+}
+.rc-recibo input:focus-visible,
+.rc-recibo select:focus-visible,
+.rc-tabla-scroll:focus-visible {
+  outline: 2px solid #1762c7;
+  outline-offset: -2px;
+  background-color: #fff9e8;
+}
+.rc-recibo input:disabled,
+.rc-recibo select:disabled {
+  background: #ececec;
+  color: #555;
+  cursor: not-allowed;
+}
+.rc-membrete {
+  display: grid;
+  grid-template-columns: 66% 34%;
+  min-height: 40px;
+  align-items: stretch;
+}
+.rc-membrete > span {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  border-left: 1px solid var(--rc-line);
+  padding: 6px 4px;
+  text-align: center;
+  font-size: 11px;
+}
+.rc-membrete img {
+  box-sizing: border-box;
+  width: 100%;
+  height: 40px;
+  padding: 7px;
+  object-fit: contain;
+  border: 1px solid var(--rc-line);
+}
+.rc-fecha {
+  display: grid;
+  grid-template-columns: 58% 8% 34%;
+  align-items: stretch;
+  font-size: 12px;
+}
+.rc-fecha label {
+  border: 1px solid var(--rc-line);
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+  text-transform: uppercase;
+  background: #ebebeb;
+  font-weight: 700;
+}
+.rc-fecha input,
+.rc-fecha > strong {
+  border: 1px solid var(--rc-line);
+  border-left: 0;
+  background: var(--rc-cell);
+  text-align: center;
+  min-height: 32px;
+  font-size: 13px;
+}
+.rc-fecha > strong {
+  display: grid;
+  place-items: center;
+}
+.rc-recibo .rc-titulo {
+  margin: 0;
+  padding: 5px;
+  border: 1px solid var(--rc-line);
+  border-bottom: 0;
+  background: #ebebeb;
+  color: #111;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-align: center;
+}
+.rc-concesionario {
+  display: grid;
+  grid-template-columns: 16.5% 83.5%;
+  border: 1px solid var(--rc-line);
+  border-bottom: 0;
+  align-items: stretch;
+  font-size: 13px;
+}
+.rc-concesionario label {
+  padding: 5px;
+  display: grid;
+  place-items: center;
+  border-right: 1px solid var(--rc-line);
+  font-size: 11px;
+  font-weight: 700;
+  background: #ebebeb;
+}
+.rc-concesionario select,
+.rc-concesionario > strong {
+  background: var(--rc-cell);
+  min-height: 34px;
+  font-size: 14px;
+}
+.rc-concesionario > strong {
+  display: flex;
+  align-items: center;
+  padding: 4px 7px;
+}
+.rc-tabla-scroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: auto;
+}
+.rc-tabla {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 12px;
+  color: #111;
+}
+.rc-recibo .rc-tabla input,
+.rc-recibo .rc-tabla select {
+  height: 28px;
+  min-height: 28px;
+  line-height: 1.2;
+  padding: 3px 6px;
+}
+.rc-col-tam,
+.rc-col-codigo,
+.rc-col-sabor,
+.rc-col-cantidad {
+  width: 16.5%;
+}
+.rc-recibo .rc-tabla th,
+.rc-recibo .rc-tabla td {
+  border: 1px solid var(--rc-line);
+  padding: 0;
+  vertical-align: middle;
+  text-align: center;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+.rc-recibo .rc-tabla thead th {
+  text-transform: uppercase;
+  background: #ebebeb;
+  font-size: 10px;
+  padding: 5px 2px;
+  font-weight: 700;
+}
+.rc-tabla .rc-tamano {
+  font-weight: 700;
+  font-size: 11px;
+}
+.rc-tabla tbody th[scope="row"] {
+  font-weight: 400;
+}
+.rc-tabla .rc-cantidad {
+  background: var(--rc-cell);
+}
+.rc-tabla .rc-cantidad input,
+.rc-tabla .rc-cantidad output {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+}
+.rc-cantidad output {
+  display: grid;
+  align-items: center;
+  min-height: 28px;
+}
+.rc-tabla .rc-observacion input {
+  text-align: left;
+}
+.rc-recibo .rc-tabla .rc-gap td {
+  border: 0;
+  height: 14px;
+  background: #fff;
+}
+.rc-subtitulo th {
+  font-size: 11px;
+  background: #ebebeb;
+  padding: 5px;
+}
+.rc-extra {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.rc-extra button {
+  flex-shrink: 0;
+  min-height: 32px;
+  border: 1px solid #aaa;
+  background: #fff;
+  color: #222;
+  padding: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.rc-firmas {
+  display: grid;
+  grid-template-columns: 42% 42%;
+  justify-content: space-between;
+  gap: 16%;
+  margin: 16px 0 8px;
+}
+.rc-firmas > div {
+  min-height: 88px;
+  border: 1px solid var(--rc-line);
+  text-align: center;
+}
+.rc-firmas strong {
+  display: block;
+  padding: 5px;
+  border-bottom: 1px solid var(--rc-line);
+  background: #ebebeb;
+  color: #111;
+  font-size: 11px;
+  font-weight: 700;
+}
+.rc-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+.rc-complementos {
+  color: var(--theme-text, #152b43);
+  margin-top: 14px;
+}
+.rc-ayuda {
+  font-size: 13px;
+  color: var(--theme-muted, #526079);
+  line-height: 1.6;
+}
+.rc-agregar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin: 14px 0;
+}
+.rc-agregar small {
+  color: var(--theme-muted, #526079);
+}
+.rc-clasificacion {
+  border: 1px solid var(--theme-border, #dce4ee);
+  border-radius: 6px;
+  padding: 12px;
+  background: var(--theme-surface, #fff);
+}
+.rc-clasificacion summary {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+}
+.rc-clasificacion p,
+.rc-motivos-revision {
+  font-size: 13px;
+  color: var(--theme-muted, #526079);
+}
+.rc-clasificacion label {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  font-size: 14px;
+}
+.rc-clasificacion select {
+  min-width: 0;
+  width: 100%;
+  min-height: 44px;
+  padding: 6px;
+  border: 1px solid var(--theme-border-strong, #a7b6c9);
+  border-radius: 4px;
+  background: var(--theme-input, #fff);
+  color: var(--theme-text, #152b43);
+}
+@media (max-width: 900px) {
+  .rc-recibo {
+    padding: 16px;
+  }
+}
+@media (max-width: 600px) {
+  .rc-recibo {
+    padding: 10px;
+  }
+  .rc-membrete > span {
+    font-size: 9px;
+  }
+  .rc-fecha {
+    grid-template-columns: 42% 16% 42%;
+  }
+  .rc-concesionario {
+    grid-template-columns: 30% 70%;
+  }
+  .rc-concesionario label {
+    font-size: 10px;
+  }
+  .rc-clasificacion label {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}

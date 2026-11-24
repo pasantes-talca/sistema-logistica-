@@ -6,12 +6,14 @@ import "./CargaGuiada.css";
 export function CargaGuiada({
   titulo,
   seccion,
+  ayuda,
   guardado,
   revision: { tituloRef, alertaRef, revisando, error },
   children,
 }: {
   titulo: string;
   seccion: string;
+  ayuda?: string;
   guardado: boolean;
   revision: ReturnType<typeof useRevisionCarga>;
   children: ReactNode;
@@ -33,7 +35,8 @@ export function CargaGuiada({
               ? "La carga se completó correctamente. No hace falta volver a enviarla."
               : revisando
                 ? "Comprobá estos datos. Si está todo bien, confirmá al final."
-                : "Completá los bloques en orden. Después vas a poder revisar los datos antes de guardarlos."}
+                : ayuda ||
+                  "Completá los bloques en orden. Después vas a poder revisar los datos antes de guardarlos."}
           </p>
           {!guardado && (
             <ol className="nr-progress" aria-label="Etapas de la carga">

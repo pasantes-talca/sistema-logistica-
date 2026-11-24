@@ -18,20 +18,19 @@ import type {
 } from "../types/logistica";
 import {
   AccionesCarga,
-  BloqueCarga,
   CargaGuiada,
   ResumenCarga,
 } from "../components/ui/CargaGuiada";
 import { useRevisionCarga } from "../components/ui/useRevisionCarga";
 import { mensajeCarga } from "../components/ui/mensajeCarga";
 
-interface FilaProducto {
-  idLocal: number;
-  productoId: string;
-  cantidad: string;
-  motivoId: string;
-  observacion: string;
-}
+import ReciboCambioEditable from "../components/cambios/ReciboCambioEditable";
+import {
+  camposOtros,
+  plantillaRecibo,
+  type FilaProducto,
+} from "../components/cambios/plantillaRecibo";
+
 const vacia = (idLocal: number): FilaProducto => ({
   idLocal,
   productoId: "",
@@ -39,15 +38,6 @@ const vacia = (idLocal: number): FilaProducto => ({
   motivoId: "",
   observacion: "",
 });
-const camposOtros = [
-  { campo: "pallets", nota: "pallets_observacion", titulo: "Pallets" },
-  {
-    campo: "pallets_descargados",
-    nota: "pallets_descargados_observacion",
-    titulo: "Pallets descargados",
-  },
-  { campo: "prensados", nota: "prensados_observacion", titulo: "Prensados" },
-] as const;
 const otrosVacios = {
   pallets: "",
   pallets_observacion: "",
@@ -65,8 +55,8 @@ export default function NuevoReciboCambioPage() {
   );
   const [concesionarioId, setConcesionarioId] = useState("");
   const [otros, setOtros] = useState(otrosVacios);
-  const [filas, setFilas] = useState<FilaProducto[]>([vacia(1)]);
-  const siguiente = useRef(2);
+  const [filas, setFilas] = useState<FilaProducto[]>([]);
+  const siguiente = useRef(-1);
   const [guardado, setGuardado] = useState<RespuestaGuardarReciboCambio | null>(
     null,
   );
@@ -82,9 +72,7 @@ export default function NuevoReciboCambioPage() {
   const productos = productosQuery.data || [];
   const producto = (id: string) => productos.find((p) => String(p.id) === id);
   const familias = [
-    ...new Set(
-      filas.map((f) => producto(f.productoId)?.familia || "").filter(Boolean),
-    ),
+    ...new Set(productos.map((p) => p.familia || "").filter(Boolean)),
   ];
   const consultasMotivos = useQueries({
     queries: familias.map((familia) => ({
@@ -101,9 +89,6 @@ export default function NuevoReciboCambioPage() {
     !concesionariosQuery.isPending &&
     !concesionariosQuery.isError &&
     !concesionarios.length;
-  const concesionario =
-    concesionarios.find((c) => String(c.id) === concesionarioId)?.nombre ||
-    "Sin seleccionar";
   const filasConDatos = filas.filter(
     (f) => f.productoId || f.cantidad || f.motivoId || f.observacion.trim(),
   );
@@ -153,7 +138,7 @@ export default function NuevoReciboCambioPage() {
         Number(f.cantidad) <= 0
       ) {
         revision.mostrarError(
-          `En el producto ${posicion}, elegí un producto e ingresá una cantidad mayor a cero. Si no corresponde, usá Quitar producto o dejá la tarjeta completamente vacía.`,
+          `En el producto ${posicion}, elegí un producto e ingresá una cantidad mayor a cero. Si no corresponde, borrá los datos de esa fila para dejarla completamente vacía.`,
         );
         return false;
       }
@@ -218,15 +203,12 @@ export default function NuevoReciboCambioPage() {
     revision.setError("");
     mutation.mutate(payload);
   }
-  const datos: [string, string][] = [
-    ["Fecha", fecha.split("-").reverse().join("/")],
-    ["Concesionario", concesionario],
-  ];
   const advertencia =
     "Si ya existe un recibo para esta fecha y concesionario, esta carga se suma al recibo existente. No reemplaza lo cargado anteriormente.";
   return (
     <CargaGuiada
       titulo="Nuevo recibo de cambios"
+      ayuda="Completá directamente las casillas del recibo. Después podrás revisarlo antes de guardar."
       seccion="RECIBOS DE CAMBIOS"
       guardado={!!guardado}
       revision={revision}
@@ -281,7 +263,7 @@ export default function NuevoReciboCambioPage() {
               onClick={() => {
                 setGuardado(null);
                 setOtros(otrosVacios);
-                setFilas([vacia(siguiente.current++)]);
+                setFilas([]);
                 mutation.reset();
                 revision.corregir();
               }}
@@ -299,329 +281,91 @@ export default function NuevoReciboCambioPage() {
           className={revision.revisando ? "nr-review" : "nr-form"}
           aria-busy={mutation.isPending}
         >
-          {revision.revisando ? (
-            <>
-              <section className="nr-card">
-                <h2>Resumen de la nueva carga</h2>
-                <ResumenCarga datos={datos} />
-                <div className="nr-receipt-summary">
-                  <h3>Productos que vas a agregar</h3>
-                  {filasConDatos.length ? (
-                    filasConDatos.map((f, i) => (
-                      <article key={f.idLocal}>
-                        <h3>
-                          Producto {i + 1}: {producto(f.productoId)?.codigo} ·{" "}
-                          {producto(f.productoId)?.nombre}
-                        </h3>
-                        <ResumenCarga
-                          datos={[
-                            ["Cantidad", f.cantidad],
-                            [
-                              "Motivo",
-                              motivos(
-                                producto(f.productoId)?.familia || "",
-                              ).find((m) => String(m.id) === f.motivoId)
-                                ?.nombre || "Sin clasificar",
-                            ],
-                            [
-                              "Observación",
-                              f.observacion.trim() || "Sin observaciones",
-                            ],
-                          ]}
-                        />
-                      </article>
-                    ))
-                  ) : (
-                    <p>No se agregarán productos.</p>
-                  )}
-                </div>
-                <div className="nr-receipt-summary">
-                  <h3>Otros movimientos que vas a agregar</h3>
-                  <ResumenCarga
-                    datos={camposOtros.flatMap(
-                      (c) =>
-                        [
-                          [c.titulo, otros[c.campo] || "0"],
-                          [
-                            `Observación de ${c.titulo.toLowerCase()}`,
-                            otros[c.nota].trim() || "Sin observaciones",
-                          ],
-                        ] as [string, string][],
-                    )}
-                  />
-                </div>
-              </section>
-              <p className="nr-warning">{advertencia}</p>
-            </>
-          ) : (
-            <>
-              <p className="nr-required">
-                La <strong>fecha</strong> y el <strong>concesionario</strong>{" "}
-                son obligatorios. Agregá los productos o los otros movimientos
-                que correspondan.
+          {cargando && (
+            <p className="nr-info" role="status">
+              Cargando las listas necesarias…
+            </p>
+          )}
+          {fallo && (
+            <div className="nr-error" role="alert">
+              <strong>No se pudieron cargar las listas</strong>
+              <p>
+                Comprobá la conexión y volvé a intentar. Tus datos siguen en
+                pantalla.
               </p>
-              {cargando && (
-                <p className="nr-info" role="status">
-                  Cargando las listas necesarias…
-                </p>
-              )}
-              {fallo && (
-                <div className="nr-error" role="alert">
-                  <strong>No se pudieron cargar las listas</strong>
-                  <p>
-                    Comprobá la conexión y volvé a intentar. Tus datos siguen en
-                    pantalla.
-                  </p>
-                  <button
-                    className="nr-secondary"
-                    type="button"
-                    onClick={() =>
-                      void Promise.all(consultas.map((q) => q.refetch()))
-                    }
-                  >
-                    Volver a intentar
-                  </button>
-                </div>
-              )}
-              {sinConcesionarios && (
-                <p className="nr-error" role="alert">
-                  No hay concesionarios disponibles. Pedile al administrador que
-                  revise el listado.
-                </p>
-              )}
-              <BloqueCarga
-                numero={1}
-                titulo="Datos del recibo"
-                ayuda="Indicá la fecha y a quién corresponde la carga."
-                disabled={
-                  concesionariosQuery.isPending || concesionariosQuery.isError
+              <button
+                type="button"
+                className="nr-secondary"
+                onClick={() =>
+                  void Promise.all(consultas.map((q) => q.refetch()))
                 }
               >
-                <div className="nr-grid">
-                  <label htmlFor="recibo-fecha">
-                    Fecha <span>(obligatorio)</span>
-                    <input
-                      id="recibo-fecha"
-                      type="date"
-                      required
-                      value={fecha}
-                      onChange={(e) => setFecha(e.target.value)}
-                    />
-                  </label>
-                  <label htmlFor="recibo-concesionario">
-                    Concesionario <span>(obligatorio)</span>
-                    <select
-                      id="recibo-concesionario"
-                      aria-label="Concesionario (obligatorio)"
-                      required
-                      value={concesionarioId}
-                      onChange={(e) => setConcesionarioId(e.target.value)}
-                    >
-                      <option value="">Elegí el concesionario</option>
-                      {concesionarios.map((c) => (
-                        <option key={c.id} value={c.id}>
-                          {c.nombre}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                </div>
-              </BloqueCarga>
-              <BloqueCarga
-                numero={2}
-                titulo="Productos a cambiar"
-                ayuda="Completá una tarjeta por producto. Si solo registrás pallets o prensados, podés dejar este bloque vacío."
-                disabled={productosQuery.isPending || productosQuery.isError}
-              >
-                {!productos.length &&
-                  !productosQuery.isPending &&
-                  !productosQuery.isError && (
-                    <p className="nr-info">
-                      No hay productos disponibles. Podés registrar los otros
-                      movimientos; para agregar productos, consultá al
-                      administrador.
-                    </p>
-                  )}
-                {filas.map((f, i) => {
-                  const p = producto(f.productoId);
-                  const query =
-                    consultasMotivos[familias.indexOf(p?.familia || "")];
-                  return (
-                    <section
-                      className="nr-product"
-                      key={f.idLocal}
-                      aria-labelledby={`recibo-producto-titulo-${f.idLocal}`}
-                    >
-                      <div className="nr-product-heading">
-                        <h3 id={`recibo-producto-titulo-${f.idLocal}`}>
-                          Producto {i + 1}
-                        </h3>
-                        {filas.length > 1 && (
-                          <button
-                            className="nr-remove"
-                            type="button"
-                            aria-label={`Quitar producto ${i + 1}`}
-                            onClick={() => {
-                              setFilas((v) =>
-                                v.filter((x) => x.idLocal !== f.idLocal),
-                              );
-                              requestAnimationFrame(() =>
-                                document
-                                  .getElementById("recibo-agregar")
-                                  ?.focus(),
-                              );
-                            }}
-                          >
-                            Quitar producto
-                          </button>
-                        )}
-                      </div>
-                      <div className="nr-grid">
-                        <label htmlFor={`recibo-producto-${f.idLocal}`}>
-                          Producto
-                          <select
-                            id={`recibo-producto-${f.idLocal}`}
-                            aria-label={`Producto ${i + 1}`}
-                            value={f.productoId}
-                            required={
-                              !!(
-                                f.cantidad ||
-                                f.motivoId ||
-                                f.observacion.trim()
-                              )
-                            }
-                            onChange={(e) =>
-                              cambiar(f.idLocal, "productoId", e.target.value)
-                            }
-                          >
-                            <option value="">Elegí el producto</option>
-                            {productos.map((x) => (
-                              <option key={x.id} value={x.id}>
-                                {x.codigo} · {x.nombre}
-                              </option>
-                            ))}
-                          </select>
-                        </label>
-                        <label htmlFor={`recibo-cantidad-${f.idLocal}`}>
-                          Cantidad{" "}
-                          <span>(obligatoria si elegís un producto)</span>
-                          <input
-                            id={`recibo-cantidad-${f.idLocal}`}
-                            aria-label={`Cantidad del producto ${i + 1}`}
-                            type="number"
-                            inputMode="decimal"
-                            min="0.01"
-                            step="0.01"
-                            required={!!f.productoId}
-                            value={f.cantidad}
-                            onChange={(e) =>
-                              cambiar(f.idLocal, "cantidad", e.target.value)
-                            }
-                            placeholder="Ejemplo: 12"
-                          />
-                        </label>
-                        <label htmlFor={`recibo-motivo-${f.idLocal}`}>
-                          Motivo <span>(opcional)</span>
-                          <select
-                            id={`recibo-motivo-${f.idLocal}`}
-                            aria-label={`Motivo del producto ${i + 1}`}
-                            disabled={
-                              !p?.familia || query?.isPending || query?.isError
-                            }
-                            value={f.motivoId}
-                            onChange={(e) =>
-                              cambiar(f.idLocal, "motivoId", e.target.value)
-                            }
-                          >
-                            <option value="">Sin clasificar</option>
-                            {motivos(p?.familia || "").map((m) => (
-                              <option key={m.id} value={m.id}>
-                                {m.nombre}
-                              </option>
-                            ))}
-                          </select>
-                          <small>
-                            Primero elegí el producto para ver sus motivos.
-                          </small>
-                        </label>
-                        <label htmlFor={`recibo-observacion-${f.idLocal}`}>
-                          Observación del producto <span>(opcional)</span>
-                          <input
-                            id={`recibo-observacion-${f.idLocal}`}
-                            aria-label={`Observación del producto ${i + 1}`}
-                            value={f.observacion}
-                            onChange={(e) =>
-                              cambiar(f.idLocal, "observacion", e.target.value)
-                            }
-                            placeholder="Solo si hay algo que aclarar"
-                          />
-                        </label>
-                      </div>
-                    </section>
-                  );
-                })}
-                <button
-                  id="recibo-agregar"
-                  className="nr-secondary"
-                  type="button"
-                  disabled={!productos.length}
-                  onClick={() => {
-                    const id = siguiente.current++;
-                    setFilas((v) => [...v, vacia(id)]);
-                    requestAnimationFrame(() =>
-                      document.getElementById(`recibo-producto-${id}`)?.focus(),
-                    );
-                  }}
-                >
-                  + Agregar otro producto
-                </button>
-              </BloqueCarga>
-              <BloqueCarga
-                numero={3}
-                titulo="Pallets y prensados"
-                ayuda="Completá solo los movimientos que correspondan. Los campos vacíos se guardan como cero."
-              >
-                {camposOtros.map((c) => (
-                  <section className="nr-other" key={c.campo}>
-                    <label htmlFor={`recibo-${c.campo}`}>
-                      {c.titulo} <span>(opcional)</span>
-                      <input
-                        id={`recibo-${c.campo}`}
-                        type="number"
-                        inputMode="decimal"
-                        min="0"
-                        step="0.01"
-                        value={otros[c.campo]}
-                        onChange={(e) => {
-                          const valor = e.currentTarget.value;
-                          setOtros((v) => ({ ...v, [c.campo]: valor }));
-                        }}
-                        placeholder="0"
-                      />
-                    </label>
-                    <details className="nr-notes">
-                      <summary>
-                        Agregar observación de {c.titulo.toLowerCase()}{" "}
-                        (opcional)
-                      </summary>
-                      <label htmlFor={`recibo-${c.nota}`}>
-                        Observación de {c.titulo.toLowerCase()}
-                        <textarea
-                          id={`recibo-${c.nota}`}
-                          rows={2}
-                          value={otros[c.nota]}
-                          onChange={(e) => {
-                            const valor = e.currentTarget.value;
-                            setOtros((v) => ({ ...v, [c.nota]: valor }));
-                          }}
-                        />
-                      </label>
-                    </details>
-                  </section>
-                ))}
-              </BloqueCarga>
-            </>
+                Volver a intentar
+              </button>
+            </div>
           )}
+          {sinConcesionarios && (
+            <p className="nr-error" role="alert">
+              No hay concesionarios disponibles. Pedile al administrador que
+              revise el listado.
+            </p>
+          )}
+          <ReciboCambioEditable
+            fecha={fecha}
+            concesionarioId={concesionarioId}
+            concesionarios={concesionarios}
+            productos={productos}
+            filas={filas}
+            otros={otros}
+            revisando={revision.revisando}
+            cargandoDatos={
+              concesionariosQuery.isPending || concesionariosQuery.isError
+            }
+            cargandoProductos={
+              productosQuery.isPending || productosQuery.isError
+            }
+            motivos={motivos}
+            motivoPendiente={(familia) => {
+              const q = consultasMotivos[familias.indexOf(familia)];
+              return !!(q?.isPending || q?.isError);
+            }}
+            cambiarFecha={setFecha}
+            cambiarConcesionario={setConcesionarioId}
+            cambiarFila={cambiar}
+            cambiarFija={(codigo, campo, valor) => {
+              const index = plantillaRecibo.findIndex(([, c]) => c === codigo);
+              const p = productos.find((p) => p.codigo.trim() === codigo);
+              if (!p || index < 0) return;
+              const idLocal = 1000 + index;
+              setFilas((actuales) => {
+                const fila = actuales.find((f) => f.idLocal === idLocal) || {
+                  ...vacia(idLocal),
+                  productoId: String(p.id),
+                };
+                const nueva = { ...fila, [campo]: valor };
+                const resto = actuales.filter((f) => f.idLocal !== idLocal);
+                return nueva.cantidad ||
+                  nueva.motivoId ||
+                  nueva.observacion.trim()
+                  ? [...resto, nueva]
+                  : resto;
+              });
+            }}
+            cambiarOtro={(campo, valor) =>
+              setOtros((v) => ({ ...v, [campo]: valor }))
+            }
+            agregar={() => {
+              const idLocal = siguiente.current--;
+              setFilas((v) => [...v, vacia(idLocal)]);
+              requestAnimationFrame(() =>
+                document.getElementById(`recibo-producto-${idLocal}`)?.focus(),
+              );
+            }}
+            quitar={(idLocal) =>
+              setFilas((v) => v.filter((f) => f.idLocal !== idLocal))
+            }
+          />
+          <p className="nr-warning">{advertencia}</p>
           <AccionesCarga
             revisando={revision.revisando}
             ocupado={mutation.isPending}
