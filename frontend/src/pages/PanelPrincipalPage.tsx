@@ -1255,6 +1255,27 @@ export default function PanelPrincipalPage() {
     },
 
     {
+      title: "Rechazos Preventa",
+
+      description:
+        "Mapa de calor de entregas de preventa no realizadas y asistente IA.",
+
+      icon: "alert",
+
+      permiso: "RECHAZOS_PREVENTA",
+
+      home: "/rechazos-preventa",
+
+      links: [
+        {
+          label: "Mapa y asistente",
+
+          to: "/rechazos-preventa",
+        },
+      ],
+    },
+
+    {
       title: "Recibos de cambios",
 
       description: "Controlá devoluciones, productos " + "y movimientos.",

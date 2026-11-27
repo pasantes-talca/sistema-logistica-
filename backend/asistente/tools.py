@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 from django.db.models import Count, Sum
+from django.utils import timezone
 
 from cambios.models import (
     DetalleReciboCambio,
@@ -602,4 +603,53 @@ def consultar_resumen_general(
 
         "cambios":
             cambios,
+    }
+
+def _fecha_o_none(valor):
+    """Parse an LLM-provided ISO date; invalid values count as absent."""
+    from datetime import date
+
+    try:
+        return date.fromisoformat(valor) if valor else None
+    except (TypeError, ValueError):
+        return None
+
+
+def consultar_rechazos_preventa(
+    desde=None,
+    hasta=None,
+    movil=None,
+):
+    """
+    Preventa rejections (Persat NOT_DELIVERED).
+    READ ONLY. Without dates it covers the whole history.
+    """
+    from datetime import date
+
+    from rechazos_preventa.servicios import MOVILES, resumen
+
+    inicio = _fecha_o_none(desde) or date(2000, 1, 1)
+    fin = _fecha_o_none(hasta) or timezone.localdate()
+    datos = resumen(inicio, fin, movil if movil in MOVILES else "")
+
+    por_departamento = sorted(
+        (
+            {"departamento": d["nombre"], "cantidad": d["cantidad"]}
+            for d in datos["departamentos"]
+            if d["cantidad"]
+        ),
+        key=lambda d: (-d["cantidad"], d["departamento"]),
+    )
+
+    return {
+        "desde": inicio.isoformat(),
+        "hasta": fin.isoformat(),
+        "movil": movil if movil in MOVILES else None,
+        "total": datos["total_mapa"] + datos["sin_ubicacion"],
+        "sin_ubicacion": datos["sin_ubicacion"],
+        "por_departamento": por_departamento,
+        "motivos": datos["motivos"],
+        "motivo_principal": datos["motivo_principal"],
+        "por_movil": datos["moviles"],
+        "clientes": datos["clientes"][:10],
     }

@@ -5,6 +5,7 @@ __pycache__/
 # Entornos virtuales
 .venv/
 backend/.venv/
+venv/
 
 # Variables de entorno
 .env
@@ -25,3 +26,7 @@ backend/importaciones/
 # Sistema
 .DS_Store
 Thumbs.db
+
+# Herramientas de IA (cache local)
+.atl/
+.claude/

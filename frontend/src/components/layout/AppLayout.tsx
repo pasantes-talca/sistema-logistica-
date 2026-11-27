@@ -102,6 +102,22 @@ const modules: SidebarModule[] = [
 
 
   {
+    label: "Rechazos Preventa",
+    icon: "alert",
+    base: "/rechazos-preventa",
+    permiso: "RECHAZOS_PREVENTA",
+
+    links: [
+      {
+        label: "Mapa y asistente",
+        to: "/rechazos-preventa",
+        icon: "chart",
+      },
+    ],
+  },
+
+
+  {
     label: "Recibos de cambios",
     icon: "boxes",
     base: "/cambios",
@@ -266,6 +282,9 @@ const pageNames: Record<
 
   rechazos:
     "Rechazos",
+
+  "rechazos-preventa":
+    "Rechazos Preventa",
 
   cambios:
     "Recibos de cambios",
@@ -442,13 +461,16 @@ export default function AppLayout({
   const esExpedicion = location.pathname === "/expedicion" || location.pathname.startsWith("/expedicion/");
 
   const [modulosAbiertos, setModulosAbiertos] = useState<Record<string, boolean>>({});
+  // Segment-aware match: "/rechazos" must not match "/rechazos-preventa".
+  const enRuta = (base: string) =>
+    location.pathname === base || location.pathname.startsWith(`${base}/`);
   const estaAbierto = (base: string) =>
-    modulosAbiertos[base] ?? location.pathname.startsWith(base);
+    modulosAbiertos[base] ?? enRuta(base);
 
   function alternarModulo(base: string) {
     setModulosAbiertos(actual => ({
       ...actual,
-      [base]: !(actual[base] ?? location.pathname.startsWith(base)),
+      [base]: !(actual[base] ?? enRuta(base)),
     }));
   }
 

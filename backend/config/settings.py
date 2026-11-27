@@ -54,15 +54,36 @@ SECRET_KEY = env(
 )
 
 DEBUG = env.bool(
-    "DEBUG"
+    "DEBUG",
+    default=False
 )
 
 
-ALLOWED_HOSTS = [
-    "127.0.0.1",
-    "localhost",
-    "10.242.4.13",
-]
+ALLOWED_HOSTS = env.list(
+    "ALLOWED_HOSTS",
+    default=[
+        "127.0.0.1",
+        "localhost",
+        "10.242.4.13",
+    ]
+)
+
+# The deployment is served over plain http today, so these default to
+# off. Enable all of them (env vars) once HTTPS is in place.
+SESSION_COOKIE_SECURE = env.bool(
+    "SESSION_COOKIE_SECURE",
+    default=False
+)
+
+CSRF_COOKIE_SECURE = env.bool(
+    "CSRF_COOKIE_SECURE",
+    default=False
+)
+
+SECURE_HSTS_SECONDS = env.int(
+    "SECURE_HSTS_SECONDS",
+    default=0
+)
 
 
 # ============================================================
@@ -88,6 +109,7 @@ INSTALLED_APPS = [
     "maestros",
     "repartos",
     "rechazos",
+    "rechazos_preventa",
     "cambios",
     "asistente",
     "planillas_recargas",
@@ -203,7 +225,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "America/Argentina/Buenos_Aires"
 
 USE_I18N = True
 
@@ -240,11 +262,14 @@ DEFAULT_AUTO_FIELD = (
 #   http://10.242.4.13:8001
 #
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "http://10.242.4.13:8001",
-]
+CORS_ALLOWED_ORIGINS = env.list(
+    "CORS_ALLOWED_ORIGINS",
+    default=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://10.242.4.13:8001",
+    ]
+)
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -257,11 +282,14 @@ CORS_ALLOW_CREDENTIALS = True
 # mediante sesiones de Django.
 #
 
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "http://10.242.4.13:8001",
-]
+CSRF_TRUSTED_ORIGINS = env.list(
+    "CSRF_TRUSTED_ORIGINS",
+    default=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://10.242.4.13:8001",
+    ]
+)
 
 
 # ============================================================
@@ -337,5 +365,21 @@ RECIBOS_EMAIL_DESTINO = env(
 
 GOOGLE_RECHAZOS_URL = env(
     "GOOGLE_RECHAZOS_URL",
+    default=""
+)
+
+
+# ============================================================
+# PERSAT / RECHAZOS PREVENTA
+# ============================================================
+
+PERSAT_API_KEY = env(
+    "PERSAT_API_KEY",
+    default=""
+)
+
+# Secret path segment for the Persat webhook (minimum 32 characters).
+PERSAT_WEBHOOK_TOKEN = env(
+    "PERSAT_WEBHOOK_TOKEN",
     default=""
 )

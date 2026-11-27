@@ -1,8 +1,12 @@
+import logging
+
 from rest_framework import status
 from rest_framework.response import Response
 from core.api import APIView
 
 from .services import preguntar_gemini
+
+logger = logging.getLogger(__name__)
 
 
 class AsistenteAPIView(APIView):
@@ -28,10 +32,14 @@ class AsistenteAPIView(APIView):
         try:
 
             resultado = preguntar_gemini(
-                pregunta
+                pregunta,
+                usuario=request.user,
             )
 
         except Exception as error:
+
+            # Full detail goes to the server log only, never to the client.
+            logger.exception("Assistant query failed")
 
             mensaje = str(error)
 
@@ -52,7 +60,10 @@ class AsistenteAPIView(APIView):
             return Response(
                 {
                     "error":
-                        mensaje
+                        (
+                            "No pudimos procesar la consulta. "
+                            "Intentá nuevamente más tarde."
+                        )
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )

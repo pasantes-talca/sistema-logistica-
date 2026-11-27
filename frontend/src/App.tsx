@@ -35,6 +35,7 @@ import HistorialRechazosPage from "./pages/HistorialRechazosPage";
 import EditarRechazoPage from "./pages/EditarRechazoPage";
 import EstadisticasRechazosPage from "./pages/EstadisticasRechazosPage";
 import InicioRechazosPage from "./pages/InicioRechazosPage";
+import RechazosPreventaPage from "./pages/RechazosPreventaPage";
 
 
 // =============================================
@@ -244,6 +245,17 @@ function App() {
                     path="/rechazos"
                     element={
                       <HistorialRechazosPage />
+                    }
+                  />
+
+                  {/* ============================= */}
+                  {/* RECHAZOS PREVENTA */}
+                  {/* ============================= */}
+
+                  <Route
+                    path="/rechazos-preventa"
+                    element={
+                      <RechazosPreventaPage />
                     }
                   />
 

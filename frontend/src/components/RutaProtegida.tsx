@@ -39,6 +39,7 @@ export default function RutaProtegida({ children }: Props) {
   const modulos: Record<string, string> = {
     repartos: "REPARTOS",
     rechazos: "RECHAZOS",
+    "rechazos-preventa": "RECHAZOS_PREVENTA",
     cambios: "CAMBIOS",
     viaticos: "VIATICOS",
     kilometrajes: "KILOMETRAJES",

@@ -32,6 +32,8 @@ import type {
   ResumenControlDiario,
   UbicacionControlDiario,
   EstadisticasControlDiario,
+  ResumenRechazosPreventa,
+  GeoJsonMendoza,
 } from "../types/logistica";
 
 //const API_URL = "http://127.0.0.1:8000/api";
@@ -890,4 +892,26 @@ export async function obtenerEstadisticasControlDiario(
   }
 
   return response.json();
+}
+
+// =============================================
+// RECHAZOS PREVENTA
+// =============================================
+
+export function obtenerResumenRechazosPreventa(
+  desde: string,
+  hasta: string,
+  movil: string,
+): Promise<ResumenRechazosPreventa> {
+  const params = new URLSearchParams({ desde, hasta });
+  if (movil) params.set("movil", movil);
+  return getJson<ResumenRechazosPreventa>(`${API_URL}/rechazos-preventa/resumen/?${params}`);
+}
+
+export function obtenerRevisionRechazosPreventa(): Promise<{ revision: string }> {
+  return getJson<{ revision: string }>(`${API_URL}/rechazos-preventa/revision/`);
+}
+
+export function obtenerMapaRechazosPreventa(): Promise<GeoJsonMendoza> {
+  return getJson<GeoJsonMendoza>(`${API_URL}/rechazos-preventa/mapa/`);
 }

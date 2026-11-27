@@ -2,6 +2,8 @@
 from django.contrib import admin
 from django.urls import include, path
 
+from rechazos_preventa.views import webhook_persat
+
 
 urlpatterns = [
     path("api/administracion/", include("core.administracion_urls")),
@@ -27,6 +29,17 @@ urlpatterns = [
     ),
 
     path(
+        "api/rechazos-preventa/",
+        include("rechazos_preventa.urls"),
+    ),
+
+    path(
+        "api/webhooks/persat/<str:token>/",
+        webhook_persat,
+        name="webhook-persat",
+    ),
+
+    path(
         "api/cambios/",
         include("cambios.urls"),
     ),
@@ -34,11 +47,6 @@ urlpatterns = [
     path(
         "api/auth/",
         include("core.urls"),
-    ),
-
-    path(
-        "api/asistente/",
-        include("asistente.urls"),
     ),
 
     path(

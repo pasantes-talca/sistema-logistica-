@@ -5,10 +5,13 @@ from django.utils import timezone
 
 from google import genai
 
+from core.permissions import tiene_modulo
+
 from .tools import (
     consultar_cambios,
     consultar_recargas,
     consultar_rechazos,
+    consultar_rechazos_preventa,
     consultar_repartos,
     consultar_resumen_general,
 )
@@ -86,6 +89,18 @@ Los módulos disponibles son:
 3. rechazos
 4. cambios
 5. general
+6. rechazos_preventa
+
+Diferencia entre rechazos y rechazos_preventa:
+- "rechazos" son los registrados en Logística
+  (formulario: asignación, punto de venta, bultos).
+- "rechazos_preventa" son las entregas de preventa
+  NO entregadas según Persat: mapa de calor por
+  departamento de Mendoza, motivos, clientes y móviles
+  (Quatro Sur S.A. y Leonardo Torres Chofer).
+  Usalo cuando mencionen preventa, Persat, entregas
+  no realizadas, departamentos, el mapa, clientes
+  con más rechazos o esos móviles.
 
 TIPOS DE CONSULTA:
 
@@ -110,17 +125,25 @@ CAMBIOS:
 GENERAL:
 - resumen
 
+RECHAZOS_PREVENTA:
+- resumen
+- motivo_frecuente
+- por_departamento
+- por_cliente
+- por_movil
+
 Formato obligatorio:
 
 {{
-  "tipo": "repartos|recargas|rechazos|cambios|general",
+  "tipo": "repartos|recargas|rechazos|cambios|general|rechazos_preventa",
   "accion": "accion_correspondiente",
   "desde": "YYYY-MM-DD o null",
   "hasta": "YYYY-MM-DD o null",
   "asignacion_codigo": null,
   "empleado": null,
   "concesionario": null,
-  "producto": null
+  "producto": null,
+  "movil": "Quatro Sur S.A.|Leonardo Torres Chofer o null"
 }}
 
 Interpretá expresiones como:
@@ -180,6 +203,22 @@ Respuesta:
   "empleado": null,
   "concesionario": null,
   "producto": null
+}}
+
+Pregunta:
+¿Qué departamento tuvo más rechazos de preventa este mes?
+
+Respuesta:
+{{
+  "tipo": "rechazos_preventa",
+  "accion": "por_departamento",
+  "desde": "{hoy[:8]}01",
+  "hasta": "{hoy}",
+  "asignacion_codigo": null,
+  "empleado": null,
+  "concesionario": null,
+  "producto": null,
+  "movil": null
 }}
 
 Pregunta:
@@ -545,14 +584,56 @@ def formatear_respuesta(
         )
 
 
+    if tipo == "rechazos_preventa":
+        return formatear_rechazos_preventa(accion, datos)
+
     return (
         "No pude interpretar correctamente "
         "la consulta."
     )
 
 
+def formatear_rechazos_preventa(accion, datos):
+    if not datos.get("total"):
+        return "No se encontraron rechazos de preventa para el período consultado."
+
+    if accion == "motivo_frecuente":
+        top = datos["motivos"][0]
+        return (
+            f"El motivo más frecuente fue \"{top['nombre']}\", "
+            f"con {top['cantidad']} de {datos['total']} rechazos de preventa."
+        )
+
+    if accion == "por_departamento":
+        if not datos["por_departamento"]:
+            return "Los rechazos de preventa del período no tienen departamento identificado."
+        top = datos["por_departamento"][0]
+        return (
+            f"{top['departamento']} fue el departamento con más rechazos de preventa, "
+            f"con {top['cantidad']} de {datos['total']}."
+        )
+
+    if accion == "por_cliente":
+        top = datos["clientes"][0]
+        return (
+            f"{top['nombre']} fue el cliente con más rechazos de preventa: "
+            f"{top['cantidad']} (motivo principal: {top['motivo']})."
+        )
+
+    if accion == "por_movil":
+        detalle = ", ".join(f"{movil}: {cantidad}" for movil, cantidad in datos["por_movil"].items())
+        return f"Rechazos de preventa por móvil: {detalle}."
+
+    return (
+        f"Se registraron {datos['total']} rechazos de preventa entre "
+        f"{datos['desde']} y {datos['hasta']}. "
+        f"Motivo principal: {datos['motivo_principal']}."
+    )
+
+
 def preguntar_gemini(
-    pregunta
+    pregunta,
+    usuario=None,
 ):
 
     interpretacion = (
@@ -665,6 +746,30 @@ def preguntar_gemini(
                 desde=desde,
                 hasta=hasta,
             )
+        )
+
+
+    # ========================================================
+    # RECHAZOS PREVENTA (only for users with the module)
+    # ========================================================
+
+    elif tipo == "rechazos_preventa":
+
+        if not tiene_modulo(usuario, "RECHAZOS_PREVENTA"):
+
+            return {
+                "respuesta":
+                    "No tenés acceso al módulo Rechazos Preventa.",
+                "interpretacion":
+                    interpretacion,
+                "datos":
+                    {},
+            }
+
+        datos = consultar_rechazos_preventa(
+            desde=desde,
+            hasta=hasta,
+            movil=interpretacion.get("movil"),
         )
 
 

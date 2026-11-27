@@ -706,3 +706,45 @@ export interface EstadisticasControlDiario {
     EstadisticaControlDiarioFecha[];
 }
 
+
+// =============================================
+// RECHAZOS PREVENTA
+// =============================================
+
+export interface DepartamentoPreventa {
+  nombre: string;
+  cantidad: number;
+  clientes: number;
+  motivo: string;
+}
+
+export interface ClientePreventa {
+  nombre: string;
+  uid: string | null;
+  cantidad: number;
+  departamento: string;
+  motivo: string;
+}
+
+export interface ResumenRechazosPreventa {
+  departamentos: DepartamentoPreventa[];
+  moviles: Record<string, number>;
+  total_mapa: number;
+  sin_ubicacion: number;
+  clientes: ClientePreventa[];
+  clientes_unicos: number;
+  sin_uid: number;
+  motivos: { nombre: string; cantidad: number }[];
+  motivo_principal: string;
+}
+
+export interface GeoJsonMendoza {
+  type: "FeatureCollection";
+  features: {
+    type: "Feature";
+    properties: { nombre: string };
+    geometry:
+      | { type: "Polygon"; coordinates: number[][][] }
+      | { type: "MultiPolygon"; coordinates: number[][][][] };
+  }[];
+}

@@ -3,13 +3,14 @@ from rest_framework.permissions import BasePermission, SAFE_METHODS
 
 ADMINISTRADOR = "ADMINISTRADOR"
 MODULOS = {
-    "REPARTOS": "Repartos y recargas", "RECHAZOS": "Rechazos",
+    "REPARTOS": "Repartos y recargas", "RECHAZOS": "Rechazos", "RECHAZOS_PREVENTA": "Rechazos Preventa",
     "CAMBIOS": "Recibos de cambios y enlace a Stock de pallets",
     "VIATICOS": "Viáticos", "KILOMETRAJES": "Kilometrajes",
     "CONTROL_DIARIO": "Control diario", "EXPEDICION": "Expedición", "ASISTENTE": "Asistente IA",
 }
 PREFIJOS = {
     "repartos": "REPARTOS", "planillas-recargas": "REPARTOS", "rechazos": "RECHAZOS",
+    "rechazos-preventa": "RECHAZOS_PREVENTA",
     "cambios": "CAMBIOS", "viaticos": "VIATICOS", "kilometrajes": "KILOMETRAJES",
     "control-diario": "CONTROL_DIARIO", "expedicion": "EXPEDICION", "asistente": "ASISTENTE",
 }
