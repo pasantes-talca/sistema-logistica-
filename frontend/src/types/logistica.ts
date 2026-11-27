@@ -226,6 +226,7 @@ export interface DetalleReciboCambioPayload {
 }
 
 export interface CrearReciboCambioPayload {
+  destinatarios_email?: string[];
   motivo_correccion?: string;
   fecha: string;
   concesionario_id: number;
@@ -245,6 +246,9 @@ export interface CrearReciboCambioPayload {
 export interface RespuestaGuardarReciboCambio {
   creado: boolean;
   recibo: ReciboCambio;
+  email_enviado?: boolean;
+  email_destinatarios?: string[];
+  email_error?: string | null;
 }
 
 export interface EstadisticaCambioProducto {

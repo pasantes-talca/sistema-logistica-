@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.core.mail import EmailMessage
+from django.core.validators import validate_email
 
 from .pdf import generar_pdf_recibo_cambio
 
@@ -8,6 +9,7 @@ def enviar_recibo_cambio_por_email(
     recibo,
     *,
     actualizado=False,
+    destinatarios=None,
 ):
     """
     Genera el PDF del recibo y lo envía
@@ -54,18 +56,17 @@ def enviar_recibo_cambio_por_email(
             f"Concesionario: {concesionario}"
         )
 
-    destinatario = (
-        settings.RECIBOS_EMAIL_DESTINO
-    )
+    destinos = destinatarios or [settings.RECIBOS_EMAIL_DESTINO]
+    destinos = list(dict.fromkeys(d.strip().lower() for d in destinos))
+    for destino in destinos:
+        validate_email(destino)
 
     email = EmailMessage(
         subject=asunto,
         body=mensaje,
         from_email=
             settings.DEFAULT_FROM_EMAIL,
-        to=[
-            destinatario
-        ],
+        to=destinos,
     )
 
     nombre_archivo = (
@@ -80,9 +81,11 @@ def enviar_recibo_cambio_por_email(
         "application/pdf",
     )
 
-    email.send(
+    resultado = email.send(
         fail_silently=False
     )
 
-    return resultado
+    if resultado != 1:
+        raise RuntimeError("El servidor de correo no confirmó el envío.")
+    return destinos
     

@@ -19,6 +19,15 @@ def preferencias():
 
 
 def accion_solicitada(request):
+    if request.path.startswith("/api/repartos-erp/") and request.method not in {"GET", "HEAD", "OPTIONS"}:
+        data = request.data if isinstance(request.data, dict) else {}
+        accion = data.get("accion", "")
+        if request.path.endswith("/importar/"):
+            return "crear"
+        if request.path.endswith("/unidades/"):
+            return "configurar"
+        return {"anular_cobro": "anular", "calcular": "consultar", "ver_recorrido": "consultar",
+                "cobro": "crear"}.get(accion, "editar")
     if request.path.startswith("/api/kilometrajes/") and request.path.endswith("/finalizar/"):
         return "exportar"
     if request.method in {"GET", "HEAD", "OPTIONS"}:

@@ -1,7 +1,7 @@
 
 from django.contrib import admin
 from django.urls import include, path
-
+from django.urls import path, include
 
 urlpatterns = [
     path("api/administracion/", include("core.administracion_urls")),
@@ -69,6 +69,11 @@ urlpatterns = [
     path(
         "api/expedicion/",
         include("expedicion.urls"),
+    ),
+
+    path(
+        "api/repartos-erp/",
+        include("repartos_erp.urls"),
     ),
 
 ]

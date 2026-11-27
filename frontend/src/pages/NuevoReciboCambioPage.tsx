@@ -23,6 +23,7 @@ import {
 } from "../components/ui/CargaGuiada";
 import { useRevisionCarga } from "../components/ui/useRevisionCarga";
 import { mensajeCarga } from "../components/ui/mensajeCarga";
+import { destinatariosRecibo, errorDestinatariosRecibo } from "../components/cambios/destinatariosRecibo";
 
 import ReciboCambioEditable from "../components/cambios/ReciboCambioEditable";
 import {
@@ -55,6 +56,7 @@ export default function NuevoReciboCambioPage() {
   );
   const [concesionarioId, setConcesionarioId] = useState("");
   const [otros, setOtros] = useState(otrosVacios);
+  const [correos, setCorreos] = useState("");
   const [filas, setFilas] = useState<FilaProducto[]>([]);
   const siguiente = useRef(-1);
   const [guardado, setGuardado] = useState<RespuestaGuardarReciboCambio | null>(
@@ -125,6 +127,11 @@ export default function NuevoReciboCambioPage() {
     );
   }
   function validar() {
+    const errorCorreos = errorDestinatariosRecibo(correos);
+    if (errorCorreos) {
+      revision.mostrarError(errorCorreos);
+      return false;
+    }
     if (!fecha || !concesionarioId) {
       revision.mostrarError("Completá la fecha y el concesionario.");
       return false;
@@ -183,6 +190,7 @@ export default function NuevoReciboCambioPage() {
       return;
     }
     const payload: CrearReciboCambioPayload = {
+      ...(destinatariosRecibo(correos).length ? {destinatarios_email: destinatariosRecibo(correos)} : {}),
       fecha,
       concesionario_id: Number(concesionarioId),
       pallets: Number(otros.pallets || 0),
@@ -226,6 +234,8 @@ export default function NuevoReciboCambioPage() {
               ? "El recibo ya aparece en el historial."
               : "Se conservaron las cargas anteriores. Los valores que siguen son los totales actuales del recibo."}
           </p>
+          {guardado.email_enviado === true && <p className="nr-info" role="status">El servidor de correo aceptó el envío del PDF a: {guardado.email_destinatarios?.join(", ") || "el correo habitual configurado"}.</p>}
+          {guardado.email_enviado === false && <p className="nr-warning" role="alert">{guardado.email_error || "El recibo quedó guardado, pero el PDF no se pudo enviar. No repitas la carga; consultá al administrador."}</p>}
           <ResumenCarga
             datos={[
               ["Fecha", guardado.recibo.fecha.split("-").reverse().join("/")],
@@ -263,6 +273,7 @@ export default function NuevoReciboCambioPage() {
               onClick={() => {
                 setGuardado(null);
                 setOtros(otrosVacios);
+                setCorreos("");
                 setFilas([]);
                 mutation.reset();
                 revision.corregir();
@@ -366,6 +377,16 @@ export default function NuevoReciboCambioPage() {
             }
           />
           <p className="nr-warning">{advertencia}</p>
+          <section className="nr-card" aria-labelledby="recibo-correo-titulo">
+            <h2 id="recibo-correo-titulo">Enviar el PDF por correo</h2>
+            <label htmlFor="recibo-destinatarios">Correos destinatarios <span>(opcional)</span></label>
+            <textarea id="recibo-destinatarios" rows={3} inputMode="email" spellCheck={false}
+              autoCapitalize="none" autoComplete="off" value={correos} disabled={mutation.isPending}
+              aria-describedby="recibo-correo-ayuda" placeholder="nombre@empresa.com; otro@empresa.com"
+              onChange={e => setCorreos(e.target.value)} />
+            <p id="recibo-correo-ayuda">Separá las direcciones con coma, punto y coma o salto de línea. Máximo 20 correos. Si indicás correos, el PDF se enviará solo a esa lista; si dejás el campo vacío, se usará el correo habitual configurado.</p>
+            {revision.revisando && <p>Destinatarios del envío: <strong>{destinatariosRecibo(correos).join(", ") || "Correo habitual configurado"}</strong>. El PDF se envía recién al confirmar y guardar.</p>}
+          </section>
           <AccionesCarga
             revisando={revision.revisando}
             ocupado={mutation.isPending}

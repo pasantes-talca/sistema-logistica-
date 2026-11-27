@@ -158,6 +158,14 @@ class ReciboCambioCargaSerializer(
     serializers.Serializer
 ):
 
+    destinatarios_email = serializers.ListField(
+        child=serializers.EmailField(max_length=254),
+        required=False, allow_empty=True, max_length=20,
+    )
+
+    def validate_destinatarios_email(self, value):
+        return list(dict.fromkeys(email.strip().lower() for email in value))
+
     fecha = serializers.DateField()
 
     concesionario_id = serializers.IntegerField()

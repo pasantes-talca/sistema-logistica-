@@ -112,6 +112,12 @@ import EstadisticasControlDiarioPage
 import ExpedicionOperativaPage from "./pages/ExpedicionOperativaPage";
 // =============================================
 
+
+
+import RepartosERPPage
+  from "./pages/RepartosERPPage";
+  
+
 function App() {
 
   return (
@@ -500,6 +506,16 @@ function App() {
                       <ExpedicionOperativaPage />
                     }
                   />
+
+                  <Route
+                    path="/repartos/erp"
+                    element={
+                      <RepartosERPPage />
+                    }
+                  />
+
+                  <Route path="/repartos/erp/:cod" element={<RepartosERPPage />} />
+                  <Route path="/repartos/erp/:cod/planificacion" element={<RepartosERPPage />} />
 
 
                 </Routes>

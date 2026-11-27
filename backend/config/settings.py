@@ -95,6 +95,8 @@ INSTALLED_APPS = [
     "kilometrajes",
     "control_diario",
     "expedicion",
+
+    "repartos_erp",
 ]
 
 
@@ -339,3 +341,35 @@ GOOGLE_RECHAZOS_URL = env(
     "GOOGLE_RECHAZOS_URL",
     default=""
 )
+
+
+# ============================================================
+# SQL SERVER / LOGISTICA
+# ============================================================
+
+SQLSERVER_LOGISTICA = {
+    "HOST": env(
+        "SQLSERVER_LOGISTICA_HOST",
+        default=""
+    ),
+    "PORT": env(
+        "SQLSERVER_LOGISTICA_PORT",
+        default="1433"
+    ),
+    "DATABASE": env(
+        "SQLSERVER_LOGISTICA_DATABASE",
+        default="Logistica"
+    ),
+    "USER": env(
+        "SQLSERVER_LOGISTICA_USER",
+        default=""
+    ),
+    "PASSWORD": env(
+        "SQLSERVER_LOGISTICA_PASSWORD",
+        default=""
+    ),
+    "DRIVER": env(
+        "SQLSERVER_LOGISTICA_DRIVER",
+        default="ODBC Driver 18 for SQL Server"
+    ),
+}

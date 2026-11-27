@@ -26,6 +26,9 @@ from .services import (
 )
 
 from .email import enviar_recibo_cambio_por_email
+import logging
+
+logger = logging.getLogger(__name__)
 
 class ReciboCambioListCreateAPIView(APIView):
     """
@@ -39,6 +42,24 @@ class ReciboCambioListCreateAPIView(APIView):
         FECHA + CONCESIONARIO,
         acumula la información sobre ese recibo.
     """
+
+    def dispatch(self, request, *args, **kwargs):
+        self._envio_recibo = None
+        # La API base confirma la transacción de guardado y auditoría antes de
+        # contactar al servidor de correo. El fallo de correo no repite la carga.
+        respuesta = super().dispatch(request, *args, **kwargs)
+        if self._envio_recibo and 200 <= respuesta.status_code < 300:
+            recibo, actualizado, destinatarios = self._envio_recibo
+            try:
+                destinos = enviar_recibo_cambio_por_email(
+                    recibo, actualizado=actualizado, destinatarios=destinatarios,
+                )
+                respuesta.data.update(email_enviado=True, email_destinatarios=destinos, email_error=None)
+            except Exception:
+                logger.exception("No se pudo enviar el PDF del recibo %s", recibo.pk)
+                respuesta.data.update(email_enviado=False, email_destinatarios=destinatarios or [],
+                    email_error="El recibo quedó guardado, pero no se pudo enviar el PDF por correo. No vuelvas a cargarlo: se duplicarían sus cantidades. Consultá al administrador.")
+        return respuesta
 
     def get(self, request):
 
@@ -204,20 +225,7 @@ class ReciboCambioListCreateAPIView(APIView):
         # ENVIAR RECIBO POR EMAIL
         # =========================================
 
-        email_enviado = True
-        email_error = None
-
-        try:
-
-            enviar_recibo_cambio_por_email(
-                recibo,
-                actualizado=not resultado["creado"],
-            )
-
-        except Exception as error:
-
-            email_enviado = False
-            email_error = str(error)
+        self._envio_recibo = (recibo, not resultado["creado"], datos.get("destinatarios_email"))
 
 
         respuesta = {
@@ -302,21 +310,6 @@ class ReciboCambioDetailAPIView(EliminacionHistorialMixin, APIView):
         serializer = ReciboCambioSerializer(
             recibo
         )
-
-
-        try:
-
-            enviar_recibo_cambio_por_email(
-                recibo,
-                actualizado=True,
-            )
-
-        except Exception as error:
-
-            print(
-                "Error enviando recibo por email:",
-                error,
-            )
 
 
         return Response(

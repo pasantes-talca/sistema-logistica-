@@ -1,6 +1,9 @@
 import { useState } from "react";
+
 import ThemeToggle from "../ui/ThemeToggle";
-import TurnoExpedicionSelector from "../expedicion/TurnoExpedicionSelector";
+
+import TurnoExpedicionSelector
+  from "../expedicion/TurnoExpedicionSelector";
 
 import {
   NavLink,
@@ -42,7 +45,13 @@ type SidebarModule = {
 };
 
 
+// =============================================
+// MÓDULOS DEL SISTEMA
+// =============================================
+
 const modules: SidebarModule[] = [
+
+  // REPARTOS Y RECARGAS
 
   {
     label: "Repartos y recargas",
@@ -71,9 +80,16 @@ const modules: SidebarModule[] = [
         to: "/repartos/recargas",
         icon: "chart",
       },
+      {
+        label: "Repartos ERP",
+        to: "/repartos/erp",
+        icon: "truck",
+      },
     ],
   },
 
+
+  // RECHAZOS
 
   {
     label: "Rechazos",
@@ -101,6 +117,8 @@ const modules: SidebarModule[] = [
   },
 
 
+  // RECIBOS DE CAMBIOS
+
   {
     label: "Recibos de cambios",
     icon: "boxes",
@@ -126,6 +144,8 @@ const modules: SidebarModule[] = [
     ],
   },
 
+
+  // VIÁTICOS
 
   {
     label: "Viáticos",
@@ -153,6 +173,8 @@ const modules: SidebarModule[] = [
   },
 
 
+  // KILOMETRAJES
+
   {
     label: "Kilometrajes",
     icon: "truck",
@@ -178,6 +200,8 @@ const modules: SidebarModule[] = [
     ],
   },
 
+
+  // CONTROL DIARIO
 
   {
     label: "Control diario",
@@ -205,6 +229,8 @@ const modules: SidebarModule[] = [
   },
 
 
+  // EXPEDICIÓN
+
   {
     label: "Expedición",
     icon: "boxes",
@@ -212,13 +238,21 @@ const modules: SidebarModule[] = [
     permiso: "EXPEDICION",
 
     links: [
-      { label: "Resumen del turno", to: "/expedicion/inicio", icon: "chart" },
+      {
+        label: "Resumen del turno",
+        to: "/expedicion/inicio",
+        icon: "chart",
+      },
       {
         label: "Órdenes de carga",
         to: "/expedicion/ordenes",
         icon: "truck",
       },
-      { label: "Pendientes y cambios", to: "/expedicion/pendientes", icon: "history" },
+      {
+        label: "Pendientes y cambios",
+        to: "/expedicion/pendientes",
+        icon: "history",
+      },
       {
         label: "Stock",
         to: "/expedicion/stock",
@@ -234,22 +268,42 @@ const modules: SidebarModule[] = [
         to: "/expedicion/materiales",
         icon: "boxes",
       },
-      { label: "Empleados", to: "/expedicion/empleados", icon: "boxes" },
-      { label: "Conteos y relevo", to: "/expedicion/conteos", icon: "history" },
-      { label: "Auditoría", to: "/expedicion/auditoria", icon: "history" },
-      { label: "Configuración", to: "/expedicion/configuracion", icon: "boxes" },
-      { label: "Fleteros", to: "/expedicion/fleteros", icon: "truck" },
+      {
+        label: "Empleados",
+        to: "/expedicion/empleados",
+        icon: "boxes",
+      },
+      {
+        label: "Conteos y relevo",
+        to: "/expedicion/conteos",
+        icon: "history",
+      },
+      {
+        label: "Auditoría",
+        to: "/expedicion/auditoria",
+        icon: "history",
+      },
+      {
+        label: "Configuración",
+        to: "/expedicion/configuracion",
+        icon: "boxes",
+      },
+      {
+        label: "Fleteros",
+        to: "/expedicion/fleteros",
+        icon: "truck",
+      },
     ],
   },
 
 ];
 
 
-const pageNames: Record<
-  string,
-  string
-> = {
+// =============================================
+// NOMBRES DE PÁGINAS
+// =============================================
 
+const pageNames: Record<string, string> = {
   administracion: "Administración",
   usuarios: "Usuarios y accesos",
   catalogos: "Catálogos",
@@ -261,26 +315,16 @@ const pageNames: Record<
   notificaciones: "Notificaciones",
   seguridad: "Seguridad",
   estado: "Estado del sistema",
-  repartos:
-    "Repartos y recargas",
 
-  rechazos:
-    "Rechazos",
+  repartos: "Repartos y recargas",
+  erp: "Repartos ERP",
 
-  cambios:
-    "Recibos de cambios",
-
-  viaticos:
-    "Viáticos",
-
-  kilometrajes:
-    "Kilometrajes",
-
-  "control-diario":
-    "Control diario",
-
-  expedicion:
-    "Expedición",
+  rechazos: "Rechazos",
+  cambios: "Recibos de cambios",
+  viaticos: "Viáticos",
+  kilometrajes: "Kilometrajes",
+  "control-diario": "Control diario",
+  expedicion: "Expedición",
 
   pendientes: "Pendientes y cambios",
   empleados: "Empleados",
@@ -289,69 +333,40 @@ const pageNames: Record<
   configuracion: "Configuración",
   nueva: "Nuevo registro",
 
-  stock:
-    "Stock",
+  stock: "Stock",
+  ordenes: "Órdenes de carga",
+  movimientos: "Movimientos",
+  fleteros: "Fleteros",
+  materiales: "Pallets y chapadur",
 
-  ordenes:
-    "Órdenes de carga",
-
-  movimientos:
-    "Movimientos",
-
-  fleteros:
-    "Fleteros",
-
-  materiales:
-    "Pallets y chapadur",
-
-  asistente:
-    "Asistente IA",
-
-  nuevo:
-    "Nuevo registro",
-
-  editar:
-    "Editar",
-
-  recargas:
-    "Reporte de recargas",
-
-  estadisticas:
-    "Estadísticas",
-
-  recibos:
-    "Detalle de recibo",
-
-  planillas:
-    "Carga desde planillas",
-
-  resumen:
-    "Resumen anual",
-
-  inicio:
-    "Resumen",
+  asistente: "Asistente IA",
+  nuevo: "Nuevo registro",
+  editar: "Editar",
+  recargas: "Reporte de recargas",
+  estadisticas: "Estadísticas",
+  recibos: "Detalle de recibo",
+  planillas: "Carga desde planillas",
+  resumen: "Resumen anual",
+  inicio: "Resumen",
+  detalle: "Detalle",
 };
 
 
+// =============================================
+// BREADCRUMBS
+// =============================================
+
 function Breadcrumbs() {
 
-  const location =
-    useLocation();
+  const location = useLocation();
 
-
-
-  const segments =
-    location.pathname
-      .split("/")
-      .filter(Boolean);
-
+  const segments = location.pathname
+    .split("/")
+    .filter(Boolean);
 
   if (!segments.length) {
-
     return (
-
       <div className="breadcrumb">
-
         <Icon
           name="home"
           size={15}
@@ -360,209 +375,175 @@ function Breadcrumbs() {
         <span>
           Panel general
         </span>
-
       </div>
-
     );
   }
 
-
-  const items =
-    segments.filter(
-      segment =>
-        !/^\d+$/.test(
-          segment
-        )
-    );
-
+  const items = segments.filter(
+    segment => !/^\d+$/.test(segment)
+  );
 
   return (
-
     <div className="breadcrumb">
 
       <NavLink to="/panel">
         Inicio
       </NavLink>
 
+      {items.map((item, index) => (
+        <span
+          key={`${item}-${index}`}
+          className="breadcrumb-item"
+        >
+          <Icon
+            name="chevron"
+            size={13}
+          />
 
-      {
-        items.map(
-          (
-            item,
-            index
-          ) => (
-
-            <span
-              key={
-                `${item}-${index}`
-              }
-              className="breadcrumb-item"
-            >
-
-              <Icon
-                name="chevron"
-                size={13}
-              />
-
-              <span>
-                {
-                  pageNames[item]
-                  ?? item
-                }
-              </span>
-
-            </span>
-
-          )
-        )
-      }
+          <span>
+            {pageNames[item] ?? item}
+          </span>
+        </span>
+      ))}
 
     </div>
-
   );
 }
 
+
+// =============================================
+// LAYOUT PRINCIPAL
+// =============================================
 
 export default function AppLayout({
   children,
 }: Props) {
 
+  const [open, setOpen] = useState(false);
+
+  const location = useLocation();
+
+  const navigate = useNavigate();
+
+  const queryClient = useQueryClient();
+
+
+  const esExpedicion =
+    location.pathname === "/expedicion" ||
+    location.pathname.startsWith("/expedicion/");
+
+
   const [
-    open,
-    setOpen,
-  ] = useState(
-    false
-  );
+    modulosAbiertos,
+    setModulosAbiertos,
+  ] = useState<Record<string, boolean>>({});
 
 
-  const location =
-    useLocation();
-
-
-  const esExpedicion = location.pathname === "/expedicion" || location.pathname.startsWith("/expedicion/");
-
-  const [modulosAbiertos, setModulosAbiertos] = useState<Record<string, boolean>>({});
-  const estaAbierto = (base: string) =>
-    modulosAbiertos[base] ?? location.pathname.startsWith(base);
-
-  function alternarModulo(base: string) {
-    setModulosAbiertos(actual => ({
-      ...actual,
-      [base]: !(actual[base] ?? location.pathname.startsWith(base)),
-    }));
+  function perteneceAlModulo(base: string) {
+    return (
+      location.pathname === base ||
+      location.pathname.startsWith(`${base}/`)
+    );
   }
 
-  const navigate =
-    useNavigate();
+
+  const estaAbierto = (base: string) =>
+    modulosAbiertos[base] ??
+    perteneceAlModulo(base);
 
 
-  const queryClient =
-    useQueryClient();
+  function alternarModulo(base: string) {
 
+    setModulosAbiertos(actual => ({
+      ...actual,
+
+      [base]: !(
+        actual[base] ??
+        perteneceAlModulo(base)
+      ),
+    }));
+
+  }
+
+
+  // =============================================
+  // USUARIO ACTUAL
+  // =============================================
 
   const {
     data: user,
     isLoading: cargandoUsuario,
   } = useQuery({
-
-    queryKey: [
-      "usuario-actual",
-    ],
-
-    queryFn:
-      obtenerUsuarioActual,
-
-    retry:
-      false,
-
+    queryKey: ["usuario-actual"],
+    queryFn: obtenerUsuarioActual,
+    retry: false,
   });
 
 
-  const esSuperusuario = user?.es_superusuario ?? false;
-  const esAdministrador = user?.es_administrador ?? esSuperusuario;
-  const puedeAdministrar = user?.puede_administrar ??
-    (esAdministrador && user?.username.toLowerCase() !== "arielgarro");
+  const esSuperusuario =
+    user?.es_superusuario ?? false;
 
 
-  const grupos =
-    user?.grupos
-    ?? [];
+  const esAdministrador =
+    user?.es_administrador ?? esSuperusuario;
 
 
-  function tienePermiso(
-    permiso: string
-  ) {
+  const puedeAdministrar =
+    user?.puede_administrar ??
+    (
+      esAdministrador &&
+      user?.username.toLowerCase() !== "arielgarro"
+    );
 
-    if (
-      esAdministrador
-    ) {
 
+  const grupos = user?.grupos ?? [];
+
+
+  function tienePermiso(permiso: string) {
+
+    if (esAdministrador) {
       return true;
     }
 
-
-    return grupos.includes(
-      permiso
-    );
+    return grupos.includes(permiso);
   }
 
 
   const modulesVisibles =
     esAdministrador
       ? modules
-      : modules.filter(
-          module =>
-            tienePermiso(
-              module.permiso
-            )
+      : modules.filter(module =>
+          tienePermiso(module.permiso)
         );
 
 
   const puedeUsarAsistente =
-    esAdministrador
-    ||
-    grupos.includes(
-      "ASISTENTE"
-    );
+    esAdministrador ||
+    grupos.includes("ASISTENTE");
 
 
-  /*
-   * Por ahora el sistema de Stock
-   * de pallets queda habilitado para:
-   *
-   * - superusuario
-   * - grupo CAMBIOS
-   */
   const puedeVerStock =
-    esAdministrador
-    ||
-    grupos.includes(
-      "CAMBIOS"
-    );
+    esAdministrador ||
+    grupos.includes("CAMBIOS");
 
 
   const name =
-    user?.nombre_completo
-    ||
-    user?.username
-    ||
+    user?.nombre_completo ||
+    user?.username ||
     "Usuario";
 
 
-  const initials =
-    name
-      .split(" ")
-      .slice(
-        0,
-        2
-      )
-      .map(
-        part =>
-          part[0]
-      )
-      .join("")
-      .toUpperCase();
+  const initials = name
+    .split(" ")
+    .slice(0, 2)
+    .map(part => part[0])
+    .join("")
+    .toUpperCase();
 
+
+  // =============================================
+  // CERRAR SESIÓN
+  // =============================================
 
   async function logout() {
 
@@ -572,29 +553,30 @@ export default function AppLayout({
 
       queryClient.clear();
 
-
-      navigate(
-        "/login",
-        {
-          replace:
-            true,
-        }
-      );
+      navigate("/login", {
+        replace: true,
+      });
 
     } catch (error) {
-      window.alert(error instanceof Error ? error.message : "No se pudo cerrar la sesión. Volvé a intentarlo.");
+
+      window.alert(
+        error instanceof Error
+          ? error.message
+          : "No se pudo cerrar la sesión. Volvé a intentarlo."
+      );
 
     }
 
   }
 
 
-  if (
-    cargandoUsuario
-  ) {
+  // =============================================
+  // CARGANDO USUARIO
+  // =============================================
+
+  if (cargandoUsuario) {
 
     return (
-
       <div className="app-shell">
 
         <div className="app-main">
@@ -604,9 +586,7 @@ export default function AppLayout({
             <div className="pagina">
 
               <div className="dashboard-container">
-
                 Cargando usuario...
-
               </div>
 
             </div>
@@ -616,8 +596,8 @@ export default function AppLayout({
         </div>
 
       </div>
-
     );
+
   }
 
 
@@ -633,9 +613,7 @@ export default function AppLayout({
       <aside
         className={
           `sidebar ${
-            open
-              ? "sidebar-open"
-              : ""
+            open ? "sidebar-open" : ""
           }`
         }
       >
@@ -650,42 +628,34 @@ export default function AppLayout({
             onClick={() => setOpen(false)}
           >
 
-          <img
-            className="sidebar-logo"
-            src="/logo-talca.png"
-            alt="Talca"
-          />
+            <img
+              className="sidebar-logo"
+              src="/logo-talca.png"
+              alt="Talca"
+            />
 
+            <div className="sidebar-brand-copy">
 
-          <div className="sidebar-brand-copy">
+              <strong>
+                Logística
+              </strong>
 
-            <strong>
-              Logística
-            </strong>
+              <span>
+                Gestión operativa
+              </span>
 
-            <span>
-              Gestión operativa
-            </span>
-
-          </div>
+            </div>
 
           </NavLink>
 
 
           <button
             className="sidebar-close"
-            onClick={
-              () =>
-                setOpen(
-                  false
-                )
-            }
+            onClick={() => setOpen(false)}
             aria-label="Cerrar menú"
           >
 
-            <Icon
-              name="close"
-            />
+            <Icon name="close" />
 
           </button>
 
@@ -698,14 +668,41 @@ export default function AppLayout({
 
         <nav
           className="sidebar-nav"
-          onClick={
-            event => {
-              if ((event.target as Element).closest("a")) setOpen(false);
+          onClick={event => {
+            if (
+              (event.target as Element)
+                .closest("a")
+            ) {
+              setOpen(false);
             }
-          }
+          }}
         >
 
-          {puedeAdministrar && <NavLink to="/administracion/usuarios" className={({isActive})=>`nav-item ${isActive ? "active" : ""}`}><Icon name="shield"/><span>Administración</span></NavLink>}
+
+          {/* ADMINISTRACIÓN */}
+
+          {puedeAdministrar && (
+
+            <NavLink
+              to="/administracion/usuarios"
+              className={({ isActive }) =>
+                `nav-item ${
+                  isActive ? "active" : ""
+                }`
+              }
+            >
+
+              <Icon name="shield" />
+
+              <span>
+                Administración
+              </span>
+
+            </NavLink>
+
+          )}
+
+
           <span className="nav-caption">
             Plataforma
           </span>
@@ -716,21 +713,14 @@ export default function AppLayout({
           <NavLink
             to="/panel"
             end
-            className={
-              ({
-                isActive,
-              }) =>
-                `nav-item ${
-                  isActive
-                    ? "active"
-                    : ""
-                }`
+            className={({ isActive }) =>
+              `nav-item ${
+                isActive ? "active" : ""
+              }`
             }
           >
 
-            <Icon
-              name="home"
-            />
+            <Icon name="home" />
 
             <span>
               Panel general
@@ -741,185 +731,154 @@ export default function AppLayout({
 
           {/* ASISTENTE IA */}
 
-          {
-            puedeUsarAsistente
-            &&
-            (
+          {puedeUsarAsistente && (
 
-              <NavLink
-                to="/asistente"
-                className={
-                  ({
-                    isActive,
-                  }) =>
-                    `nav-item ${
-                      isActive
-                        ? "active"
-                        : ""
-                    }`
-                }
-              >
+            <NavLink
+              to="/asistente"
+              className={({ isActive }) =>
+                `nav-item ${
+                  isActive ? "active" : ""
+                }`
+              }
+            >
 
-                <Icon
-                  name="chart"
-                />
+              <Icon name="chart" />
 
-                <span>
-                  Asistente IA
-                </span>
+              <span>
+                Asistente IA
+              </span>
 
-              </NavLink>
+            </NavLink>
 
-            )
-          }
+          )}
 
 
-          <span
-            className="
-              nav-caption
-              nav-caption-modules
-            "
-          >
+          <span className="nav-caption nav-caption-modules">
             Operación
           </span>
 
 
-          {/* MÓDULOS */}
+          {/* MÓDULOS DESPLEGABLES */}
 
-          {
-            modulesVisibles.map(
-              module => (
+          {modulesVisibles.map(module => (
 
-                <div
-                  className={
-                    `nav-module ${
-                      estaAbierto(module.base)
-                        ? "expanded"
-                        : ""
-                    }`
-                  }
-                  key={
-                    module.base
-                  }
-                >
+            <div
+              key={module.base}
+              className={
+                `nav-module ${
+                  estaAbierto(module.base)
+                    ? "expanded"
+                    : ""
+                }`
+              }
+            >
 
-                  <button
-                    type="button"
-                    className="nav-module-title"
-                    aria-expanded={estaAbierto(module.base)}
-                    aria-controls={`submenu-${module.base.slice(1)}`}
-                    onClick={() => alternarModulo(module.base)}
+              <button
+                type="button"
+                className="nav-module-title"
+                aria-expanded={
+                  estaAbierto(module.base)
+                }
+                aria-controls={
+                  `submenu-${module.base.slice(1)}`
+                }
+                onClick={() =>
+                  alternarModulo(module.base)
+                }
+              >
+
+                <Icon name={module.icon} />
+
+                <span>
+                  {module.label}
+                </span>
+
+                <Icon
+                  name="chevron"
+                  size={15}
+                />
+
+              </button>
+
+
+              <div
+                className="nav-subitems"
+                id={
+                  `submenu-${module.base.slice(1)}`
+                }
+                hidden={
+                  !estaAbierto(module.base)
+                }
+              >
+
+                {module.links.map(link => (
+
+                  <NavLink
+                    key={link.to}
+                    to={link.to}
+
+                    end={
+                      link.to !== "/repartos/erp"
+                    }
+
+                    className={({ isActive }) =>
+                      `nav-subitem ${
+                        isActive ? "active" : ""
+                      }`
+                    }
                   >
 
                     <Icon
-                      name={
-                        module.icon
-                      }
+                      name={link.icon}
+                      size={17}
                     />
 
                     <span>
-                      {
-                        module.label
-                      }
+                      {link.label}
                     </span>
 
-                    <Icon name="chevron" size={15} />
-                  </button>
+                  </NavLink>
 
+                ))}
 
-                  <div className="nav-subitems" id={`submenu-${module.base.slice(1)}`} hidden={!estaAbierto(module.base)}>
+              </div>
 
-                    {
-                      module.links.map(
-                        link => (
+            </div>
 
-                          <NavLink
-                            key={
-                              link.to
-                            }
-                            to={
-                              link.to
-                            }
-                            end
-                            className={
-                              ({
-                                isActive,
-                              }) =>
-                                `nav-subitem ${
-                                  isActive
-                                    ? "active"
-                                    : ""
-                                }`
-                            }
-                          >
-
-                            <Icon
-                              name={
-                                link.icon
-                              }
-                              size={17}
-                            />
-
-                            <span>
-                              {
-                                link.label
-                              }
-                            </span>
-
-                          </NavLink>
-
-                        )
-                      )
-                    }
-
-                  </div>
-
-                </div>
-
-              )
-            )
-          }
+          ))}
 
 
           {/* STOCK DE PALLETS */}
 
-          {
-            puedeVerStock
-            &&
-            (
+          {puedeVerStock && (
 
-              <a
-                href="http://10.242.4.13:8000/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="nav-item"
-              >
+            <a
+              href="http://10.242.4.13:8000/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="nav-item"
+            >
 
-                <Icon
-                  name="boxes"
-                />
+              <Icon name="boxes" />
 
-                <span>
-                  Stock de pallets
-                </span>
+              <span>
+                Stock de pallets
+              </span>
 
-              </a>
+            </a>
 
-            )
-          }
+          )}
 
         </nav>
 
 
         {/* ===================================== */}
-        {/* ESTADO */}
+        {/* ESTADO DEL SISTEMA */}
         {/* ===================================== */}
 
         <div className="sidebar-status">
 
-          <Icon
-            name="shield"
-          />
+          <Icon name="shield" />
 
           <div>
 
@@ -944,24 +903,15 @@ export default function AppLayout({
       {/* OVERLAY MOBILE */}
       {/* ======================================= */}
 
-      {
-        open
-        &&
-        (
+      {open && (
 
-          <button
-            className="sidebar-overlay"
-            onClick={
-              () =>
-                setOpen(
-                  false
-                )
-            }
-            aria-label="Cerrar menú"
-          />
+        <button
+          className="sidebar-overlay"
+          onClick={() => setOpen(false)}
+          aria-label="Cerrar menú"
+        />
 
-        )
-      }
+      )}
 
 
       {/* ======================================= */}
@@ -970,22 +920,24 @@ export default function AppLayout({
 
       <div className="app-main">
 
-        <header className={`app-header${esExpedicion ? " app-header-expedicion" : ""}`}>
+
+        <header
+          className={
+            `app-header${
+              esExpedicion
+                ? " app-header-expedicion"
+                : ""
+            }`
+          }
+        >
 
           <button
             className="menu-toggle"
-            onClick={
-              () =>
-                setOpen(
-                  true
-                )
-            }
+            onClick={() => setOpen(true)}
             aria-label="Abrir menú"
           >
 
-            <Icon
-              name="menu"
-            />
+            <Icon name="menu" />
 
           </button>
 
@@ -997,23 +949,21 @@ export default function AppLayout({
 
             <ThemeToggle />
 
-            {esExpedicion && <TurnoExpedicionSelector />}
+
+            {esExpedicion && (
+              <TurnoExpedicionSelector />
+            )}
+
 
             <div className="user-avatar">
-
-              {
-                initials
-              }
-
+              {initials}
             </div>
 
 
             <div className="user-copy">
 
               <strong>
-                {
-                  name
-                }
+                {name}
               </strong>
 
               <span>
@@ -1025,15 +975,11 @@ export default function AppLayout({
 
             <button
               className="logout-button"
-              onClick={
-                logout
-              }
+              onClick={logout}
               title="Cerrar sesión"
             >
 
-              <Icon
-                name="logout"
-              />
+              <Icon name="logout" />
 
               <span>
                 Cerrar sesión
@@ -1048,9 +994,7 @@ export default function AppLayout({
 
         <main className="app-content">
 
-          {
-            children
-          }
+          {children}
 
         </main>
 

@@ -9,6 +9,7 @@ MODULOS = {
     "CONTROL_DIARIO": "Control diario", "EXPEDICION": "Expedición", "ASISTENTE": "Asistente IA",
 }
 PREFIJOS = {
+    "repartos-erp": "REPARTOS",
     "repartos": "REPARTOS", "planillas-recargas": "REPARTOS", "rechazos": "RECHAZOS",
     "cambios": "CAMBIOS", "viaticos": "VIATICOS", "kilometrajes": "KILOMETRAJES",
     "control-diario": "CONTROL_DIARIO", "expedicion": "EXPEDICION", "asistente": "ASISTENTE",
